@@ -63,16 +63,24 @@ async function normalizeImage(buffer) {
 }
 
 // 🎯 Normalização da máscara
-async function normalizeMask(buffer) {
-  return await sharp(buffer)
+async function normalizeMask(buffer, intent = 'EDIT') {
+  let sharpInstance = sharp(buffer)
     .resize(1024, 1024, {
       fit: 'contain',
       background: { r: 0, g: 0, b: 0 }
     })
-    .grayscale()
-    .threshold(128) // força binário (evita bleed)
-    .png()
-    .toBuffer();
+    .grayscale();
+
+  if (intent === 'ERASE') {
+    // APLICA DILATAÇÃO (GROW MASK) LEVE PARA EVITAR COLOR BLEED EM REMOÇÕES completas
+    // O blur(5) com threshold(50) garante um inchaço sutil (approx 3-5px) para matar a bordinha da roupa sem destruir a iluminação do resto do objeto (ex: boné).
+    sharpInstance = sharpInstance.blur(5).threshold(50);
+  } else {
+    // Para EDIÇÃO/INPAINT (ex: pintar roupa): Máscara exata para não destruir destalhes (rosto, cabelo)
+    sharpInstance = sharpInstance.threshold(128);
+  }
+
+  return await sharpInstance.png().toBuffer();
 }
 
 // =========================
@@ -82,9 +90,9 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
-// =========================
-// EDIT ENDPOINT
-// =========================
+// ==========================================
+// 3. ROTA PRINCIPAL DA API (Apenas processamento lógico)
+// ==========================================
 app.post('/api/edit', upload.any(), async (req, res) => {
 
   const requestId = Math.random().toString(36).substring(7);
@@ -105,31 +113,20 @@ app.post('/api/edit', upload.any(), async (req, res) => {
     console.log(`[${requestId}] Prompt original:`, userPrompt);
 
     // =========================
-    // Processamento
+    // Preparação de Imagem para Visão Computacional
     // =========================
     const baseImage = await normalizeImage(imageFile.buffer);
-
-    let maskImage = null;
-    if (maskFile) {
-      console.log(`[${requestId}] Máscara detectada`);
-      maskImage = await normalizeMask(maskFile.buffer);
-    }
+    const inputImageBase64 = `data:image/png;base64,${baseImage.toString('base64')}`;
 
     // =========================
-    // Stability AI Image Edit (Erase)
+    // Roteamento Semântico + Vision GPT
     // =========================
-    console.log(`[${requestId}] Enviando para Stability AI (Erase)...`);
+    console.log(`[${requestId}] Analisando intenção, arte e iluminação via GPT-4o-mini Vision...`);
+    
+    let intent = "EDIT"; // Padrão
+    let finalPromptText = userPrompt;
+    let negativePromptText = "low quality, blur, distortion, bad anatomy, artifacts";
 
-    const STABILITY_KEY = process.env.STABILITY_API_KEY;
-    if (!STABILITY_KEY) {
-      throw new Error("STABILITY_API_KEY não configurada no .env. Configure sua chave para usar a funcionalidade Erase.");
-    }
-
-    // Call OpenAI to enhance the user's prompt using gpt-4o-mini
-    let finalPromptText = "remove the specified object, fill with natural background, realistic, seamless, no artifacts, consistent lighting";
-    let negativePromptText = "person, face, human, arm, body parts, human silhouette, phantom limbs, distortion, bad reconstruction, car, vehicle, blur, incomplete shelves, empty voids, bad lighting, overlapping objects, faulty perspective, fuzzy labels, bad reconstruction, empty shelves";
-
-    console.log(`[${requestId}] Melhorando prompt via OpenAI GPT-4o-mini...`);
     try {
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
@@ -137,29 +134,70 @@ app.post('/api/edit', upload.any(), async (req, res) => {
         messages: [
           {
             role: "system",
-            content: `Você é um engenheiro de prompt especialista no modelo de inpainting/erase da Stability AI.
-Sua missão é pegar a intenção do usuário (sobre o que ele quer no lugar ou o que remover) e transformá-la num prompt extremamente descritivo, otimizado para inpainting fotorrealista e orgânico.
-Você também deve gerar um 'negative_prompt' robusto para evitar qualquer artefato ou traços da imagem original removida.
-Obrigatoriamente, seu output deve ser apenas um JSON contendo:
+            content: `Você é um engenheiro de roteamento cirúrgico para a API de Inpainting.
+Sua missão final:
+1. Identificar a INTENÇÃO ("ERASE" para apagar, ou "EDIT" para alterar/adicionar coisas).
+2. Gerar o 'prompt' e 'negative_prompt'.
+
+REGRA DE ANÁLISE VISUAL (MUITO IMPORTANTE):
+Você receberá a imagem enviada pelo usuário. Analise o ESTILO DE ARTE (fotorrealista, cartoon 2D plano, vector, render 3D, anime), a ILUMINAÇÃO e a TEXTURA. 
+Se for EDIT, seu prompt DEVE incorporar esse estilo de arte para que a edição não destoe! (Ex: se for um avatar 2D, peça explicitamente por "flat 2D vector style, matching cartoon shading").
+
+REGRA DRACONIANA PARA O PROMPT (SE EDIT):
+O Inpainting atua APENAS dentro de uma pequena máscara. Você É PROIBIDO de descrever o cenário completo ou sujeitos. NUNCA use palavras de contexto inteiro como "avatar", "person", "room".
+Seu prompt deve ser APENAS fragmentos da TEXTURA/OBJETO + o ESTILO DA ARTE.
+EXEMPLO (Para foto real): "vibrant red fabric, cotton clothing texture, photorealistic cinematic lighting"
+EXEMPLO (Para desenho 2D): "vibrant red flat color, 2D vector graphic shading, solid clean lines, matching cartoon aesthetic"
+
+RETORNE APENAS JSON:
 {
-  "prompt": "sua instrução aprimorada em ingles...",
-  "negative_prompt": "seu prompt negativo aprimorado em ingles..."
+  "intent": "ERASE" ou "EDIT",
+  "prompt": "detalhes do objeto + contexto de estilo de arte em ingles (se EDIT)",
+  "negative_prompt": "bloquear texturas divergentes do estilo da arte (ex: block 3d render if 2d), whole body, extra faces, clones"
 }`
           },
           {
             role: "user",
-            content: userPrompt || "Clean up this area perfectly."
+            content: [
+              { type: "text", text: userPrompt },
+              { type: "image_url", image_url: { url: inputImageBase64, detail: "low" } }
+            ]
           }
         ]
       });
 
       const enhanced = JSON.parse(completion.choices[0].message.content);
+      intent = enhanced.intent === "ERASE" ? "ERASE" : "EDIT";
       if (enhanced.prompt) finalPromptText = enhanced.prompt;
       if (enhanced.negative_prompt) negativePromptText = enhanced.negative_prompt;
-      console.log(`[${requestId}] Prompt Otimizado:`, enhanced);
+      
+      console.log(`[${requestId}] Resultado GPT -> Intenção: ${intent} | Prompt Estendido:`, finalPromptText);
     } catch (openaiErr) {
-      console.warn(`[${requestId}] Erro no OpenAI GPT-4o-mini, usando default:`, openaiErr.message);
+      console.warn(`[${requestId}] Erro no roteador GPT-4o-mini Vision, assumindo EDIT:`, openaiErr.message);
     }
+
+    // =========================
+    // Processamento da Máscara (Baseado na Intenção)
+    // =========================
+    let maskImage = null;
+    if (maskFile) {
+      console.log(`[${requestId}] Máscara detectada, normalizando para o modo: ${intent}`);
+      maskImage = await normalizeMask(maskFile.buffer, intent);
+    }
+
+    // =========================
+    // Chamada para a API da Stability AI
+    // =========================
+    const STABILITY_KEY = process.env.STABILITY_API_KEY;
+    if (!STABILITY_KEY) {
+      throw new Error("STABILITY_API_KEY não configurada no .env.");
+    }
+
+    const endpointUrl = intent === 'ERASE' 
+      ? 'https://api.stability.ai/v2beta/stable-image/edit/erase'
+      : 'https://api.stability.ai/v2beta/stable-image/edit/inpaint';
+
+    console.log(`[${requestId}] Disparando requisição real para o endpoint: ${endpointUrl}`);
 
     const formData = new FormData();
     formData.append('image', baseImage, { filename: 'image.png', contentType: 'image/png' });
@@ -168,13 +206,17 @@ Obrigatoriamente, seu output deve ser apenas um JSON contendo:
       formData.append('mask', maskImage, { filename: 'mask.png', contentType: 'image/png' });
     }
 
-    formData.append('prompt', finalPromptText);
-    formData.append('negative_prompt', negativePromptText);
+    // Stability Erase ignora prompts. Inpaint requer.
+    if (intent === 'EDIT') {
+      formData.append('prompt', finalPromptText);
+      formData.append('negative_prompt', negativePromptText);
+    }
+    
     formData.append('seed', 0);
     formData.append('output_format', 'png');
 
     const response = await axios.post(
-      'https://api.stability.ai/v2beta/stable-image/edit/erase',
+      endpointUrl,
       formData,
       {
         headers: {
