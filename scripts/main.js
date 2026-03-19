@@ -89,7 +89,7 @@ function initSidebarToggle() {
 
 /**
  * AI Image Editor - Frontend Logic
- * Refactored for stability and VEED-style premium UX.
+ * Refactored for stability, VEED-style premium UX, and DALL-E 2 interactive masking.
  */
 function initImageEditor() {
   const elements = {
@@ -97,6 +97,7 @@ function initImageEditor() {
     placeholder: document.getElementById('uploader-placeholder'),
     previewContainer: document.getElementById('preview-container'),
     previewImg: document.getElementById('preview-img'),
+    maskCanvas: document.getElementById('mask-canvas'),
     removeBtn: document.getElementById('remove-img'),
     fileInput: document.getElementById('file-input'),
     controls: document.getElementById('editor-controls'),
@@ -104,11 +105,26 @@ function initImageEditor() {
     generateBtn: document.getElementById('generate-button'),
     btnText: document.getElementById('btn-text'),
     spinner: document.getElementById('loading-spinner'),
-    errorDisplay: document.getElementById('error-message')
+    errorDisplay: document.getElementById('error-message'),
+    brushSize: document.getElementById('brush-size'),
+    clearMask: document.getElementById('clear-mask')
+  };
+
+  const canvasObj = {
+    ctx: elements.maskCanvas.getContext('2d'),
+    isDrawing: false,
+    lastX: 0,
+    lastY: 0
   };
 
   // State Management
   let currentState = 'IDLE'; // IDLE, PREVIEW, PROCESSING
+  let originalImageForExtraction = new Image(); // Hidden image to avoid cross-origin issues during draw
+  originalImageForExtraction.crossOrigin = "anonymous"; // Resolves Tainted Canvas issues
+
+  const clearCanvas = () => {
+    canvasObj.ctx.clearRect(0, 0, elements.maskCanvas.width, elements.maskCanvas.height);
+  };
 
   const setState = (state, data = {}) => {
     currentState = state;
@@ -127,12 +143,24 @@ function initImageEditor() {
       case 'IDLE':
         elements.placeholder.classList.remove('tw-hidden');
         elements.fileInput.value = '';
+        clearCanvas();
         break;
 
       case 'PREVIEW':
         elements.previewContainer.classList.remove('tw-hidden');
         elements.controls.classList.remove('tw-hidden');
-        if (data.src) elements.previewImg.src = data.src;
+        if (data.src) {
+          elements.previewImg.src = data.src;
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.onload = () => { originalImageForExtraction = img; };
+          img.src = data.src;
+          
+          // Lock canvas resolution to 1024x1024 for DALL-E 2 high-res precision
+          elements.maskCanvas.width = 1024;
+          elements.maskCanvas.height = 1024;
+          clearCanvas();
+        }
         break;
 
       case 'PROCESSING':
@@ -152,7 +180,85 @@ function initImageEditor() {
     }
   };
 
-  // Events
+  // --- DRAWING LOGIC ---
+  const getMousePos = (e) => {
+    const rect = elements.maskCanvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    
+    // Scale to the 1024x1024 internal coordinate system
+    const x = (clientX - rect.left) * (1024 / rect.width);
+    const y = (clientY - rect.top) * (1024 / rect.height);
+    
+    return { x, y };
+  };
+
+  // Helper to apply Gaussian Blur to the mask for professional blending
+  const applyBlur = (ctx, radius) => {
+    const canvas = ctx.canvas;
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const tCtx = tempCanvas.getContext('2d');
+    
+    tCtx.filter = `blur(${radius}px)`;
+    tCtx.drawImage(canvas, 0, 0);
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(tempCanvas, 0, 0);
+  };
+
+  const startDrawing = (e) => {
+    if (currentState !== 'PREVIEW') return;
+    e.preventDefault();
+    canvasObj.isDrawing = true;
+    const { x, y } = getMousePos(e);
+    canvasObj.lastX = x;
+    canvasObj.lastY = y;
+    draw(e); // Draw a dot even if no movement
+  };
+
+  const draw = (e) => {
+    if (!canvasObj.isDrawing || currentState !== 'PREVIEW') return;
+    e.preventDefault();
+    const { x, y } = getMousePos(e);
+    const ctx = canvasObj.ctx;
+    
+    // Visual green tint
+    ctx.strokeStyle = 'rgba(59, 130, 246, 0.5)'; // Tailwind Blue-500 semi-transparent
+    ctx.fillStyle = 'rgba(59, 130, 246, 0.5)';
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.lineWidth = parseInt(elements.brushSize.value, 10);
+
+    ctx.beginPath();
+    ctx.moveTo(canvasObj.lastX, canvasObj.lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+
+    canvasObj.lastX = x;
+    canvasObj.lastY = y;
+  };
+
+  const stopDrawing = () => {
+    canvasObj.isDrawing = false;
+  };
+
+  elements.maskCanvas.addEventListener('mousedown', startDrawing);
+  elements.maskCanvas.addEventListener('mousemove', draw);
+  elements.maskCanvas.addEventListener('mouseup', stopDrawing);
+  elements.maskCanvas.addEventListener('mouseleave', stopDrawing);
+  
+  elements.maskCanvas.addEventListener('touchstart', startDrawing, { passive: false });
+  elements.maskCanvas.addEventListener('touchmove', draw, { passive: false });
+  elements.maskCanvas.addEventListener('touchend', stopDrawing);
+
+  elements.clearMask.addEventListener('click', (e) => {
+    e.preventDefault();
+    clearCanvas();
+  });
+
+  // --- EVENTS ---
   elements.uploader.addEventListener('click', (e) => {
     if (currentState === 'IDLE') elements.fileInput.click();
   });
@@ -165,7 +271,6 @@ function initImageEditor() {
   elements.fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validation from agent.md: Max 4MB, PNG or JPG
       const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
       const maxSize = 4 * 1024 * 1024; // 4MB
 
@@ -186,11 +291,11 @@ function initImageEditor() {
   });
 
 
+  // --- EXTRACTION PIPELINE ---
   elements.generateBtn.addEventListener('click', async () => {
-    const prompt = elements.promptInput.value.trim();
-    const file = elements.fileInput.files[0];
+    const promptValue = elements.promptInput.value.trim();
 
-    if (!prompt) {
+    if (!promptValue) {
       elements.promptInput.focus();
       elements.promptInput.classList.add('tw-ring-red-400');
       setTimeout(() => elements.promptInput.classList.remove('tw-ring-red-400'), 2000);
@@ -200,9 +305,77 @@ function initImageEditor() {
     setState('PROCESSING');
 
     try {
+      // 1. Generate 1024x1024 Base Image using "FIT" (Padding)
+      // This ensures 100% of the original image is preserved and visible.
+      const baseCanvas = document.createElement('canvas');
+      baseCanvas.width = 1024;
+      baseCanvas.height = 1024;
+      const bCtx = baseCanvas.getContext('2d');
+      
+      // Fill background with black
+      bCtx.fillStyle = '#000000';
+      bCtx.fillRect(0, 0, 1024, 1024);
+      
+      // Calculate "Fit" (Contain) math
+      const imgTarget = originalImageForExtraction;
+      const hRatio = 1024 / imgTarget.width;
+      const vRatio = 1024 / imgTarget.height;
+      const ratio = Math.min(hRatio, vRatio);
+      
+      const nw = imgTarget.width * ratio;
+      const nh = imgTarget.height * ratio;
+      const ox = (1024 - nw) / 2;
+      const oy = (1024 - nh) / 2;
+      
+      bCtx.drawImage(imgTarget, ox, oy, nw, nh);
+
+      // 2. Criação da máscara P&B isolada para Stability AI
+      const maskCanvasExport = document.createElement('canvas');
+      maskCanvasExport.width = 1024;
+      maskCanvasExport.height = 1024;
+      const mCtx = maskCanvasExport.getContext('2d');
+      
+      // Fundo preto (Stability: áreas para MANTÉM)
+      mCtx.fillStyle = '#000000';
+      mCtx.fillRect(0, 0, 1024, 1024);
+      
+      // Pegar dados desenhados pelo usuário
+      const tempMaskCanvas = document.createElement('canvas');
+      tempMaskCanvas.width = 1024;
+      tempMaskCanvas.height = 1024;
+      const tCtx = tempMaskCanvas.getContext('2d');
+      tCtx.drawImage(elements.maskCanvas, 0, 0);
+      const userDrawData = tCtx.getImageData(0, 0, 1024, 1024);
+      
+      const finalMaskData = mCtx.getImageData(0, 0, 1024, 1024);
+      
+      let hasHoles = false;
+      for (let i = 0; i < userDrawData.data.length; i += 4) {
+        if (userDrawData.data[i + 3] > 10) { 
+          // Area pintada pelo usuário -> Branco (Stability: APAGA/ERASE)
+          finalMaskData.data[i] = 255;     // R
+          finalMaskData.data[i + 1] = 255; // G
+          finalMaskData.data[i + 2] = 255; // B
+          finalMaskData.data[i + 3] = 255; // Alpha
+          hasHoles = true;
+        }
+      }
+
+      if (!hasHoles) {
+         throw new Error("A máscara está vazia. Pinte a área da imagem que deseja remover.");
+      }
+
+      // Aplica os pixels da máscara sobre o fundo preto
+      mCtx.putImageData(finalMaskData, 0, 0);
+
+      // Converter em Blobs para o FormData
+      const imageBlob = await new Promise(resolve => baseCanvas.toBlob(resolve, 'image/png'));
+      const maskBlob = await new Promise(resolve => maskCanvasExport.toBlob(resolve, 'image/png'));
+
       const formData = new FormData();
-      formData.append('image', file);
-      formData.append('prompt', prompt);
+      formData.append('image', imageBlob, 'image.png'); 
+      formData.append('mask', maskBlob, 'mask.png'); 
+      formData.append('prompt', promptValue);
 
       const response = await fetch('/api/edit', {
         method: 'POST',
@@ -217,7 +390,6 @@ function initImageEditor() {
 
       if (data.url) {
         setState('PREVIEW', { src: data.url });
-        // Success micro-interaction
         elements.previewImg.classList.add('tw-ring-4', 'tw-ring-green-400');
         setTimeout(() => elements.previewImg.classList.remove('tw-ring-4', 'tw-ring-green-400'), 3000);
       }
@@ -227,3 +399,4 @@ function initImageEditor() {
     }
   });
 }
+// EOF: main.js

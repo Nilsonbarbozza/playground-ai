@@ -623,12 +623,26 @@
                             <span class="tw-text-xs tw-text-gray-400 tw-mt-1">PNG ou JPG (DALL-E 2)</span>
                           </div>
 
-                          <!-- Preview -->
-                          <div id="preview-container" class="tw-hidden tw-absolute tw-inset-0 tw-p-4">
-                            <img id="preview-img" class="tw-w-full tw-h-full tw-object-contain tw-rounded-xl tw-shadow-sm" />
-                            <button id="remove-img" class="tw-absolute tw-top-6 tw-right-6 tw-bg-white/90 tw-backdrop-blur-sm tw-p-2 tw-rounded-full tw-shadow-md hover:tw-bg-red-50 tw-text-gray-500 hover:tw-text-red-500 tw-transition-colors">
+                          <!-- Preview / Masking Editor -->
+                          <div id="preview-container" class="tw-hidden tw-relative tw-w-full tw-max-w-[500px] tw-aspect-square tw-mx-auto tw-rounded-xl tw-overflow-hidden tw-shadow-sm tw-bg-gray-100 tw-border tw-border-gray-200">
+                            <!-- Using object-contain to ensure the whole image is always visible for DALL-E 2 -->
+                            <img id="preview-img" class="tw-absolute tw-inset-0 tw-w-full tw-h-full tw-object-contain tw-pointer-events-none" />
+                            <!-- The canvas where the user paints the mask -->
+                            <canvas id="mask-canvas" class="tw-absolute tw-inset-0 tw-w-full tw-h-full tw-cursor-crosshair"></canvas>
+                            
+                            <button id="remove-img" class="tw-absolute tw-top-4 tw-right-4 tw-bg-white/90 tw-backdrop-blur-sm tw-p-2 tw-rounded-full tw-shadow-md hover:tw-bg-red-50 tw-text-gray-500 hover:tw-text-red-500 tw-transition-colors tw-z-10" title="Remover Imagem">
                               <svg class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
+                            
+                            <!-- Brush Size / Tools Toolbar -->
+                            <div class="tw-absolute tw-bottom-4 tw-left-1/2 -tw-translate-x-1/2 tw-bg-white/95 tw-backdrop-blur-md tw-px-5 tw-py-2 tw-rounded-full tw-shadow-lg tw-flex tw-items-center tw-gap-4 tw-z-10">
+                              <div class="tw-flex tw-items-center tw-gap-2">
+                                <svg class="tw-w-4 tw-h-4 tw-text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                <input type="range" id="brush-size" min="10" max="100" value="40" class="tw-w-24 tw-accent-blue-600 tw-h-1 tw-bg-gray-200 tw-rounded-lg tw-appearance-none tw-cursor-pointer">
+                              </div>
+                              <div class="tw-w-px tw-h-4 tw-bg-gray-300"></div>
+                              <button id="clear-mask" class="tw-text-xs tw-text-gray-600 hover:tw-text-blue-600 tw-font-semibold tw-uppercase tw-tracking-wide tw-transition-colors">Limpar</button>
+                            </div>
                           </div>
 
                           <input id="file-input" name="image" accept="image/*" class="tw-hidden" type="file" />
