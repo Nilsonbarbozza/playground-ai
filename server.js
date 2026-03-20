@@ -11,6 +11,10 @@ import path from 'path';
 
 dotenv.config();
 
+// Global crash protection (CRITICAL for debugging Eixo 2)
+process.on('uncaughtException', (err) => console.error('[CRASH] Uncaught:', err));
+process.on('unhandledRejection', (reason) => console.error('[CRASH] Unhandled:', reason));
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -126,6 +130,7 @@ app.post('/api/edit', upload.any(), async (req, res) => {
     let intent = "EDIT"; // Padrão
     let finalPromptText = userPrompt;
     let negativePromptText = "low quality, blur, distortion, bad anatomy, artifacts";
+    let enhanced = null; // DECLARAÇÃO FORA PARA EVITAR REFERENCE ERROR
 
     try {
       const completion = await openai.chat.completions.create({
@@ -137,18 +142,24 @@ app.post('/api/edit', upload.any(), async (req, res) => {
             content: `You are an elite Art Director and Computer Vision Architect for a Surgical Inpainting API (Stability AI).
 Your mission is to perform a surgical dissection of the user's image and instruction, outputting a hyper-precise JSON parameters object.
 
+STRICT INTENT ROUTING (CRITICAL):
+1. **ERASE**: If the user uses verbs like "remover", "apagar", "limpar", "delete", "erase", "remove", "blank", OR if the goal is to leave a surface empty/clean, set intent to "ERASE".
+2. **EDIT**: Only if the user wants to change colors, add new objects, or replace one thing with another specific thing.
+
 STRICT VISUAL ANALYSIS:
-1. ART STYLE & TEXTURE: Identify exact materials present (e.g., 'rough cotton', 'brushed metal', 'flat 2D vector graphic', 'smooth photorealistic'). 
-2. EXACT COLORS: Identify exact colors requested. If the user requests a specific HEX color (e.g. #777772) or literal hue, you MUST command the engine to use that exact color shade contextually on the object.
+1. ART STYLE & TEXTURE: Identify materials (e.g., '2D vector', 'cotton', 'metal'). 
+2. EXACT COLORS: Identify HEX codes (#XXXXXX).
 3. BACKGROUND PRESERVATION: The background outside the mask MUST NOT change. 
 
 JSON RESPONSE FORMAT:
 {
   "intent": "ERASE" or "EDIT",
-  "texture_analysis": "<internal text describing the physical materials of the image>",
-  "lighting_background_analysis": "<internal text describing the ambiance, lighting, and background type>",
-  "prompt": "<If EDIT: highly descriptive prompt combining the requested object, the exact color, the physical texture, the lighting, and the art style. DO NOT mention the whole image context like 'a room' or 'a man'. ONLY describe the targeted object inside the mask. Respond in English.>",
-  "negative_prompt": "<CRITICAL: Exhaustive list of what to BLOCK. If the art is 2D, block '3d, photorealistic, cinematic'. ALWAYS block 'text, logos, signatures, watermarks, background alteration, mismatched environment'. Ensure the background stays pristine.>"
+  "target_hex": "<Extracted HEX or null>",
+  "target_color_name": "<Nearest color name in English, e.g. 'vibrant yellow'>",
+  "texture_analysis": "<internal text>",
+  "lighting_background_analysis": "<internal text>",
+  "prompt": "<Generic fragmented description of the OBJECT ONLY. Use English.>",
+  "negative_prompt": "<CRITICAL: Exhaustive block of text, logos, fonts, symbols, graphics.>"
 }
 `
           },
@@ -162,23 +173,81 @@ JSON RESPONSE FORMAT:
         ]
       });
 
-      const enhanced = JSON.parse(completion.choices[0].message.content);
+      enhanced = JSON.parse(completion.choices[0].message.content);
       intent = enhanced.intent === "ERASE" ? "ERASE" : "EDIT";
-      if (enhanced.prompt) finalPromptText = enhanced.prompt;
-      if (enhanced.negative_prompt) negativePromptText = enhanced.negative_prompt;
+      finalPromptText = enhanced.prompt || userPrompt;
+      negativePromptText = enhanced.negative_prompt || negativePromptText;
+
+      // 💉 REFORÇO DE PROMPT PROGRAMÁTICO (Eixo 2)
+      // Se há uma cor alvo, nós não confiamos no GPT para repetir. O JS faz o serviço pesado.
+      if (intent === 'EDIT' && enhanced.target_hex) {
+        const colorName = enhanced.target_color_name || 'requested color';
+        const colorRepetition = `${colorName}, ${colorName}, ${colorName}, ${colorName}, ${colorName}`;
+        finalPromptText = `${finalPromptText}, ${colorRepetition}, solid plain surface, no graphics, no logo, match original style`;
+        negativePromptText = `${negativePromptText}, logos, text, letters, symbols, fffc, embroidery, badge, emblem, brand`;
+      }
       
-      console.log(`[${requestId}] Resultado GPT -> Intenção: ${intent} | Prompt Estendido:`, finalPromptText);
+      console.log(`\n[${requestId}] 🎨 Análise do Diretor de Arte:`);
+      console.log(`   🔸 [INTENÇÃO]: ${intent}`);
+      console.log(`   🔸 [HEX DETECTADO]: ${enhanced.target_hex || "Nenhum"}`);
+      console.log(`   🔸 [TEXTURA DEDUZIDA]: ${enhanced.texture_analysis || "N/A"}`);
+      console.log(`   🔸 [LUZ/BACKGROUND]: ${enhanced.lighting_background_analysis || "N/A"}`);
+      console.log(`   👉 [PROMPT POSITIVO]: ${finalPromptText}`);
+      console.log(`   🛡️ [BLINDAGEM (NEG_PROMPT)]: ${negativePromptText}\n`);
     } catch (openaiErr) {
       console.warn(`[${requestId}] Erro no roteador GPT-4o-mini Vision, assumindo EDIT:`, openaiErr.message);
     }
 
     // =========================
-    // Processamento da Máscara (Baseado na Intenção)
+    // Processamento da Máscara e Injeção de Cor (Color Seeding)
     // =========================
     let maskImage = null;
+    let finalBaseImage = baseImage;
+
     if (maskFile) {
       console.log(`[${requestId}] Máscara detectada, normalizando para o modo: ${intent}`);
       maskImage = await normalizeMask(maskFile.buffer, intent);
+
+      // --- TÉCNICA: COLOR SEEDING (HINTING) ---
+      // Se o GPT identificou um HEX desejado, pintamos um pequeno "ponto semente" 
+      // no centro da máscara para guiar a Stability AI fisicamente.
+      if (intent === 'EDIT' && enhanced?.target_hex && enhanced.target_hex.startsWith('#')) {
+        console.log(`[${requestId}] 💉 Aplicando Color Seed: ${enhanced.target_hex}`);
+        
+        try {
+          // Criamos um buffer de cor sólida do tamanho da imagem
+          const colorBuffer = await sharp({
+            create: {
+              width: 1024,
+              height: 1024,
+              channels: 3,
+              background: enhanced.target_hex
+            }
+          }).png().toBuffer();
+
+          // Usamos a máscara do usuário para "recortar" essa cor
+          // Técnica nuclear de Seeding: Preenchemos a máscara 100% com a cor
+          // Mas aplicamos um leve blur na borda do "patch" para a IA fundir suavemente
+          const maskProcessed = await sharp(maskImage)
+            .ensureAlpha()
+            .extractChannel(0)
+            .toBuffer();
+
+          const colorWithAlpha = await sharp(colorBuffer)
+            .joinChannel(maskProcessed) 
+            .png()
+            .toBuffer();
+
+          finalBaseImage = await sharp(baseImage)
+            .composite([{ input: colorWithAlpha, blend: 'over' }])
+            .png()
+            .toBuffer();
+          
+          console.log(`[${requestId}] ✨ Injeção Cromática Nuclear aplicada.`);
+        } catch (seedErr) {
+          console.error(`[${requestId}] Falha ao aplicar Color Seed:`, seedErr.message);
+        }
+      }
     }
 
     // =========================
@@ -196,7 +265,7 @@ JSON RESPONSE FORMAT:
     console.log(`[${requestId}] Disparando requisição real para o endpoint: ${endpointUrl}`);
 
     const formData = new FormData();
-    formData.append('image', baseImage, { filename: 'image.png', contentType: 'image/png' });
+    formData.append('image', finalBaseImage, { filename: 'image.png', contentType: 'image/png' });
     
     if (maskImage) {
       formData.append('mask', maskImage, { filename: 'mask.png', contentType: 'image/png' });
