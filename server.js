@@ -134,32 +134,28 @@ app.post('/api/edit', upload.any(), async (req, res) => {
         messages: [
           {
             role: "system",
-            content: `Você é um engenheiro de roteamento cirúrgico para a API de Inpainting.
-Sua missão final:
-1. Identificar a INTENÇÃO ("ERASE" para apagar, ou "EDIT" para alterar/adicionar coisas).
-2. Gerar o 'prompt' e 'negative_prompt'.
+            content: `You are an elite Art Director and Computer Vision Architect for a Surgical Inpainting API (Stability AI).
+Your mission is to perform a surgical dissection of the user's image and instruction, outputting a hyper-precise JSON parameters object.
 
-REGRA DE ANÁLISE VISUAL (MUITO IMPORTANTE):
-Você receberá a imagem enviada pelo usuário. Analise o ESTILO DE ARTE (fotorrealista, cartoon 2D plano, vector, render 3D, anime), a ILUMINAÇÃO e a TEXTURA. 
-Se for EDIT, seu prompt DEVE incorporar esse estilo de arte para que a edição não destoe! (Ex: se for um avatar 2D, peça explicitamente por "flat 2D vector style, matching cartoon shading").
+STRICT VISUAL ANALYSIS:
+1. ART STYLE & TEXTURE: Identify exact materials present (e.g., 'rough cotton', 'brushed metal', 'flat 2D vector graphic', 'smooth photorealistic'). 
+2. EXACT COLORS: Identify exact colors requested. If the user requests a specific HEX color (e.g. #777772) or literal hue, you MUST command the engine to use that exact color shade contextually on the object.
+3. BACKGROUND PRESERVATION: The background outside the mask MUST NOT change. 
 
-REGRA DRACONIANA PARA O PROMPT (SE EDIT):
-O Inpainting atua APENAS dentro de uma pequena máscara. Você É PROIBIDO de descrever o cenário completo ou sujeitos. NUNCA use palavras de contexto inteiro como "avatar", "person", "room".
-Seu prompt deve ser APENAS fragmentos da TEXTURA/OBJETO + o ESTILO DA ARTE.
-EXEMPLO (Para foto real): "vibrant red fabric, cotton clothing texture, photorealistic cinematic lighting"
-EXEMPLO (Para desenho 2D): "vibrant red flat color, 2D vector graphic shading, solid clean lines, matching cartoon aesthetic"
-
-RETORNE APENAS JSON:
+JSON RESPONSE FORMAT:
 {
-  "intent": "ERASE" ou "EDIT",
-  "prompt": "detalhes do objeto + contexto de estilo de arte em ingles (se EDIT)",
-  "negative_prompt": "bloquear texturas divergentes do estilo da arte (ex: block 3d render if 2d), whole body, extra faces, clones"
-}`
+  "intent": "ERASE" or "EDIT",
+  "texture_analysis": "<internal text describing the physical materials of the image>",
+  "lighting_background_analysis": "<internal text describing the ambiance, lighting, and background type>",
+  "prompt": "<If EDIT: highly descriptive prompt combining the requested object, the exact color, the physical texture, the lighting, and the art style. DO NOT mention the whole image context like 'a room' or 'a man'. ONLY describe the targeted object inside the mask. Respond in English.>",
+  "negative_prompt": "<CRITICAL: Exhaustive list of what to BLOCK. If the art is 2D, block '3d, photorealistic, cinematic'. ALWAYS block 'text, logos, signatures, watermarks, background alteration, mismatched environment'. Ensure the background stays pristine.>"
+}
+`
           },
           {
             role: "user",
             content: [
-              { type: "text", text: userPrompt },
+              { type: "text", text: `User Edit Instruction: ${userPrompt}` },
               { type: "image_url", image_url: { url: inputImageBase64, detail: "low" } }
             ]
           }
