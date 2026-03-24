@@ -9,6 +9,16 @@ import FormData from 'form-data';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
+import fs from 'fs';
+import { promises as fsPromises } from 'fs';
+import crypto from 'crypto';
+import authRoutes from './routes/authRoutes.js';
+import { authMiddleware } from './middlewares/authMiddleware.js';
+import userRoutes from './routes/userRoutes.js';
+import videoRoutes from './routes/videoRoutes.js';
+import faceswapRoutes from './routes/faceswapRoutes.js';
+import db from './config/db.js';
+
 dotenv.config();
 
 // Global crash protection (CRITICAL for debugging Eixo 2)
@@ -94,15 +104,100 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
+// =========================
+// Rotas Públicas (Auth)
+// =========================
+app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/video', videoRoutes);
+app.use('/api/faceswap', faceswapRoutes);
+
 // ==========================================
 // 3. ROTA PRINCIPAL DA API (Apenas processamento lógico)
 // ==========================================
-app.post('/api/edit', upload.any(), async (req, res) => {
+app.post('/api/generate', authMiddleware, upload.none(), async (req, res) => {
+  const requestId = crypto.randomUUID().substring(0, 8);
+  console.log(`\n[${requestId}] NEW GENERATION REQUEST`);
+
+  try {
+    // [SAAS] Verifica se tem créditos
+    const userCheck = await db.query('SELECT credits FROM users WHERE id = $1', [req.user.id]);
+    if (userCheck.rows[0].credits <= 0) {
+      return res.status(403).json({ error: 'Saldo insuficiente. Compre mais créditos.' });
+    }
+
+    const { prompt } = req.body;
+    if (!prompt) throw new Error('Prompt não enviado.');
+
+    console.log(`[${requestId}] Gerando imagem via Stability Core: "${prompt}"`);
+
+    const STABILITY_KEY = process.env.STABILITY_API_KEY;
+    const formData = new FormData();
+    formData.append('prompt', prompt);
+    formData.append('output_format', 'png');
+    // formData.append('aspect_ratio', '1:1'); // opcional na v2beta
+
+    const response = await axios.post(
+      'https://api.stability.ai/v2beta/stable-image/generate/core',
+      formData,
+      {
+        headers: {
+          ...formData.getHeaders(),
+          Authorization: `Bearer ${STABILITY_KEY}`,
+          Accept: "image/*"
+        },
+        responseType: 'arraybuffer',
+        validateStatus: undefined
+      }
+    );
+
+    if (response.status !== 200) {
+      throw new Error(`Erro API Stability: ${response.data.toString()}`);
+    }
+
+    // Salvar local 
+    const filename = `gen_${Date.now()}_${requestId}.png`;
+    const filepath = path.join(__dirname, 'public', 'uploads', filename);
+    await fsPromises.writeFile(filepath, response.data);
+    
+    const imageUrl = `/uploads/${filename}`;
+
+    // [SAAS] Deduzir crédito e registrar projeto
+    await db.query('UPDATE users SET credits = credits - 1 WHERE id = $1', [req.user.id]);
+    await db.query(
+      'INSERT INTO projects (user_id, prompt, image_url, module) VALUES ($1, $2, $3, $4)',
+      [req.user.id, prompt, imageUrl, 'text-to-image']
+    );
+    console.log(`[${requestId}] 💳 1 Crédito deduzido. Imagem salva em ${imageUrl}`);
+
+    res.json({
+      success: true,
+      url: imageUrl
+    });
+  } catch (err) {
+    console.error(`[${requestId}] ❌ ERRO:`, err.message);
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+
+// ==========================================
+// 4. ROTA DE EDIÇÃO (Módulo Atual)
+// ==========================================
+app.post('/api/edit', authMiddleware, upload.any(), async (req, res) => {
 
   const requestId = Math.random().toString(36).substring(7);
   console.log(`\n[${requestId}] NEW REQUEST`);
 
   try {
+    // [SAAS] Verifica se tem créditos ANTES de processar imagem/IA
+    const userCheck = await db.query('SELECT credits FROM users WHERE id = $1', [req.user.id]);
+    if (userCheck.rows[0].credits <= 0) {
+      return res.status(403).json({ error: 'Saldo insuficiente. Compre mais créditos.' });
+    }
+
     const { prompt: userPrompt } = req.body;
     const files = req.files;
 
@@ -301,7 +396,15 @@ JSON RESPONSE FORMAT:
     const outputImageBuffer = response.data;
     const imageBase64 = `data:image/png;base64,${Buffer.from(outputImageBuffer).toString('base64')}`;
 
-    console.log(`[${requestId}] ✅ Sucesso`);
+    console.log(`[${requestId}] ✅ Sucesso da IA.`);
+
+    // [SAAS] Deduzir crédito e registrar na galeria 'Meus Projetos'
+    await db.query('UPDATE users SET credits = credits - 1 WHERE id = $1', [req.user.id]);
+    await db.query(
+      'INSERT INTO projects (user_id, prompt, image_url, module) VALUES ($1, $2, $3, $4)',
+      [req.user.id, finalPromptText, 'storage-pending-url', 'image_editor']
+    );
+    console.log(`[${requestId}] 💳 1 Crédito deduzido. Projeto salvo.`);
 
     res.json({
       success: true,
@@ -336,6 +439,7 @@ JSON RESPONSE FORMAT:
 // OBRIGATÓRIO: Servir os arquivos do Frontend
 // =========================
 app.use(express.static(__dirname));
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 // =========================
 // START
