@@ -17,7 +17,7 @@
         },
       };
     </script>
-    <script src="scripts/main.js?v=2" defer></script>
+    <script src="scripts/main.js" defer></script>
   </head>
   <body class="inline_c81ed26d">
     <div data-channel-name="in_page_channel_2qI1Ou" id="in-page-channel-node-id"></div>
@@ -105,7 +105,7 @@
           </div>
           <div class="justify-space-between flex w-full flex-row" data-sf-nesting-track-id="1.3.1.1.2">
             <nav
-              class="flex flex-shrink-0 flex-col border-gray-100 bg-white md:gap-7 fixed top-0 left-0 z-50 h-full w-[80%] max-w-[300px] md:z-1 md:flex md:w-auto md:sticky md:top-2 md:my-2 md:ml-2 md:h-[calc(100vh-1rem)] md:rounded-xl md:border md:border-gray-100 md:shadow-lg inline_49a416b9"
+              class="hidden md:flex flex-shrink-0 flex-col border-gray-100 bg-white md:gap-7 fixed top-0 left-0 tw-z-[110] h-full w-[80%] max-w-[300px] md:z-1 md:w-auto md:sticky md:top-2 md:my-2 md:ml-2 md:h-[calc(100vh-1rem)] md:rounded-xl md:border md:border-gray-100 md:shadow-lg inline_49a416b9"
               data-testid="@ai-playground-v2/sidebar"
             >
               <div class="relative flex min-h-12 flex-shrink-0 items-center justify-between px-5 pt-4 pb-2">
@@ -482,7 +482,7 @@
             </nav>
             <div class="relative flex flex-1 flex-col overflow-auto p-0 md:p-0" data-sf-nesting-track-id="1.3.1.1.2.2">
               <header
-                class="flex items-center justify-between gap-2 px-3 pt-3 pb-6 md:px-6"
+                class="flex items-center justify-between gap-2 px-3 pt-3 pb-6 md:px-6 tw-relative tw-z-50"
                 data-sf-nesting-track-id="1.3.1.1.2.2.1"
                 data-testid="@ai-playground-v2/content/header"
               >
@@ -599,21 +599,35 @@
                 >
                   <div class="flex flex-col content-center" data-testid="@ai-playground-v2/image-editor/main">
                     <div
-                      class="relative isolate mx-0 mb-12 h-full"
+                      class="relative isolate mx-0 mb-12 h-full tw-flex tw-items-center tw-justify-center"
                       data-testid="@ai-playground-v2/image-editor/central-item"
                     >
-                                            <div class="tw-max-h-[calc(100%-2rem)] tw-max-w-full tw-absolute tw-top-1/2 tw-left-1/2 tw--translate-x-1/2 tw--translate-y-1/2 tw-flex tw-flex-col tw-items-center tw-justify-center tw-select-text tw-transition-all tw-h-full tw-w-full tw-p-5 md:tw-p-0">
+                      <div class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-overflow-auto tw-p-4 tw-pb-24 md:tw-pb-40">
                         <div
-                          class="tw-relative tw-w-full tw-aspect-square tw-max-w-[500px] tw-mx-auto tw-border-2 tw-border-dashed tw-border-gray-200 tw-rounded-2xl tw-bg-gray-50/50 hover:tw-border-blue-400 tw-transition-all tw-group"
+                          class="tw-relative tw-w-full tw-aspect-square tw-max-w-[400px] tw-mx-auto tw-border-2 tw-border-dashed tw-border-gray-200 tw-rounded-2xl tw-bg-gray-50/50 hover:tw-border-blue-400 tw-transition-all tw-group"
                           id="uploader-container"
                         >
-                          <!-- Placeholder -->
-                          <div id="uploader-placeholder" class="tw-absolute tw-inset-0 tw-flex tw-flex-col tw-items-center tw-justify-center tw-cursor-pointer">
-                            <div class="tw-w-16 tw-h-16 tw-bg-blue-100 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-byte-4 group-hover:tw-scale-110 tw-transition-transform">
-                              <svg class="tw-w-8 tw-h-8 tw-text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                          <!-- New Placeholder: 3 Cards Illustration -->
+                          <div id="uploader-placeholder" class="tw-absolute tw-inset-0 tw-flex tw-flex-col tw-items-center tw-justify-center tw-cursor-pointer tw-text-center tw-p-6">
+                            <div class="tw-relative tw-w-48 tw-h-32 tw-mb-8 tw-flex tw-items-center tw-justify-center">
+                              <!-- Overlapping Cards -->
+                              <div class="tw-absolute tw-w-24 tw-h-32 tw-bg-[#B1E5D5] tw-rounded-xl tw-shadow-lg tw-rotate-[-15deg] tw-translate-x-[-40px] tw-flex tw-items-center tw-justify-center tw-border tw-border-white/50">
+                                <span class="tw-text-2xl">🧊</span>
+                              </div>
+                              <div class="tw-absolute tw-w-24 tw-h-32 tw-bg-[#2D2B2C] tw-rounded-xl tw-shadow-2xl tw-z-10 tw-flex tw-items-center tw-justify-center tw-border tw-border-white/20">
+                                <div class="tw-w-16 tw-h-16 tw-rounded-full tw-overflow-hidden tw-border-2 tw-border-white/30">
+                                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Avatar" class="tw-w-full tw-h-full" />
+                                </div>
+                              </div>
+                              <div class="tw-absolute tw-w-24 tw-h-32 tw-bg-[#D8B4FE] tw-rounded-xl tw-shadow-lg tw-rotate-[15deg] tw-translate-x-[40px] tw-flex tw-items-center tw-justify-center tw-border tw-border-white/50">
+                                <span class="tw-text-2xl">⚡</span>
+                              </div>
                             </div>
-                            <span class="tw-text-sm tw-font-medium tw-text-gray-600">Carregar Imagem</span>
-                            <span class="tw-text-xs tw-text-gray-400 tw-mt-1">PNG ou JPG (DALL-E 2)</span>
+                            
+                            <h2 class="tw-text-xl tw-font-bold tw-text-gray-900 tw-mb-2">Carregar uma imagem</h2>
+                            <p class="tw-text-sm tw-text-blue-600 tw-font-medium">
+                              Selecione um arquivo <span class="tw-text-gray-500 tw-font-normal">ou arraste-o para cá.</span>
+                            </p>
                           </div>
 
                           <!-- Preview / Masking Editor -->
@@ -623,9 +637,15 @@
                             <!-- The canvas where the user paints the mask -->
                             <canvas id="mask-canvas" class="tw-absolute tw-inset-0 tw-w-full tw-h-full tw-cursor-crosshair"></canvas>
                             
-                            <button id="remove-img" class="tw-absolute tw-top-4 tw-right-4 tw-bg-white/90 tw-backdrop-blur-sm tw-p-2 tw-rounded-full tw-shadow-md hover:tw-bg-red-50 tw-text-gray-500 hover:tw-text-red-500 tw-transition-colors tw-z-10" title="Remover Imagem">
-                              <svg class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>
+                            <div class="tw-absolute tw-top-4 tw-right-4 tw-flex tw-flex-col tw-gap-2 tw-z-10">
+                              <button id="remove-img" class="tw-bg-white/90 tw-backdrop-blur-sm tw-p-2 tw-rounded-full tw-shadow-md hover:tw-bg-red-50 tw-text-gray-500 hover:tw-text-red-500 tw-transition-colors" title="Remover Imagem">
+                                <svg class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                              </button>
+                              
+                              <button id="btn-download-editor" class="tw-bg-white/90 tw-backdrop-blur-sm tw-p-2 tw-rounded-full tw-shadow-md hover:tw-bg-gray-50 tw-text-gray-500 hover:tw-text-blue-600 tw-transition-colors" title="Download Resultado">
+                                <svg class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                              </button>
+                            </div>
                             
                             <!-- Brush Size / Tools Toolbar -->
                             <div class="tw-absolute tw-bottom-4 tw-left-1/2 -tw-translate-x-1/2 tw-bg-white/95 tw-backdrop-blur-md tw-px-5 tw-py-2 tw-rounded-full tw-shadow-lg tw-flex tw-items-center tw-gap-4 tw-z-10">
@@ -641,38 +661,51 @@
                           <input id="file-input" name="image" accept="image/*" class="tw-hidden" type="file" />
                         </div>
 
-                        <!-- Controls -->
-                        <div id="editor-controls" class="tw-hidden tw-mt-6 tw-w-full tw-max-w-[500px] tw-mx-auto tw-flex tw-flex-col tw-gap-3">
-                          <div class="tw-relative">
-                            <input 
-                              type="text" 
-                              name="prompt"
-                              id="image-prompt" 
-                              placeholder="Descreva o que deseja mudar..." 
-                              class="tw-w-full tw-p-4 tw-pr-12 tw-rounded-xl tw-border tw-border-gray-200 tw-bg-white tw-text-sm tw-shadow-sm focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500 tw-transition-all"
-                            />
+                    </div> <!-- /isolator -->
+                  </div> <!-- /main -->
+
+                  <!-- NEW: Floating Prompt Box -->
+                  <div id="editor-controls" class="tw-hidden tw-absolute tw-bottom-0 tw-left-0 tw-w-full tw-p-4 md:tw-p-6 tw-flex tw-justify-center tw-pointer-events-none tw-z-50">
+                      <div class="tw-w-full tw-max-w-2xl tw-bg-white tw-border tw-border-gray-200 tw-rounded-2xl tw-shadow-xl tw-p-3 md:tw-p-4 tw-pointer-events-auto tw-flex tw-flex-col tw-gap-3">
+                          
+                          <!-- Input Row -->
+                          <div class="tw-flex tw-items-center tw-gap-3 md:tw-gap-4">
+                              <input 
+                                type="text" 
+                                id="image-prompt" 
+                                placeholder="Descreva o que deseja mudar (ex: adicione óculos de sol)..." 
+                                class="tw-flex-1 tw-outline-none tw-border-none tw-text-gray-800 tw-bg-transparent placeholder:tw-text-gray-400 tw-text-sm md:tw-text-base tw-py-2"
+                              />
+                              
+                              <button id="generate-button" class="tw-w-10 tw-h-10 tw-bg-[#5666F5] tw-text-white tw-rounded-xl tw-flex tw-shrink-0 tw-items-center tw-justify-center hover:tw-bg-[#4A5DDF] tw-transition-all disabled:tw-opacity-50">
+                                <svg id="btn-icon" class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                <svg id="loading-spinner" class="tw-hidden tw-animate-spin tw-h-5 tw-w-5 tw-text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                  <circle class="tw-opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                  <path class="tw-opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                              </button>
                           </div>
-                          <button 
-                            id="generate-button"
-                            class="tw-w-full tw-bg-blue-600 tw-text-white tw-py-4 tw-rounded-xl tw-font-medium hover:tw-bg-blue-700 tw-transition-all tw-shadow-lg tw-shadow-blue-200 disabled:tw-opacity-50 disabled:tw-cursor-not-allowed tw-flex tw-items-center tw-justify-center tw-gap-2"
-                          >
-                            <span id="btn-text">Editar com IA</span>
-                            <svg id="loading-spinner" class="tw-hidden tw-animate-spin tw-h-5 tw-w-5 tw-text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                              <circle class="tw-opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                              <path class="tw-opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                          </button>
-                          <!-- Error Message Display -->
-                          <div id="error-message" class="tw-hidden tw-text-xs tw-text-red-500 tw-mt-1 tw-bg-red-50 tw-p-3 tw-rounded-lg tw-border tw-border-red-100 italic"></div>
-                        </div>
+
+                          <!-- Config Row -->
+                          <div class="tw-flex tw-items-center tw-justify-between tw-border-t tw-border-gray-50 tw-pt-2">
+                              <div class="tw-flex tw-items-center tw-gap-3 tw-text-[11px] md:tw-text-xs tw-font-semibold tw-text-gray-500">
+                                  <span class="tw-flex tw-items-center tw-gap-1.5 tw-bg-gray-50 tw-px-2 tw-py-1 tw-rounded-md">
+                                    <span class="tw-w-2 tw-h-2 tw-bg-green-500 tw-rounded-full"></span>
+                                    DALL-E Inpaint
+                                  </span>
+                                  <span class="tw-text-gray-300">|</span>
+                                  <span>Custo: 5 créditos</span>
+                              </div>
+                              <div id="btn-text" class="tw-hidden">Editar com IA</div> <!-- Mantendo o ID para compatibilidade JS -->
+                          </div>
                       </div>
-                    </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-                </div> <!-- /#view-image-editor -->
+                  
+                  <!-- Error Message Popup -->
+                  <div id="error-message" class="tw-hidden tw-absolute tw-bottom-24 tw-left-1/2 tw--translate-x-1/2 tw-bg-red-50 tw-text-red-600 tw-px-4 tw-py-2 tw-rounded-lg tw-border tw-border-red-100 tw-text-sm tw-shadow-sm tw-z-50"></div>
+                </div> <!-- Closes flex content-center (Line 600) -->
+              </div> <!-- Closes grid (Line 597) -->
+            </div> <!-- /#view-image-editor -->
 
                 <!-- VIEW: Meus Projetos -->
                 <div id="view-projects" class="view-panel hidden tw-p-8 tw-w-full tw-mx-auto tw-max-w-6xl">
@@ -695,144 +728,239 @@
 
                 
                 <!-- VIEW: Texto para Imagem -->
-                <div id="view-text2img" class="view-panel hidden tw-flex tw-flex-col tw-items-center tw-justify-center tw-h-full tw-w-full tw-p-8">
-                    <div class="tw-w-full tw-max-w-2xl tw-bg-white tw-shadow-2xl tw-rounded-3xl tw-overflow-hidden tw-border tw-border-gray-100">
-                        <div class="tw-bg-gradient-to-r tw-from-blue-600 tw-to-cyan-600 tw-px-8 tw-py-6 tw-text-white">
-                            <div class="tw-flex tw-items-center tw-gap-4">
-                                <div class="tw-bg-white/20 tw-p-3 tw-rounded-2xl tw-backdrop-blur-sm">
-                                    <span class="tw-text-2xl">🖼️</span>
-                                </div>
-                                <div>
-                                    <h2 class="tw-text-2xl tw-font-bold tw-tracking-tight">Gerador de Imagens AI</h2>
-                                    <p class="tw-text-blue-100 tw-text-sm tw-mt-1">Crie imagens incríveis do zero a partir de descrições em texto.</p>
-                                </div>
+                <div id="view-text2img" class="view-panel hidden tw-absolute tw-inset-0 tw-flex-col tw-bg-[#FCFCFD]">
+                    <!-- Main Canvas Area -->
+                    <div class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-overflow-auto tw-p-4 tw-pb-24 md:tw-pb-40 lg:tw-pb-0">
+                         <!-- Empty state -->
+                         <div id="t2i-placeholder" class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-opacity-60">
+                              <div class="tw-relative tw-w-full tw-aspect-square tw-max-w-[500px] tw-mx-auto tw-border-2 tw-border-dashed tw-border-gray-200 tw-rounded-2xl tw-bg-gray-50/50 hover:tw-border-blue-400 tw-transition-all tw-group">
+                                <button class="tw-w-100 tw-h-100 tw-shrink-0 tw-border tw-border-dashed tw-border-gray-300 tw-rounded-xl tw-flex tw-items-center tw-justify-center hover:tw-bg-gray-50 tw-text-gray-400 tw-transition-colors">
+                                    <svg class="tw-w-60 tw-h-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                </button>
+                              </div>                         
+                          </div>
+                         <!-- Generated Image -->
+                        <div class="tw-relative tw-group tw-max-w-full tw-max-h-full tw-flex tw-items-center tw-justify-center">
+                             <img id="t2i-preview-img" class="tw-hidden tw-max-w-full tw-max-h-full tw-object-contain tw-rounded-xl tw-shadow-2xl" />
+                             
+                             <!-- Download Button -->
+                             <button id="btn-download-t2i" class="tw-absolute tw-top-4 tw-right-4 tw-z-20 tw-bg-white/90 tw-backdrop-blur-sm tw-p-2.5 tw-rounded-xl tw-shadow-sm tw-opacity-0 group-hover:tw-opacity-100 tw-transition-all hover:tw-bg-white tw-text-gray-700">
+                                 <svg class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                             </button>
+                         </div>
+                         
+                         <!-- Loading/Loader View -->
+                         <div id="t2i-loader" class="tw-hidden tw-flex-col tw-items-center tw-justify-center tw-gap-4">
+                            <svg class="tw-animate-spin tw-h-10 tw-w-10 tw-text-[#5666F5]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="tw-opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="tw-opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p class="tw-text-gray-500 tw-font-medium">Gerando sua imagem com Inteligência Artificial...</p>
+                         </div>
+                    </div>
+
+                    <!-- Floating Prompt Box Container -->
+                    <div class="tw-absolute tw-bottom-0 tw-left-0 tw-w-full tw-p-4 md:tw-p-6 tw-flex tw-justify-center tw-pointer-events-none tw-z-10">
+                        <div class="tw-w-full tw-max-w-2xl tw-bg-white tw-border tw-border-gray-200 tw-rounded-2xl tw-shadow-xl tw-p-3 md:tw-p-4 tw-pointer-events-auto tw-flex tw-flex-col tw-gap-3">
+                            
+                            <!-- Input Row -->
+                            <div class="tw-flex tw-items-start tw-gap-3 md:tw-gap-4">
+                                <button class="tw-w-12 tw-h-12 tw-shrink-0 tw-border tw-border-dashed tw-border-gray-300 tw-rounded-xl tw-flex tw-items-center tw-justify-center hover:tw-bg-gray-50 tw-text-gray-400 tw-transition-colors">
+                                    <svg class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                </button>
+                                <textarea id="t2i-prompt" class="tw-flex-1 tw-resize-none tw-outline-none tw-border-none tw-text-gray-800 tw-bg-transparent placeholder:tw-text-gray-400 tw-text-sm md:tw-text-base tw-min-h-[48px] tw-pt-3" placeholder="Describe the image you want to create"></textarea>
                             </div>
-                        </div>
-                        <div class="tw-p-8">
-                            <div class="tw-mb-6 tw-flex tw-justify-center">
-                                <div id="t2i-preview-container" class="tw-w-full tw-max-w-md tw-aspect-square tw-border-2 tw-border-dashed tw-border-gray-200 tw-rounded-2xl tw-bg-gray-50 tw-flex tw-items-center tw-justify-center tw-overflow-hidden tw-relative">
-                                   <div id="t2i-placeholder" class="tw-text-center tw-text-gray-400">
-                                        <span class="tw-text-4xl tw-block tw-mb-2">✨</span>
-                                        <span class="tw-text-sm">Sua imagem aparecerá aqui</span>
-                                   </div>
-                                   <img id="t2i-preview-img" class="tw-hidden tw-absolute tw-inset-0 tw-w-full tw-h-full tw-object-contain tw-bg-white" />
-                                </div>
-                            </div>
-                            <div class="tw-space-y-4">
-                                <div>
-                                    <label class="tw-block tw-text-sm tw-font-semibold tw-text-gray-700 tw-mb-2">
-                                        Prompt (Descreva a imagem)
+
+                            <!-- Controls Row -->
+                            <div class="tw-flex tw-items-center tw-justify-between tw-mt-1">
+                                <!-- Left Configs -->
+                                <div class="tw-flex tw-flex-wrap tw-items-center tw-gap-2 md:tw-gap-4 tw-text-[11px] md:tw-text-xs tw-font-semibold tw-text-gray-600">
+                                    <button class="hover:tw-text-gray-900 tw-transition-colors">Stable Diffusion XL</button>
+                                    <span class="tw-text-gray-300">|</span>
+                                    <button class="tw-flex tw-items-center tw-gap-1.5 hover:tw-text-gray-900 tw-transition-colors">
+                                        <svg class="tw-w-3.5 tw-h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="4" width="10" height="16" rx="2"></rect></svg>
+                                        9:16
+                                    </button>
+                                    <span class="tw-text-gray-300">|</span>
+                                    <button class="tw-flex tw-items-center tw-gap-1.5 hover:tw-text-gray-900 tw-transition-colors">
+                                        <svg class="tw-w-3.5 tw-h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2 12h20M12 2v20"></path></svg>
+                                        1
+                                    </button>
+                                    <span class="tw-text-gray-300">|</span>
+                                    <button class="tw-flex tw-items-center hover:tw-text-gray-900 tw-transition-colors">
+                                        <svg class="tw-w-4 tw-h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </button>
+                                    <span class="tw-text-gray-300">|</span>
+                                    <label class="tw-flex tw-items-center tw-gap-2 tw-cursor-pointer">
+                                        <div class="tw-relative">
+                                            <input type="checkbox" class="tw-sr-only tw-peer" checked>
+                                            <div class="tw-w-7 tw-h-4 tw-bg-[#5666F5] tw-rounded-full tw-peer tw-peer-checked:after:tw-translate-x-3 after:tw-content-[''] after:tw-absolute after:tw-top-[2px] after:tw-left-[2px] after:tw-bg-white after:tw-rounded-full after:tw-h-3 after:tw-w-3 after:tw-transition-all"></div>
+                                        </div>
+                                        <span class="tw-text-xs tw-font-medium tw-text-gray-700">Melhorar</span>
                                     </label>
-                                    <textarea id="t2i-prompt" rows="3" class="tw-w-full tw-px-4 tw-py-3 tw-bg-gray-50 tw-border tw-border-gray-200 tw-rounded-xl tw-text-sm focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500 focus:tw-bg-white tw-transition-all tw-resize-none" placeholder="Ex: Um astronauta andando a cavalo na lua, estilo fotorrealista..."></textarea>
                                 </div>
+
+                                <!-- Generate Button -->
+                                <button id="btn-generate-t2i" class="tw-w-14 tw-h-10 tw-bg-[#5666F5] tw-text-white tw-rounded-xl tw-flex tw-shrink-0 tw-items-center tw-justify-center hover:tw-bg-[#4A5DDF] tw-transition-all disabled:tw-opacity-50">
+                                    <svg class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                                    <svg class="tw-w-4 tw-h-4 tw-ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
                             </div>
-                            <div id="t2i-error" class="tw-hidden tw-mt-4 tw-p-3 tw-bg-red-50 tw-text-red-600 tw-text-sm tw-rounded-lg"></div>
-                        </div>
-                        <div class="tw-bg-gray-50 tw-px-8 tw-py-5 tw-border-t tw-border-gray-100 tw-flex tw-items-center tw-justify-between">
-                            <div class="tw-flex tw-items-center tw-gap-2 tw-text-sm tw-text-gray-500">
-                                <span>Custo: <strong>1 crédito</strong></span>
-                            </div>
-                            <button id="btn-generate-t2i" class="tw-px-6 tw-py-2.5 tw-bg-blue-600 tw-text-white tw-font-medium tw-rounded-xl hover:tw-bg-blue-700 disabled:tw-opacity-50">
-                                <span>Gerar Imagem</span>
-                            </button>
+                            <div id="t2i-error" class="tw-hidden tw-text-xs tw-text-red-500 tw-mt-1"></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- VIEW: AI Video Generator -->
-                <div id="view-video" class="view-panel hidden tw-flex tw-flex-col tw-items-center tw-justify-center tw-h-full tw-w-full tw-p-8">
-                    <div class="tw-w-full tw-max-w-2xl tw-bg-white tw-shadow-2xl tw-rounded-3xl tw-overflow-hidden tw-border tw-border-gray-100">
-                        <div class="tw-bg-gradient-to-r tw-from-indigo-600 tw-to-purple-600 tw-px-8 tw-py-6 tw-text-white">
-                            <div class="tw-flex tw-items-center tw-gap-4">
-                                <div class="tw-bg-white/20 tw-p-3 tw-rounded-2xl tw-backdrop-blur-sm">
-                                    <svg class="tw-w-8 tw-h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                    </svg>
+                <div id="view-video" class="view-panel hidden tw-absolute tw-inset-0 tw-flex-col tw-bg-[#FCFCFD]">
+                    <!-- Main Canvas Area -->
+                    <div class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-overflow-auto tw-p-4 tw-pb-24 md:tw-pb-40">
+                         <!-- Empty state -->
+                         <div id="video-placeholder" class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-opacity-60">
+                              <div class="tw-relative tw-w-full tw-aspect-video tw-max-w-[600px] tw-mx-auto tw-border-2 tw-border-dashed tw-border-gray-200 tw-rounded-2xl tw-bg-gray-50/50 hover:tw-border-indigo-400 tw-transition-all tw-group">
+                                <div id="video-image-uploader" class="tw-w-full tw-h-full tw-flex tw-items-center tw-justify-center tw-cursor-pointer tw-relative">
+                                    <input type="file" id="video-file-input" accept="image/*" class="tw-hidden" />
+                                    <div id="video-upload-prompt" class="tw-flex tw-flex-col tw-items-center">
+                                        <svg class="tw-w-16 tw-h-16 tw-text-gray-400 group-hover:tw-text-indigo-400 tw-mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                        <p class="tw-text-lg md:tw-text-xl tw-text-gray-500 tw-font-medium">Gere vídeos incríveis a partir de textos e imagens.</p>
+                                        <p class="tw-text-sm tw-text-gray-400 tw-mt-2">(Opcional) Clique para adicionar imagem inicial</p>
+                                    </div>
+                                    <img id="video-preview-img" class="tw-hidden tw-absolute tw-inset-0 tw-w-full tw-h-full tw-object-contain tw-rounded-2xl tw-bg-black/5" />
                                 </div>
-                                <div>
-                                    <h2 class="tw-text-2xl tw-font-bold tw-tracking-tight">Video Generator AI</h2>
+                              </div>                         
+                          </div>
+                         <!-- Generated Video -->
+                        <div class="tw-relative tw-group tw-max-w-full tw-max-h-full tw-flex tw-items-center tw-justify-center">
+                             <video id="video-player" controls class="tw-hidden tw-max-w-full tw-max-h-full tw-rounded-xl tw-shadow-2xl"></video>
+                             
+                             <!-- Download Button -->
+                             <button id="btn-download-video" class="tw-absolute tw-top-4 tw-right-4 tw-z-20 tw-bg-white/90 tw-backdrop-blur-sm tw-p-2.5 tw-rounded-xl tw-shadow-sm tw-opacity-0 group-hover:tw-opacity-100 tw-transition-all hover:tw-bg-white tw-text-gray-700">
+                                 <svg class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                             </button>
+                         </div>
+                         
+                         <!-- Loading/Loader View -->
+                         <div id="video-loader" class="tw-hidden tw-flex-col tw-items-center tw-justify-center tw-gap-4">
+                            <svg class="tw-animate-spin tw-h-10 tw-w-10 tw-text-[#5666F5]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="tw-opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="tw-opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p class="tw-text-gray-500 tw-font-medium">Animando sua cena com Inteligência Artificial (Stability Video)...</p>
+                         </div>
+                    </div>
+
+                    <!-- Floating Prompt Box Container -->
+                    <div class="tw-absolute tw-bottom-0 tw-left-0 tw-w-full tw-p-4 md:tw-p-6 tw-flex tw-justify-center tw-pointer-events-none tw-z-10">
+                        <div class="tw-w-full tw-max-w-2xl tw-bg-white tw-border tw-border-gray-200 tw-rounded-2xl tw-shadow-xl tw-p-3 md:tw-p-4 tw-pointer-events-auto tw-flex tw-flex-col tw-gap-3">
+                            <!-- Input Row -->
+                            <div class="tw-flex tw-items-start tw-gap-3 md:tw-gap-4">
+                                <textarea id="video-prompt" class="tw-flex-1 tw-resize-none tw-outline-none tw-border-none tw-text-gray-800 tw-bg-transparent placeholder:tw-text-gray-400 tw-text-sm md:tw-text-base tw-min-h-[48px] tw-pt-3" placeholder="Describe the video you want to generate..."></textarea>
+                            </div>
+
+                            <!-- Controls Row -->
+                            <div class="tw-flex tw-items-center tw-justify-between tw-mt-1">
+                                <!-- Left Configs -->
+                                <div class="tw-flex tw-flex-wrap tw-items-center tw-gap-2 md:tw-gap-4 tw-text-[11px] md:tw-text-xs tw-font-semibold tw-text-gray-600">
+                                    <button class="hover:tw-text-gray-900 tw-transition-colors">Stability Video Fast</button>
+                                    <span class="tw-text-gray-300">|</span>
+                                    <span class="tw-text-gray-500">Custo: 10 créditos</span>
                                 </div>
+
+                                <!-- Generate Button -->
+                                <button id="btn-generate-video" class="tw-w-14 tw-h-10 tw-bg-[#5666F5] tw-text-white tw-rounded-xl tw-flex tw-shrink-0 tw-items-center tw-justify-center hover:tw-bg-[#4A5DDF] tw-transition-all disabled:tw-opacity-50">
+                                    <svg class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                                    <svg class="tw-w-4 tw-h-4 tw-ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
                             </div>
-                        </div>
-                        <div class="tw-p-8">
-                            <div class="tw-mb-6">
-                               <label class="tw-block tw-text-sm tw-font-semibold tw-text-gray-700 tw-mb-2">
-                                   Imagem de Origem (Opcional)
-                               </label>
-                               <div id="video-image-uploader" class="tw-w-full tw-h-48 tw-border-2 tw-border-dashed tw-border-gray-200 tw-rounded-2xl tw-bg-gray-50 hover:tw-bg-gray-100 tw-transition-colors tw-flex tw-items-center tw-justify-center tw-cursor-pointer tw-relative">
-                                   <input type="file" id="video-file-input" accept="image/*" class="tw-hidden" />
-                                   <div id="video-upload-prompt" class="tw-text-center">
-                                       <span class="tw-text-sm tw-text-gray-600">Clique para carregar uma imagem</span>
-                                   </div>
-                                   <img id="video-preview-img" class="tw-hidden tw-absolute tw-inset-0 tw-w-full tw-h-full tw-object-contain tw-rounded-xl" />
-                               </div>
-                            </div>
-                            <div class="tw-space-y-4">
-                                <div>
-                                    <label for="video-prompt" class="tw-block tw-text-sm tw-font-semibold tw-text-gray-700 tw-mb-2">
-                                        Prompt Criativo
-                                    </label>
-                                    <textarea id="video-prompt" rows="3" class="tw-w-full tw-px-4 tw-py-3 tw-bg-gray-50 tw-border tw-border-gray-200 tw-rounded-xl tw-text-sm focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-indigo-500 focus:tw-bg-white tw-transition-all tw-resize-none" placeholder="Ex: Uma renderização 3D de um carro..."></textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tw-bg-gray-50 tw-px-8 tw-py-5 tw-border-t tw-border-gray-100 tw-flex tw-items-center tw-justify-between">
-                            <div class="tw-flex tw-items-center tw-gap-2 tw-text-sm tw-text-gray-500">
-                                <span>Custo: <strong>10 créditos</strong></span>
-                            </div>
-                            <button id="btn-generate-video" class="tw-px-6 tw-py-2.5 tw-bg-indigo-600 tw-text-white tw-font-medium tw-rounded-xl hover:tw-bg-indigo-700 disabled:tw-opacity-50">
-                                <span>Gerar Vídeo</span>
-                            </button>
+                            <div id="video-error" class="tw-hidden tw-text-xs tw-text-red-500 tw-mt-1"></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- VIEW: Face Swap -->
-                <div id="view-faceswap" class="view-panel hidden tw-flex tw-flex-col tw-items-center tw-justify-center tw-h-full tw-w-full tw-p-8">
-                     <div class="tw-w-full tw-max-w-3xl tw-bg-white tw-shadow-2xl tw-rounded-3xl tw-overflow-hidden tw-border tw-border-gray-100">
-                        <div class="tw-bg-gradient-to-r tw-from-pink-500 tw-to-orange-400 tw-px-8 tw-py-6 tw-text-white">
-                            <div class="tw-flex tw-items-center tw-gap-4">
-                                <div class="tw-bg-white/20 tw-p-3 tw-rounded-2xl tw-backdrop-blur-sm">
-                                    <span class="tw-text-2xl">🎭</span>
-                                </div>
-                                <div>
-                                    <h2 class="tw-text-2xl tw-font-bold tw-tracking-tight">Troca de Rosto (FaceSwap)</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tw-p-8">
-                            <div class="tw-flex tw-flex-col sm:tw-flex-row tw-gap-8 tw-items-center sm:tw-items-start">
-                                <div class="tw-w-full sm:tw-w-1/2 tw-space-y-2">
-                                    <label class="tw-block tw-text-sm tw-font-semibold tw-text-gray-700 tw-text-center">Imagem Base (O Corpo)</label>
-                                    <div id="faceswap-target-uploader" class="tw-h-64 tw-border-2 tw-border-dashed tw-border-gray-200 tw-rounded-2xl tw-bg-gray-50 hover:tw-bg-gray-100 tw-transition-colors tw-flex tw-items-center tw-justify-center tw-cursor-pointer tw-relative tw-overflow-hidden">
-                                        <input type="file" id="faceswap-target-input" accept="image/*" class="tw-hidden" />
-                                        <div id="faceswap-target-prompt" class="tw-text-center">
-                                            <div class="tw-text-4xl tw-mb-2">🧍</div>
+                <div id="view-faceswap" class="view-panel hidden tw-absolute tw-inset-0 tw-flex-col tw-bg-[#FCFCFD]">
+                    <!-- Main Canvas Area -->
+                    <div class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-overflow-auto tw-p-4 tw-pb-24 md:tw-pb-40">
+                         
+                         <!-- UI de Inputs / Empty State -->
+                         <div id="faceswap-placeholder" class="tw-w-full tw-max-w-2xl tw-flex tw-flex-col tw-items-center tw-justify-center tw-opacity-90">
+                              <div class="tw-text-center tw-mb-8">
+                                  <h2 class="tw-text-2xl tw-font-bold tw-text-gray-800">Troca de Rosto AI</h2>
+                                  <p class="tw-text-gray-500">Faça upload do corpo base e do rosto que deseja aplicar.</p>
+                              </div>
+                              
+                              <div class="tw-flex tw-flex-row md:tw-flex-row tw-w-full tw-gap-6 tw-justify-center">
+                                  <!-- Base Img (Corpo) -->
+                                  <div class="tw-w-full md:tw-w-1/2 tw-max-w-[400px]">
+                                      <div class="tw-relative tw-w-full tw-aspect-square tw-border-2 tw-border-dashed tw-border-gray-200 tw-rounded-2xl tw-bg-gray-50/50 hover:tw-border-pink-400 tw-transition-all tw-group">
+                                        <div id="faceswap-target-uploader" class="tw-w-full tw-h-full tw-flex tw-items-center tw-justify-center tw-cursor-pointer tw-relative tw-overflow-hidden tw-rounded-2xl">
+                                            <input type="file" id="faceswap-target-input" accept="image/*" class="tw-hidden" />
+                                            <div id="faceswap-target-prompt" class="tw-flex tw-flex-col tw-items-center">
+                                                <div class="tw-text-5xl tw-mb-3 group-hover:tw-scale-110 tw-transition-transform">🧍</div>
+                                                <span class="tw-text-sm tw-font-medium tw-text-gray-600">Imagem Base (Corpo)</span>
+                                            </div>
+                                            <img id="faceswap-target-preview" class="tw-hidden tw-absolute tw-inset-0 tw-w-full tw-h-full tw-object-cover tw-bg-white" />
                                         </div>
-                                        <img id="faceswap-target-preview" class="tw-hidden tw-absolute tw-inset-0 tw-w-full tw-h-full tw-object-contain tw-bg-gray-100" />
-                                    </div>
-                                </div>
-                                <div class="tw-w-full sm:tw-w-1/2 tw-space-y-2">
-                                    <label class="tw-block tw-text-sm tw-font-semibold tw-text-gray-700 tw-text-center">Imagem do Rosto (Origem)</label>
-                                    <div id="faceswap-source-uploader" class="tw-h-64 tw-border-2 tw-border-dashed tw-border-gray-200 tw-rounded-2xl tw-bg-gray-50 hover:tw-bg-gray-100 tw-transition-colors tw-flex tw-items-center tw-justify-center tw-cursor-pointer tw-relative tw-overflow-hidden">
-                                        <input type="file" id="faceswap-source-input" accept="image/*" class="tw-hidden" />
-                                        <div id="faceswap-source-prompt" class="tw-text-center">
-                                            <div class="tw-text-4xl tw-mb-2">👤</div>
+                                      </div>
+                                  </div>
+                                  
+                                  <!-- Source Img (Rosto) -->
+                                  <div class="tw-w-full md:tw-w-1/2 tw-max-w-[400px]">
+                                      <div class="tw-relative tw-w-full tw-aspect-square tw-border-2 tw-border-dashed tw-border-gray-200 tw-rounded-2xl tw-bg-gray-50/50 hover:tw-border-orange-400 tw-transition-all tw-group">
+                                        <div id="faceswap-source-uploader" class="tw-w-full tw-h-full tw-flex tw-items-center tw-justify-center tw-cursor-pointer tw-relative tw-overflow-hidden tw-rounded-2xl">
+                                            <input type="file" id="faceswap-source-input" accept="image/*" class="tw-hidden" />
+                                            <div id="faceswap-source-prompt" class="tw-flex tw-flex-col tw-items-center">
+                                                <div class="tw-text-5xl tw-mb-3 group-hover:tw-scale-110 tw-transition-transform">👤</div>
+                                                <span class="tw-text-sm tw-font-medium tw-text-gray-600">Imagem com Rosto (Origem)</span>
+                                            </div>
+                                            <img id="faceswap-source-preview" class="tw-hidden tw-absolute tw-inset-0 tw-w-full tw-h-full tw-object-cover tw-bg-white" />
                                         </div>
-                                        <img id="faceswap-source-preview" class="tw-hidden tw-absolute tw-inset-0 tw-w-full tw-h-full tw-object-contain tw-bg-gray-100" />
-                                    </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+
+                         <!-- Generated Result Image -->
+                        <div class="tw-relative tw-group tw-max-w-full tw-max-h-full tw-flex tw-items-center tw-justify-center">
+                             <img id="faceswap-result" class="tw-hidden tw-max-w-full tw-max-h-full tw-object-contain tw-rounded-xl tw-shadow-2xl" alt="FaceSwap Result" />
+                             
+                             <!-- Download Button -->
+                             <button id="btn-download-faceswap" class="tw-absolute tw-top-4 tw-right-4 tw-z-20 tw-bg-white/90 tw-backdrop-blur-sm tw-p-2.5 tw-rounded-xl tw-shadow-sm tw-opacity-0 group-hover:tw-opacity-100 tw-transition-all hover:tw-bg-white tw-text-gray-700">
+                                 <svg class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                             </button>
+                         </div>
+                         
+                         <!-- Loading/Loader View -->
+                         <div id="faceswap-loader" class="tw-hidden tw-flex-col tw-items-center tw-justify-center tw-gap-4">
+                            <svg class="tw-animate-spin tw-h-10 tw-w-10 tw-text-[#5666F5]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="tw-opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="tw-opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p class="tw-text-gray-500 tw-font-medium">Mapeando características faciais e renderizando (Replicate)...</p>
+                         </div>
+                    </div>
+
+                    <!-- Floating Prompt Box Container -->
+                    <div class="tw-absolute tw-bottom-0 tw-left-0 tw-w-full tw-p-4 md:tw-p-6 tw-flex tw-justify-center tw-pointer-events-none tw-z-10">
+                        <div class="tw-w-full tw-max-w-2xl tw-bg-white tw-border tw-border-gray-200 tw-rounded-2xl tw-shadow-xl tw-p-3 md:tw-p-4 tw-pointer-events-auto tw-flex tw-flex-col tw-gap-3">
+                            <!-- Controls Row -->
+                            <div class="tw-flex tw-items-center tw-justify-between">
+                                <!-- Left Configs -->
+                                <div class="tw-flex tw-flex-wrap tw-items-center tw-gap-2 md:tw-gap-4 tw-text-[11px] md:tw-text-xs tw-font-semibold tw-text-gray-600">
+                                    <span class="tw-text-gray-800">Replicate FaceSwap AI</span>
+                                    <span class="tw-text-gray-300">|</span>
+                                    <span class="tw-text-gray-500">Custo: 2 créditos</span>
                                 </div>
+
+                                <!-- Generate Button -->
+                                <button id="btn-generate-faceswap" class="tw-px-6 tw-h-10 tw-bg-[#5666F5] tw-text-white tw-font-medium tw-rounded-xl tw-flex tw-shrink-0 tw-items-center tw-justify-center hover:tw-bg-[#4A5DDF] tw-transition-all disabled:tw-opacity-50">
+                                    <span>Fundir Rostos</span>
+                                    <svg class="tw-w-4 tw-h-4 tw-ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
                             </div>
+                            <div id="faceswap-error" class="tw-hidden tw-text-xs tw-text-red-500"></div>
                         </div>
-                        <div class="tw-bg-gray-50 tw-px-8 tw-py-5 tw-border-t tw-border-gray-100 tw-flex tw-items-center tw-justify-between">
-                            <div class="tw-flex tw-items-center tw-gap-2 tw-text-sm tw-text-gray-500">
-                                <span>Custo: <strong>2 créditos</strong></span>
-                            </div>
-                            <button id="btn-generate-faceswap" class="tw-px-6 tw-py-2.5 tw-bg-gradient-to-r tw-from-pink-500 tw-to-orange-500 tw-text-white tw-font-medium tw-rounded-xl hover:tw-opacity-90 disabled:tw-opacity-50">
-                                <span>Fundir Rostos</span>
-                            </button>
-                        </div>
-                     </div>
+                    </div>
                 </div>
           <section
             aria-atomic="false"
