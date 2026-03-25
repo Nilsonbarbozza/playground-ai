@@ -17,7 +17,7 @@
         },
       };
     </script>
-    <script src="scripts/main.js" defer></script>
+    <script src="scripts/app.js" type="module"></script>
   </head>
   <body class="inline_c81ed26d">
     <div data-channel-name="in_page_channel_2qI1Ou" id="in-page-channel-node-id"></div>
@@ -157,6 +157,7 @@
                         class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-tertiary text-tertiary-foreground hover:bg-tertiary-hover active:bg-tertiary-hover flex h-10 min-w-10 justify-start px-3 w-full"
                         data-active="false"
                         data-state="closed"
+                        data-view="projects"
                         data-testid="@ai-playground-v2/sidebar-my-creations"
                       >
                         <svg
@@ -204,6 +205,7 @@
                             class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-tertiary text-tertiary-foreground hover:bg-tertiary-hover active:bg-tertiary-hover flex h-10 min-w-10 justify-start px-3 w-full"
                             data-active="false"
                             data-state="closed"
+                            data-view="text-to-image"
                             data-testid="@ai-playground-v2/sidebar-category/text-to-image"
                           >
                             <svg
@@ -234,6 +236,7 @@
                             class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-gray-100 text-secondary-foreground hover:bg-gray-200 active:bg-gray-200 flex h-10 min-w-10 justify-start px-3 w-full"
                             data-active="true"
                             data-state="closed"
+                            data-view="image-editor"
                             data-testid="@ai-playground-v2/sidebar-category/image-to-image"
                           >
                             <svg
@@ -304,6 +307,7 @@
                             class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-tertiary text-tertiary-foreground hover:bg-tertiary-hover active:bg-tertiary-hover flex h-10 min-w-10 justify-start px-3 w-full"
                             data-active="false"
                             data-state="closed"
+                            data-view="video"
                             data-testid="@ai-playground-v2/sidebar-category/text-to-video"
                           >
                             <svg
@@ -338,6 +342,7 @@
                             class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-tertiary text-tertiary-foreground hover:bg-tertiary-hover active:bg-tertiary-hover flex h-10 min-w-10 justify-start px-3 w-full"
                             data-active="false"
                             data-state="closed"
+                            data-view="video"
                             data-testid="@ai-playground-v2/sidebar-category/image-to-video"
                           >
                             <svg
@@ -450,6 +455,7 @@
                             class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-tertiary text-tertiary-foreground hover:bg-tertiary-hover active:bg-tertiary-hover flex h-10 min-w-10 justify-start px-3 w-full"
                             data-active="false"
                             data-state="closed"
+                            data-view="faceswap"
                             data-testid="@ai-playground-v2/sidebar-category/video-to-video"
                           >
                             <svg
@@ -525,74 +531,60 @@
                     </svg>
                   </button>
                 </button>
+                <!-- [SECTION] Autenticação / Perfil -->
                 <div class="flex items-center gap-4">
-                  <button
-                    aria-controls="radix-_r_1t_"
-                    aria-expanded="false"
-                    aria-haspopup="dialog"
-                    class="relative items-center justify-center whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none text-secondary-foreground hover:bg-secondary-hover active:bg-secondary-hover h-10 flex gap-2 p-3 bg-white"
-                    data-state="closed"
-                    data-testid="@ai-playground-v2/credits-dropdown"
-                    type="button"
-                  >
-                    <svg aria-hidden="true" class="absolute h-0 w-0">
-                      <defs>
-                        <lineargradient
-                          id="gradient-q8r5w8okz"
-                          x1="43.6641%"
-                          x2="-4.88405%"
-                          y1="1.67656%"
-                          y2="28.5026%"
-                        >
-                          <stop offset="33.9453%" stop-color="#001BFF"></stop>
-                          <stop offset="70.4477%" stop-color="#9779FF"></stop>
-                          <stop offset="100%" stop-color="#E3CEFF"></stop>
-                        </lineargradient>
-                      </defs></svg
-                    ><svg
-                      class="overflow-visible inline_e97a0d52"
-                      data-icon-id="gradient-q8r5w8okz"
-                      fill="none"
-                      height="14"
-                      viewbox="0 0 16 16"
-                      width="14"
-                      xmlns="http://www.w3.org/2000/svg"
+                  <!-- Perfil do Usuário (Logado) -->
+                  <div id="profile-section" class="tw-hidden flex items-center gap-3">
+                    <span id="user-email" class="tw-text-sm tw-text-gray-600 tw-hidden md:tw-block"></span>
+                    <button
+                      aria-controls="radix-_r_1t_"
+                      aria-expanded="false"
+                      aria-haspopup="dialog"
+                      class="relative items-center justify-center whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none text-secondary-foreground hover:bg-secondary-hover active:bg-secondary-hover h-10 flex gap-2 p-3 bg-white"
+                      data-state="closed"
+                      data-testid="@ai-playground-v2/credits-dropdown"
+                      type="button"
                     >
-                      <g clip-path="url(#star-four_svg__clip0_6402_17)">
-                        <path
-                          d="M16 8a1.13 1.13 0 0 1-.255.723c-.257.316-.7.367-1.102.433-.994.163-2.956.594-3.926 1.565-.958.959-1.39 2.885-1.558 3.89-.07.426-.128.898-.472 1.158l-.037.026a1.14 1.14 0 0 1-1.342-.026c-.344-.26-.401-.732-.472-1.158-.167-1.005-.6-2.932-1.558-3.89-.958-.96-2.885-1.392-3.89-1.559-.425-.07-.897-.128-1.157-.473A1.14 1.14 0 0 1 0 8a1.14 1.14 0 0 1 .231-.69c.26-.344.732-.401 1.158-.472 1.004-.167 2.93-.6 3.89-1.558.958-.959 1.39-2.886 1.557-3.891.07-.426.128-.898.472-1.158A1.14 1.14 0 0 1 7.998 0a1.14 1.14 0 0 1 .69.231c.343.26.4.732.471 1.158.167 1.005.6 2.932 1.559 3.89.97.97 2.93 1.402 3.925 1.565.402.066.845.117 1.103.433l.05.067c.135.192.206.421.204.656"
-                          fill="#262525"
-                        ></path>
-                      </g>
-                      <defs>
-                        <clippath id="star-four_svg__clip0_6402_17">
-                          <path d="M0 0h16v16H0z" fill="#fff"></path>
-                        </clippath>
-                      </defs></svg
-                    >115
-                    <div class="hidden md:block">
-                      Créditos
-                    </div>
-                    <svg
-                      class="overflow-visible hidden size-4 md:block inline_e97a0d52"
-                      fill="none"
-                      height="16"
-                      viewbox="0 0 16 16"
-                      width="16"
-                      xmlns="http://www.w3.org/2000/svg"
+                      <svg aria-hidden="true" class="absolute h-0 w-0">
+                        <defs>
+                          <lineargradient id="gradient-q8r5w8okz" x1="43.6641%" x2="-4.88405%" y1="1.67656%" y2="28.5026%">
+                            <stop offset="33.9453%" stop-color="#001BFF"></stop>
+                            <stop offset="70.4477%" stop-color="#9779FF"></stop>
+                            <stop offset="100%" stop-color="#E3CEFF"></stop>
+                          </lineargradient>
+                        </defs>
+                      </svg>
+                      <svg class="overflow-visible inline_e97a0d52" data-icon-id="gradient-q8r5w8okz" fill="none" height="14" viewbox="0 0 16 16" width="14" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#star-four_svg__clip0_6402_17)">
+                          <path d="M16 8a1.13 1.13 0 0 1-.255.723c-.257.316-.7.367-1.102.433-.994.163-2.956.594-3.926 1.565-.958.959-1.39 2.885-1.558 3.89-.07.426-.128.898-.472 1.158l-.037.026a1.14 1.14 0 0 1-1.342-.026c-.344-.26-.401-.732-.472-1.158-.167-1.005-.6-2.932-1.558-3.89-.958-.96-2.885-1.392-3.89-1.559-.425-.07-.897-.128-1.157-.473A1.14 1.14 0 0 1 0 8a1.14 1.14 0 0 1 .231-.69c.26-.344.732-.401 1.158-.472 1.004-.167 2.93-.6 3.89-1.558.958-.959 1.39-2.886 1.557-3.891.07-.426.128-.898.472-1.158A1.14 1.14 0 0 1 7.998 0a1.14 1.14 0 0 1 .69.231c.343.26.4.732.471 1.158.167 1.005.6 2.932 1.559 3.89.97.97 2.93 1.402 3.925 1.565.402.066.845.117 1.103.433l.05.067c.135.192.206.421.204.656" fill="#262525"></path>
+                        </g>
+                        <defs>
+                          <clippath id="star-four_svg__clip0_6402_17">
+                            <path d="M0 0h16v16H0z" fill="#fff"></path>
+                          </clippath>
+                        </defs>
+                      </svg>
+                      <span id="user-credits">0</span>
+                      <div class="hidden md:block">Créditos</div>
+                    </button>
+                    <button id="btn-logout" class="tw-p-2 tw-text-gray-500 hover:tw-text-red-500" title="Sair">
+                      <svg class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    </button>
+                  </div>
+
+                  <!-- Seção de Login (Deslogado) -->
+                  <div id="auth-section" class="tw-flex tw-items-center">
+                    <button 
+                      id="btn-open-login"
+                      class="tw-bg-black tw-text-white tw-px-4 tw-py-2 tw-rounded-lg tw-font-medium hover:tw-bg-gray-800 tw-transition-colors"
                     >
-                      <path
-                        d="m4 6 4 4 4-4"
-                        stroke="currentColor"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      ></path>
-                    </svg>
-                  </button>
+                      Entrar
+                    </button>
+                  </div>
                 </div>
               </header>
               <div class="flex-1 p-0 relative" data-testid="@ai-playground-v2/content/main">
-                <div id="view-image-editor" class="view-panel active" style="display:block">
+                <div id="view-image-editor" class="view-panel tw-hidden">
                 <div
                   class="grid min-h-full grid-rows-[1fr_auto]"
                   data-testid="@ai-playground-v2/image-editor/container"
@@ -708,7 +700,7 @@
             </div> <!-- /#view-image-editor -->
 
                 <!-- VIEW: Meus Projetos -->
-                <div id="view-projects" class="view-panel hidden tw-p-8 tw-w-full tw-mx-auto tw-max-w-6xl">
+                <div id="view-projects" class="view-panel tw-hidden tw-p-8 tw-w-full tw-mx-auto tw-max-w-6xl">
                   <div class="tw-flex tw-items-center tw-justify-between tw-mb-8">
                     <h2 class="tw-text-3xl tw-font-bold tw-text-gray-800 tw-tracking-tight tw-flex tw-items-center tw-gap-3">
                         <span class="tw-bg-blue-100 tw-text-blue-600 tw-p-2 tw-rounded-xl">
@@ -728,7 +720,7 @@
 
                 
                 <!-- VIEW: Texto para Imagem -->
-                <div id="view-text2img" class="view-panel hidden tw-absolute tw-inset-0 tw-flex-col tw-bg-[#FCFCFD]">
+                <div id="view-text-to-image" class="view-panel tw-hidden tw-absolute tw-inset-0 tw-flex-col tw-bg-[#FCFCFD]">
                     <!-- Main Canvas Area -->
                     <div class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-overflow-auto tw-p-4 tw-pb-24 md:tw-pb-40 lg:tw-pb-0">
                          <!-- Empty state -->
@@ -812,7 +804,7 @@
                 </div>
 
                 <!-- VIEW: AI Video Generator -->
-                <div id="view-video" class="view-panel hidden tw-absolute tw-inset-0 tw-flex-col tw-bg-[#FCFCFD]">
+                <div id="view-video" class="view-panel tw-hidden tw-absolute tw-inset-0 tw-flex-col tw-bg-[#FCFCFD]">
                     <!-- Main Canvas Area -->
                     <div class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-overflow-auto tw-p-4 tw-pb-24 md:tw-pb-40">
                          <!-- Empty state -->
@@ -878,7 +870,7 @@
                 </div>
 
                 <!-- VIEW: Face Swap -->
-                <div id="view-faceswap" class="view-panel hidden tw-absolute tw-inset-0 tw-flex-col tw-bg-[#FCFCFD]">
+                <div id="view-faceswap" class="view-panel tw-hidden tw-absolute tw-inset-0 tw-flex-col tw-bg-[#FCFCFD]">
                     <!-- Main Canvas Area -->
                     <div class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-overflow-auto tw-p-4 tw-pb-24 md:tw-pb-40">
                          
@@ -1101,19 +1093,34 @@
       "
       src="data:,"
       width="1"
-    <img class="hidden" fetchpriority="high" height="1" src="data:," width="1" />
-    <img class="hidden" fetchpriority="high" height="1" src="data:," width="1" />
-    <img class="hidden" fetchpriority="high" height="1" src="data:," width="1" />
-    <img class="hidden" fetchpriority="high" height="1" src="data:," width="1" />
-    <img class="hidden" fetchpriority="high" height="1" src="data:," width="1" />
-    <div class="inline_ac8b5b8c" id="tcb-extension-us-wrapper">
-      <template shadowrootmode="open">
-        <div data-v-app="" id="app">
-          <div class="tcb-extension inline_2592cc77">
-            <div class="app"><div couponingdata="[object Object]"></div></div>
-          </div></div
-      ></template>
+    <!-- [MODAL] Autenticação -->
+    <div id="auth-modal" class="tw-fixed tw-inset-0 tw-bg-black/50 tw-z-[9999] tw-flex tw-items-center tw-justify-center tw-hidden">
+      <div class="tw-bg-white tw-rounded-2xl tw-p-8 tw-w-full tw-max-w-md tw-relative">
+        <button id="btn-close-auth" class="tw-absolute tw-top-4 tw-right-4 tw-text-gray-400 hover:tw-text-black">
+          <svg class="tw-w-6 tw-h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l18 18" /></svg>
+        </button>
+        
+        <div class="tw-text-center tw-mb-8">
+          <h2 class="tw-text-2xl tw-font-bold">Bem-vindo ao Playground</h2>
+          <p class="tw-text-gray-500">Faça login para continuar criando</p>
+        </div>
+
+        <form id="login-form" class="tw-space-y-4">
+          <div>
+            <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">E-mail</label>
+            <input name="email" type="email" required class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 focus:tw-ring-2 focus:tw-ring-black focus:tw-outline-none" placeholder="exemplo@email.com">
+          </div>
+          <div>
+            <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">Senha</label>
+            <input name="password" type="password" required class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 focus:tw-ring-2 focus:tw-ring-black focus:tw-outline-none" placeholder="••••••••">
+          </div>
+          <button id="btn-login" type="submit" class="tw-w-full tw-bg-black tw-text-white tw-py-3 tw-rounded-xl tw-font-bold hover:tw-bg-gray-800 tw-transition-all">
+            Entrar
+          </button>
+        </form>
+      </div>
     </div>
 
   </body>
 </html>
+
