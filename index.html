@@ -6,7 +6,7 @@
     <title>VEED - Playground de IA</title>
     <meta name="description" content="VEED AI Playground - Crie e edite imagens e vídeos com inteligência artificial usando ferramentas avançadas de IA em português." />
     <meta content="no-referrer" name="referrer" />
-    <link href="favicon.ico" rel="shortcut icon" />
+    <link href="https://res.cloudinary.com/dxwul5fff/image/upload/v1758373981/agente_gpt_icon_butpu3.svg" rel="shortcut icon" />
     <link href="styles/styles.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -111,7 +111,7 @@
               <div class="relative flex min-h-12 flex-shrink-0 items-center justify-between px-5 pt-4 pb-2">
                 <button data-testid="@ai-playground-v2/sidebar/logo" type="button" class="flex items-center gap-2">
                   <h1 class="sr-only">VEED AI Playground - Criador de Conteúdo com IA</h1>
-                  <img src="images/logo.jpg" alt="Logo VEED" class="h-8 w-8 rounded-lg object-cover" />
+                  <img src="https://res.cloudinary.com/dxwul5fff/image/upload/v1758373981/agente_gpt_icon_butpu3.svg" alt="Logo VEED" class="h-10 w-10 rounded-lg object-cover" />
                   <span class="font-bold text-lg tracking-tight">Playground</span>
                 </button>
                 <button id="mobile-sidebar-close" class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg md:hidden">
@@ -1165,69 +1165,190 @@
       "
       src="data:,"
       width="1"
-    <!-- [MODAL] Autenticação -->
-    <div id="auth-modal" class="tw-fixed tw-inset-0 tw-bg-black/50 tw-z-[9999] tw-flex tw-items-center tw-justify-center tw-hidden">
-      <div class="tw-bg-white tw-rounded-2xl tw-p-8 tw-w-full tw-max-w-md tw-relative tw-shadow-2xl">
-        <button id="btn-close-auth" class="tw-absolute tw-top-4 tw-right-4 tw-text-gray-400 hover:tw-text-black tw-transition-colors">
-          <svg class="tw-w-6 tw-h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-        </button>
-        
-        <div class="tw-text-center tw-mb-6">
-          <h2 class="tw-text-2xl tw-font-bold" id="auth-modal-title">Bem-vindo ao Playground</h2>
-          <p class="tw-text-gray-500 tw-text-sm" id="auth-modal-subtitle">Faça login para continuar criando</p>
-        </div>
+    
+<!-- [MODAL] Autenticação -->
+<div id="auth-modal" class="tw-fixed tw-inset-0 tw-bg-black/50 tw-z-[9999] tw-flex tw-items-center tw-justify-center tw-hidden tw-p-8">
+  <div class="tw-bg-white tw-rounded-2xl tw-relative tw-shadow-2xl tw-flex tw-overflow-hidden tw-w-full tw-max-w-4xl" style="min-height: 520px;">
 
-        <!-- Tabs -->
-        <div class="tw-flex tw-mb-6 tw-bg-gray-100 tw-rounded-xl tw-p-1">
-          <button id="tab-login" type="button" class="tw-flex-1 tw-py-2 tw-rounded-lg tw-font-medium tw-text-sm tw-bg-white tw-shadow tw-transition-all" onclick="document.getElementById('login-form').classList.remove('tw-hidden'); document.getElementById('register-form').classList.add('tw-hidden'); this.classList.add('tw-bg-white','tw-shadow'); document.getElementById('tab-register').classList.remove('tw-bg-white','tw-shadow'); document.getElementById('auth-modal-title').textContent='Bem-vindo ao Playground'; document.getElementById('auth-modal-subtitle').textContent='Faça login para continuar criando';">
+    <!-- Botão fechar -->
+    <button id="btn-close-auth" class="tw-absolute tw-top-4 tw-right-4 tw-z-10 tw-bg-transparent tw-border tw-border-black/10 tw-rounded-lg tw-w-8 tw-h-8 tw-flex tw-items-center tw-justify-center tw-text-gray-400 hover:tw-text-black hover:tw-bg-gray-100 tw-transition-all">
+      <svg class="tw-w-6 tw-h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <!-- ========== LADO ESQUERDO: Formulários ========== -->
+    <div class="tw-flex-1 tw-flex tw-flex-col tw-p-10 tw-min-w-0">
+
+      <!-- Logo -->
+      <div class="tw-flex tw-items-center tw-gap-1 tw-mb-7">
+        <span class="tw-text-sm tw-font-semibold tw-tracking-tight tw-text-gray-900">Playground</span>
+        <span class="tw-w-2 tw-h-2 tw-rounded-full tw-bg-violet-600 tw-inline-block"></span>
+      </div>
+
+      <!-- Título e subtítulo -->
+      <div class="tw-mb-6">
+        <h2 class="tw-text-2xl tw-font-bold tw-text-gray-900 tw-tracking-tight" id="auth-modal-title">Bem-vindo de volta</h2>
+        <p class="tw-text-gray-400 tw-text-sm tw-mt-1" id="auth-modal-subtitle">Faça login para continuar criando</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tw-flex tw-mb-6 tw-bg-gray-100 tw-rounded-xl tw-p-1">
+        <button
+          id="tab-login"
+          type="button"
+          class="tw-flex-1 tw-flex tw-flex-row tw-justify-center tw-py-2 tw-rounded-lg tw-font-medium tw-text-sm tw-bg-white tw-shadow tw-text-gray-900 tw-transition-all"
+          onclick="
+            document.getElementById('login-form').classList.remove('tw-hidden');
+            document.getElementById('register-form').classList.add('tw-hidden');
+            this.classList.add('tw-bg-white','tw-shadow','tw-text-gray-900');
+            this.classList.remove('tw-text-gray-400');
+            document.getElementById('tab-register').classList.remove('tw-bg-white','tw-shadow','tw-text-gray-900');
+            document.getElementById('tab-register').classList.add('tw-text-gray-400');
+            document.getElementById('auth-modal-title').textContent='Bem-vindo de volta';
+            document.getElementById('auth-modal-subtitle').textContent='Faça login para continuar criando';
+          ">
+          Entrar
+        </button>
+        <button
+          id="tab-register"
+          type="button"
+          class="tw-flex-1 tw-flex tw-flex-row tw-justify-center tw-py-2 tw-rounded-lg tw-font-medium tw-text-sm tw-text-gray-400 tw-transition-all"
+          onclick="
+            document.getElementById('register-form').classList.remove('tw-hidden');
+            document.getElementById('login-form').classList.add('tw-hidden');
+            this.classList.add('tw-bg-white','tw-shadow','tw-text-gray-900');
+            this.classList.remove('tw-text-gray-400');
+            document.getElementById('tab-login').classList.remove('tw-bg-white','tw-shadow','tw-text-gray-900');
+            document.getElementById('tab-login').classList.add('tw-text-gray-400');
+            document.getElementById('auth-modal-title').textContent='Crie sua conta';
+            document.getElementById('auth-modal-subtitle').textContent='Cadastre-se e ganhe 10 créditos grátis';
+          ">
+          Cadastrar
+        </button>
+      </div>
+
+      <!-- ===== Formulário Login ===== -->
+      <form id="login-form" class="tw-space-y-4">
+        <div>
+          <div class="tw-mb-4">
+            <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">E-mail</label>
+            <input
+              name="email"
+              type="email"
+              required
+              placeholder="exemplo@email.com"
+              class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 tw-bg-white focus:tw-ring-2 focus:tw-ring-violet-500 focus:tw-outline-none tw-transition-all tw-text-sm"
+            >
+          </div>
+          <div class="tw-mb-4">
+            <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">Senha</label>
+            <input
+              name="password"
+              type="password"
+              required
+              placeholder="••••••••"
+              class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 tw-bg-white focus:tw-ring-2 focus:tw-ring-violet-500 focus:tw-outline-none tw-transition-all tw-text-sm"
+            >
+          </div>
+          <!-- Lembrar / Esqueci -->
+          <div class="tw-flex tw-items-center tw-justify-between tw-mb-5">
+            <label class="tw-flex tw-items-center tw-gap-2 tw-cursor-pointer">
+              <input
+                type="checkbox"
+                name="remember"
+                class="tw-w-4 tw-h-4 tw-rounded tw-border-gray-300 tw-bg-white tw-accent-violet-600 tw-cursor-pointer"
+              >
+              <span class="tw-text-xs tw-text-gray-500">Lembrar de mim</span>
+            </label>
+            <button type="button" class="tw-text-xs tw-font-medium tw-text-violet-600 hover:tw-opacity-70 tw-transition-opacity tw-bg-transparent tw-border-0 tw-cursor-pointer tw-p-0">
+              Esqueci a senha
+            </button>
+          </div>
+          <button
+            id="btn-login"
+            type="submit"
+            class="tw-flex tw-flex-row tw-justify-center tw-w-full tw-bg-black tw-text-white tw-py-3 tw-rounded-xl tw-font-bold tw-text-sm hover:tw-bg-gray-800 tw-transition-all"
+          >
             Entrar
           </button>
-          <button id="tab-register" type="button" class="tw-flex-1 tw-py-2 tw-rounded-lg tw-font-medium tw-text-sm tw-transition-all" onclick="document.getElementById('register-form').classList.remove('tw-hidden'); document.getElementById('login-form').classList.add('tw-hidden'); this.classList.add('tw-bg-white','tw-shadow'); document.getElementById('tab-login').classList.remove('tw-bg-white','tw-shadow'); document.getElementById('auth-modal-title').textContent='Crie sua conta'; document.getElementById('auth-modal-subtitle').textContent='Cadastre-se e ganhe 10 créditos grátis';">
-            Cadastrar
+        </div>
+      </form>
+
+      <!-- ===== Formulário Cadastro ===== -->
+      <form id="register-form" class="tw-space-y-4 tw-hidden">
+        <div>
+          <!-- Badge créditos -->
+          <div class="tw-inline-flex tw-items-center tw-gap-1.5 tw-bg-violet-50 tw-text-violet-600 tw-rounded-full tw-px-3 tw-py-1 tw-text-xs tw-font-semibold tw-mb-4">
+            <span class="tw-w-1.5 tw-h-1.5 tw-rounded-full tw-bg-violet-600 tw-inline-block"></span>
+            10 créditos grátis ao cadastrar
+          </div>
+          <div class="tw-mb-4">
+            <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">E-mail</label>
+            <input
+              name="email"
+              type="email"
+              required
+              placeholder="exemplo@email.com"
+              class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 tw-bg-white focus:tw-ring-2 focus:tw-ring-violet-500 focus:tw-outline-none tw-transition-all tw-text-sm"
+            >
+          </div>
+          <div class="tw-mb-4">
+            <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">Senha</label>
+            <input
+              name="password"
+              type="password"
+              required
+              minlength="6"
+              placeholder="Mínimo 6 caracteres"
+              class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 tw-bg-white focus:tw-ring-2 focus:tw-ring-violet-500 focus:tw-outline-none tw-transition-all tw-text-sm"
+            >
+          </div>
+          <div class="tw-mb-5">
+            <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">Confirmar Senha</label>
+            <input
+              name="confirmPassword"
+              type="password"
+              required
+              minlength="6"
+              placeholder="••••••••"
+              class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 tw-bg-white focus:tw-ring-2 focus:tw-ring-violet-500 focus:tw-outline-none tw-transition-all tw-text-sm"
+            >
+          </div>
+          <button
+            id="btn-register"
+            type="submit"
+            class="tw-flex tw-flex-row tw-justify-center tw-w-full tw-bg-black tw-text-white tw-py-3 tw-rounded-xl tw-font-bold tw-text-sm hover:tw-bg-gray-800 tw-transition-all"
+          >
+            Criar Conta
           </button>
         </div>
+      </form>
 
+    </div>
+    <!-- /LADO ESQUERDO -->
 
-        <!-- Login Form -->
-        <form id="login-form" class="tw-space-y-4" data-view="view-login">
-          <div id="view-login">
-            <div class="tw-mb-4">
-              <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">E-mail</label>
-              <input name="email" type="email" required class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 focus:tw-ring-2 focus:tw-ring-black focus:tw-outline-none tw-transition-all" placeholder="exemplo@email.com">
-            </div>
-            <div class="tw-mb-4">
-              <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">Senha</label>
-              <input name="password" type="password" required class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 focus:tw-ring-2 focus:tw-ring-black focus:tw-outline-none tw-transition-all" placeholder="••••••••">
-            </div>
-            <button id="btn-login" type="submit" class="tw-w-full tw-bg-black tw-text-white tw-py-3 tw-rounded-xl tw-font-bold hover:tw-bg-gray-800 tw-transition-all">
-              Entrar
-            </button>
-          </div>
-        </form>
-
-        <!-- Register Form -->
-        <form id="register-form" class="tw-space-y-4 tw-hidden" data-view="view-register">
-          <div id="view-register">
-            <div class="tw-mb-4">
-              <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">E-mail</label>
-              <input name="email" type="email" required class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 focus:tw-ring-2 focus:tw-ring-black focus:tw-outline-none tw-transition-all" placeholder="exemplo@email.com">
-            </div>
-            <div class="tw-mb-4">
-              <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">Senha</label>
-              <input name="password" type="password" required minlength="6" class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 focus:tw-ring-2 focus:tw-ring-black focus:tw-outline-none tw-transition-all" placeholder="Mínimo 6 caracteres">
-            </div>
-            <div class="tw-mb-4">
-              <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">Confirmar Senha</label>
-              <input name="confirmPassword" type="password" required minlength="6" class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 focus:tw-ring-2 focus:tw-ring-black focus:tw-outline-none tw-transition-all" placeholder="••••••••">
-            </div>
-            <button id="btn-register" type="submit" class="tw-w-full tw-bg-black tw-text-white tw-py-3 tw-rounded-xl tw-font-bold hover:tw-bg-gray-800 tw-transition-all">
-              Criar Conta
-            </button>
-          </div>
-        </form>
+    <!-- ========== LADO DIREITO: Imagem ========== -->
+    <!-- Troque o src pela URL ou caminho da sua imagem -->
+    <div class="tw-w-[400px] tw-flex-shrink-0 tw-relative tw-overflow-hidden tw-hidden md:tw-block">
+      <img
+        src="uploads\gen_1774443330878_oiqtya.png"
+        alt="Playground"
+        class="tw-absolute tw-inset-0 tw-w-full tw-h-full tw-object-cover tw-object-center"
+      >
+      <!-- Overlay escuro -->
+      <div class="tw-absolute tw-inset-0 tw-bg-gradient-to-b tw-from-black/10 tw-to-black/70"></div>
+      <!-- Texto sobre a imagem -->
+      <div class="tw-absolute tw-bottom-0 tw-left-0 tw-right-0 tw-p-7 tw-z-10">
+        <img src="https://res.cloudinary.com/dxwul5fff/image/upload/v1758373981/agente_gpt_icon_butpu3.svg" alt="Logo agentGPT" class="h-10 w-10 rounded-lg object-cover" />
+        <h3 class="tw-text-white tw-text-xl tw-font-semibold tw-leading-snug tw-mb-1.5">Crie sem limites</h3>
+        <p class="tw-text-white/80 tw-text-xs tw-leading-relaxed">Ferramentas inteligentes para desenvolvedores e criadores.</p>
       </div>
     </div>
+    <!-- /LADO DIREITO -->
 
+  </div>
+</div>
 
   </body>
 </html>
