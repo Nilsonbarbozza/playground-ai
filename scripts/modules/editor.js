@@ -214,7 +214,7 @@ export const editor = {
       const data = await api.post('/edit', formData, true);
       
       this.setState('PREVIEW', { src: data.url });
-      auth.init(); // Refresh credits
+      auth.refreshUser(); // Refresh credits
       ui.showToast('Imagem editada com sucesso!');
 
     } catch (err) {

@@ -38,7 +38,7 @@ export const faceswap = {
         resultImg.src = data.url;
         loader.classList.add('tw-hidden');
         resultImg.classList.remove('tw-hidden');
-        auth.init(); 
+        auth.refreshUser(); 
 
       } catch (err) {
         ui.showToast(err.message, 'error');

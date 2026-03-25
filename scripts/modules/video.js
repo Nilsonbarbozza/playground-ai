@@ -75,7 +75,7 @@ export const videoModule = {
           loader.classList.add('tw-hidden');
           player.classList.remove('tw-hidden');
           ui.setLoading('btn-generate-video', false);
-          auth.init(); // Refresh credits
+          auth.refreshUser(); // Refresh credits
         }
       } catch (err) {
         if (err.message.includes('Sessão expirada')) return clearInterval(interval);

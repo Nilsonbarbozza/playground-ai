@@ -8,7 +8,7 @@ export class VideoEngine {
    * Submit a new video generation job
    */
   static async submit(userId, imageBuffer) {
-    const cost = 5;
+    const cost = Number(process.env.COST_TEXT_TO_VIDEO) || 5;
     const description = `Geração de Vídeo (Job Submission)`;
 
     // 1. Transactional Credit Deduction (Deduct upfront for Video)

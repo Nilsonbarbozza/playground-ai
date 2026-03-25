@@ -6,7 +6,7 @@ import { StorageService } from '../storage/storage.service.js';
 
 export class FaceSwapEngine {
   static async execute(userId, targetBase64, swapBase64) {
-    const cost = 2;
+    const cost = Number(process.env.COST_FACESWAP) || 3;
     const description = `Face Swap: AI Generation`;
 
     // 1. Billing

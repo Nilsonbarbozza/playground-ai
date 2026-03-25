@@ -7,7 +7,7 @@ import * as aiHelper from '../../utils/aiHelper.js';
 export class ImageEditEngine {
   static async execute(userId, options) {
     const { userPrompt, imageBuffer, maskBuffer } = options;
-    const cost = 1;
+    const cost = Number(process.env.COST_IMAGE_EDITOR) || 2;
 
     // 1. Transactional Credit Deduction
     await CreditService.useCredits(userId, cost, `Editor: ${userPrompt.substring(0, 30)}...`);

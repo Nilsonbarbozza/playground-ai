@@ -8,8 +8,11 @@ export const navigation = {
   views: [
     'view-text-to-image',
     'view-image-editor',
+    'view-upscale',
     'view-video',
+    'view-video-editor',
     'view-faceswap',
+    'view-avatar',
     'view-projects'
   ],
 
@@ -23,15 +26,22 @@ export const navigation = {
     this.views.forEach(id => {
       const el = document.getElementById(id);
       if (el) el.classList.toggle('tw-hidden', id !== viewId);
+      
+      // Update sidebar active state
+      const baseId = id.replace('view-', '');
+      const btn = document.querySelector(`[data-view="${baseId}"]`);
+      if (btn) {
+        if (id === viewId) {
+          btn.classList.add('tw-bg-gray-100', 'tw-text-black', 'tw-font-bold');
+          btn.classList.remove('tw-bg-transparent', 'tw-text-gray-500');
+          btn.setAttribute('data-active', 'true');
+        } else {
+          btn.classList.remove('tw-bg-gray-100', 'tw-text-black', 'tw-font-bold');
+          btn.classList.add('tw-bg-transparent', 'tw-text-gray-500');
+          btn.setAttribute('data-active', 'false');
+        }
+      }
     });
-    
-    // Auto-close sidebar on mobile after navigating
-    if (window.innerWidth < 768) {
-      this.closeSidebar();
-    }
-
-    // Scroll top
-    window.scrollTo(0, 0);
 
     // Specific view actions
     if (viewId === 'view-projects') {

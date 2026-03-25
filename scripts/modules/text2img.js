@@ -37,7 +37,7 @@ export const text2img = {
         previewImg.classList.remove('tw-hidden');
 
         // Refresh user credits in UI
-        auth.init(); // Simple way to refresh credits for now
+        auth.refreshUser();
       } catch (err) {
         errorDiv.textContent = err.message;
         errorDiv.classList.remove('tw-hidden');

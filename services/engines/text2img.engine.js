@@ -5,7 +5,7 @@ import { StorageService } from '../storage/storage.service.js';
 
 export class Text2ImgEngine {
   static async execute(userId, prompt) {
-    const cost = 1;
+    const cost = Number(process.env.COST_TEXT_TO_IMAGE) || 1;
     const description = `Geração de Imagem: ${prompt.substring(0, 30)}...`;
 
     // 1. Transactional Credit Deduction

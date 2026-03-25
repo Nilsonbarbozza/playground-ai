@@ -124,6 +124,20 @@ export const auth = {
     ui.showToast(isNewUser ? `Conta criada! Você ganhou ${data.user.credits} créditos.` : 'Bem-vindo de volta!');
     navigation.switchView('view-text-to-image');
     this.showModal(false);
+  },
+
+  async refreshUser() {
+    try {
+      const data = await api.get('/user/me');
+      if (data.success) {
+        this.user = data.user;
+        localStorage.setItem('user', JSON.stringify(data.user));
+        this.updateUI();
+        console.log('[Auth] Credits refreshed:', data.user.credits);
+      }
+    } catch (err) {
+      console.error('[Auth] Failed to refresh user:', err.message);
+    }
   }
 };
 

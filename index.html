@@ -153,15 +153,14 @@
                 <div class="flex w-full flex-col gap-1 flex-1">
                   <div class="flex h-full flex-col" data-testid="@ai-playground-v2/generation-sidebar">
                     <div class="px-4 pb-7">
-                      <button
-                        class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-tertiary text-tertiary-foreground hover:bg-tertiary-hover active:bg-tertiary-hover flex h-10 min-w-10 justify-start px-3 w-full"
-                        data-active="false"
-                        data-state="closed"
-                        data-view="projects"
-                        data-testid="@ai-playground-v2/sidebar-my-creations"
-                      >
+                        <button
+                          class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-transparent text-gray-500 hover:bg-gray-100 flex h-10 min-w-10 justify-start px-3 w-full"
+                          data-active="false"
+                          data-view="projects"
+                          data-testid="@ai-playground-v2/sidebar-my-creations"
+                        >
                         <svg
-                          class="h-4 w-4 shrink-0 stroke-[1.5px]"
+                          class="h-4 w-4 shrink-0 stroke-[1.5px] tw-text-gray-900"
                           fill="none"
                           height="16"
                           viewbox="0 0 16 16"
@@ -181,8 +180,7 @@
                           </defs></svg
                         ><span
                           class="flex flex-1 items-center justify-between gap-2 overflow-hidden whitespace-nowrap font-medium text-sm leading-[140%] inline_ab09c04b"
-                          ><span class="truncate"
-                                               >Meus Projetos</span>         ></span
+                          ><span class="tw-text-gray-900">Meus Projetos</span>></span
                           ></span
                         >
                       </button>
@@ -202,14 +200,13 @@
                         </div>
                         <div class="flex flex-col gap-2" data-testid="@ai-playground-v2/sidebar-category/items">
                           <button
-                            class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-tertiary text-tertiary-foreground hover:bg-tertiary-hover active:bg-tertiary-hover flex h-10 min-w-10 justify-start px-3 w-full"
+                            class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-transparent text-gray-500 hover:bg-gray-100 flex h-10 min-w-10 justify-start px-3 w-full"
                             data-active="false"
-                            data-state="closed"
                             data-view="text-to-image"
                             data-testid="@ai-playground-v2/sidebar-category/text-to-image"
                           >
                             <svg
-                              class="h-4 w-4 shrink-0 stroke-[1.5px]"
+                              class="h-4 w-4 shrink-0 stroke-[1.5px] tw-text-gray-900"
                               fill="none"
                               height="16"
                               viewbox="0 0 16 16"
@@ -228,19 +225,18 @@
                               </defs></svg
                             ><span
                               class="flex flex-1 items-center justify-between gap-2 overflow-hidden whitespace-nowrap font-medium text-sm leading-[140%] inline_ab09c04b"
-                              ><span class="truncate"
+                              ><span class="tw-text-gray-900"
                                 >Texto para Imagem</span
                               ></span
                             ></button
                           ><button
-                            class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-gray-100 text-secondary-foreground hover:bg-gray-200 active:bg-gray-200 flex h-10 min-w-10 justify-start px-3 w-full"
-                            data-active="true"
-                            data-state="closed"
+                            class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-transparent text-gray-500 hover:bg-gray-100 flex h-10 min-w-10 justify-start px-3 w-full"
+                            data-active="false"
                             data-view="image-editor"
                             data-testid="@ai-playground-v2/sidebar-category/image-to-image"
                           >
                             <svg
-                              class="h-4 w-4 shrink-0 stroke-[1.5px]"
+                              class="h-4 w-4 shrink-0 stroke-[1.5px] tw-text-gray-900"
                               fill="none"
                               height="16"
                               viewbox="0 0 16 16"
@@ -255,18 +251,18 @@
                               ></path></svg
                             ><span
                               class="flex flex-1 items-center justify-between gap-2 overflow-hidden whitespace-nowrap font-medium text-sm leading-[140%] inline_ab09c04b"
-                              ><span class="truncate"
+                              ><span class="tw-text-gray-900"
                                 >Editor de Imagens</span
                               ></span
                             ></button
                           ><button
-                            class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-tertiary text-tertiary-foreground hover:bg-tertiary-hover active:bg-tertiary-hover flex h-10 min-w-10 justify-start px-3 w-full"
+                            class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-transparent text-gray-500 hover:bg-gray-100 flex h-10 min-w-10 justify-start px-3 w-full"
                             data-active="false"
-                            data-state="closed"
+                            data-view="upscale"
                             data-testid="@ai-playground-v2/sidebar-category/upscale"
                           >
                             <svg
-                              class="h-4 w-4 shrink-0 stroke-[1.5px]"
+                              class="h-4 w-4 shrink-0 stroke-[1.5px] tw-text-gray-900"
                               fill="none"
                               height="16"
                               viewbox="0 0 16 16"
@@ -286,7 +282,7 @@
                               </defs></svg
                             ><span
                               class="flex flex-1 items-center justify-between gap-2 overflow-hidden whitespace-nowrap font-medium text-sm leading-[140%] inline_ab09c04b"
-                              ><span class="truncate"
+                              ><span class="tw-text-gray-900"
                                 >Upscale de Imagem</span
                               ></span
                             >
@@ -304,14 +300,13 @@
                         </div>
                         <div class="flex flex-col gap-2" data-testid="@ai-playground-v2/sidebar-category/items">
                           <button
-                            class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-tertiary text-tertiary-foreground hover:bg-tertiary-hover active:bg-tertiary-hover flex h-10 min-w-10 justify-start px-3 w-full"
+                            class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-transparent text-gray-500 hover:bg-gray-100 flex h-10 min-w-10 justify-start px-3 w-full"
                             data-active="false"
-                            data-state="closed"
                             data-view="video"
                             data-testid="@ai-playground-v2/sidebar-category/text-to-video"
                           >
                             <svg
-                              class="h-4 w-4 shrink-0 stroke-[1.5px]"
+                              class="h-4 w-4 shrink-0 stroke-[1.5px] tw-text-gray-900"
                               fill="none"
                               height="16"
                               viewbox="0 0 16 16"
@@ -334,19 +329,18 @@
                               ></path></svg
                             ><span
                               class="flex flex-1 items-center justify-between gap-2 overflow-hidden whitespace-nowrap font-medium text-sm leading-[140%] inline_ab09c04b"
-                              ><span class="truncate"
+                              ><span class="tw-text-gray-900"
                                 ><span>Texto para Vídeo</span></span
                               ></span
                             ></button
                           ><button
-                            class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-tertiary text-tertiary-foreground hover:bg-tertiary-hover active:bg-tertiary-hover flex h-10 min-w-10 justify-start px-3 w-full"
+                            class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-transparent text-gray-500 hover:bg-gray-100 flex h-10 min-w-10 justify-start px-3 w-full"
                             data-active="false"
-                            data-state="closed"
-                            data-view="video"
+                            data-view="video-editor"
                             data-testid="@ai-playground-v2/sidebar-category/image-to-video"
                           >
                             <svg
-                              class="h-4 w-4 shrink-0 stroke-[1.5px]"
+                              class="h-4 w-4 shrink-0 stroke-[1.5px] tw-text-gray-900"
                               fill="none"
                               height="16"
                               viewbox="0 0 16 16"
@@ -377,18 +371,18 @@
                               </defs></svg
                             ><span
                               class="flex flex-1 items-center justify-between gap-2 overflow-hidden whitespace-nowrap font-medium text-sm leading-[140%] inline_ab09c04b"
-                              ><span class="truncate"
+                              ><span class="tw-text-gray-900"
                                 ><span>Imagem para Vídeo</span></span
                               ></span
                             ></button
                           ><button
-                            class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-tertiary text-tertiary-foreground hover:bg-tertiary-hover active:bg-tertiary-hover flex h-10 min-w-10 justify-start px-3 w-full"
+                            class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-transparent text-gray-500 hover:bg-gray-100 flex h-10 min-w-10 justify-start px-3 w-full"
                             data-active="false"
-                            data-state="closed"
+                            data-view="video-editor"
                             data-testid="@ai-playground-v2/sidebar-category/video-edits"
                           >
                             <svg
-                              class="h-4 w-4 shrink-0 stroke-[2]"
+                              class="h-4 w-4 shrink-0 stroke-[1.5px] tw-text-gray-900"
                               fill="none"
                               height="24"
                               viewbox="0 0 24 24"
@@ -408,7 +402,7 @@
                               ></path></svg
                             ><span
                               class="flex flex-1 items-center justify-between gap-2 overflow-hidden whitespace-nowrap font-medium text-sm leading-[140%] inline_ab09c04b"
-                              ><span class="truncate"
+                              ><span class="tw-text-gray-900"
                                 ><span>Edições de Vídeo</span></span
                               ></span
                             >
@@ -426,13 +420,13 @@
                         </div>
                         <div class="flex flex-col gap-2" data-testid="@ai-playground-v2/sidebar-category/items">
                           <button
-                            class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-tertiary text-tertiary-foreground hover:bg-tertiary-hover active:bg-tertiary-hover flex h-10 min-w-10 justify-start px-3 w-full"
+                            class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-transparent text-gray-500 hover:bg-gray-100 flex h-10 min-w-10 justify-start px-3 w-full"
                             data-active="false"
-                            data-state="closed"
+                            data-view="avatar"
                             data-testid="@ai-playground-v2/sidebar-category/speech-to-video"
                           >
                             <svg
-                              class="h-4 w-4 shrink-0 stroke-[1.5px]"
+                              class="h-4 w-4 shrink-0 stroke-[1.5px] tw-text-gray-900"
                               fill="none"
                               height="16"
                               viewbox="0 0 16 16"
@@ -447,19 +441,18 @@
                               ></path></svg
                             ><span
                               class="flex flex-1 items-center justify-between gap-2 overflow-hidden whitespace-nowrap font-medium text-sm leading-[140%] inline_ab09c04b"
-                              ><span class="truncate"
+                              ><span class="tw-text-gray-900"
                                 ><span>Avatar Falante</span></span
                               ></span
                             ></button
                           ><button
-                            class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-tertiary text-tertiary-foreground hover:bg-tertiary-hover active:bg-tertiary-hover flex h-10 min-w-10 justify-start px-3 w-full"
+                            class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-transparent text-gray-500 hover:bg-gray-100 flex h-10 min-w-10 justify-start px-3 w-full"
                             data-active="false"
-                            data-state="closed"
                             data-view="faceswap"
                             data-testid="@ai-playground-v2/sidebar-category/video-to-video"
                           >
                             <svg
-                              class="h-4 w-4 shrink-0 stroke-[1.5px]"
+                              class="h-4 w-4 shrink-0 stroke-[1.5px] tw-text-gray-900"
                               fill="none"
                               height="16"
                               viewbox="0 0 16 16"
@@ -474,7 +467,7 @@
                               ></path></svg
                             ><span
                               class="flex flex-1 items-center justify-between gap-2 overflow-hidden whitespace-nowrap font-medium text-sm leading-[140%] inline_ab09c04b"
-                              ><span class="truncate"
+                              ><span class="tw-text-gray-900"
                                 ><span>Troca de Rostos</span></span
                               ></span
                             >
@@ -531,9 +524,8 @@
                     </svg>
                   </button>
                 </button>
-                <!-- [SECTION] Autenticação / Perfil -->
                 <div class="flex items-center gap-4">
-                  <!-- Perfil do Usuário (Logado) -->
+                  <!-- [SECTION] Autenticação / Perfil -->
                   <div id="profile-section" class="tw-hidden flex items-center gap-3">
                     <span id="user-email" class="tw-text-sm tw-text-gray-600 tw-hidden md:tw-block"></span>
                     <button
@@ -547,25 +539,57 @@
                     >
                       <svg aria-hidden="true" class="absolute h-0 w-0">
                         <defs>
-                          <lineargradient id="gradient-q8r5w8okz" x1="43.6641%" x2="-4.88405%" y1="1.67656%" y2="28.5026%">
+                        <lineargradient
+                          id="gradient-q8r5w8okz"
+                          x1="43.6641%"
+                          x2="-4.88405%"
+                          y1="1.67656%"
+                          y2="28.5026%"
+                        >
                             <stop offset="33.9453%" stop-color="#001BFF"></stop>
                             <stop offset="70.4477%" stop-color="#9779FF"></stop>
                             <stop offset="100%" stop-color="#E3CEFF"></stop>
                           </lineargradient>
-                        </defs>
-                      </svg>
-                      <svg class="overflow-visible inline_e97a0d52" data-icon-id="gradient-q8r5w8okz" fill="none" height="14" viewbox="0 0 16 16" width="14" xmlns="http://www.w3.org/2000/svg">
+                      </defs></svg
+                    ><svg
+                      class="overflow-visible inline_e97a0d52"
+                      data-icon-id="gradient-q8r5w8okz"
+                      fill="none"
+                      height="14"
+                      viewbox="0 0 16 16"
+                      width="14"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
                         <g clip-path="url(#star-four_svg__clip0_6402_17)">
-                          <path d="M16 8a1.13 1.13 0 0 1-.255.723c-.257.316-.7.367-1.102.433-.994.163-2.956.594-3.926 1.565-.958.959-1.39 2.885-1.558 3.89-.07.426-.128.898-.472 1.158l-.037.026a1.14 1.14 0 0 1-1.342-.026c-.344-.26-.401-.732-.472-1.158-.167-1.005-.6-2.932-1.558-3.89-.958-.96-2.885-1.392-3.89-1.559-.425-.07-.897-.128-1.157-.473A1.14 1.14 0 0 1 0 8a1.14 1.14 0 0 1 .231-.69c.26-.344.732-.401 1.158-.472 1.004-.167 2.93-.6 3.89-1.558.958-.959 1.39-2.886 1.557-3.891.07-.426.128-.898.472-1.158A1.14 1.14 0 0 1 7.998 0a1.14 1.14 0 0 1 .69.231c.343.26.4.732.471 1.158.167 1.005.6 2.932 1.559 3.89.97.97 2.93 1.402 3.925 1.565.402.066.845.117 1.103.433l.05.067c.135.192.206.421.204.656" fill="#262525"></path>
+                        <path
+                          d="M16 8a1.13 1.13 0 0 1-.255.723c-.257.316-.7.367-1.102.433-.994.163-2.956.594-3.926 1.565-.958.959-1.39 2.885-1.558 3.89-.07.426-.128.898-.472 1.158l-.037.026a1.14 1.14 0 0 1-1.342-.026c-.344-.26-.401-.732-.472-1.158-.167-1.005-.6-2.932-1.558-3.89-.958-.96-2.885-1.392-3.89-1.559-.425-.07-.897-.128-1.157-.473A1.14 1.14 0 0 1 0 8a1.14 1.14 0 0 1 .231-.69c.26-.344.732-.401 1.158-.472 1.004-.167 2.93-.6 3.89-1.558.958-.959 1.39-2.886 1.557-3.891.07-.426.128-.898.472-1.158A1.14 1.14 0 0 1 7.998 0a1.14 1.14 0 0 1 .69.231c.343.26.4.732.471 1.158.167 1.005.6 2.932 1.559 3.89.97.97 2.93 1.402 3.925 1.565.402.066.845.117 1.103.433l.05.067c.135.192.206.421.204.656"
+                          fill="#262525"
+                        ></path>
                         </g>
                         <defs>
                           <clippath id="star-four_svg__clip0_6402_17">
                             <path d="M0 0h16v16H0z" fill="#fff"></path>
                           </clippath>
-                        </defs>
-                      </svg>
-                      <span id="user-credits">0</span>
-                      <div class="hidden md:block">Créditos</div>
+                      </defs></svg
+                    ><span id="user-credits">0</span>
+                    <div class="hidden md:block">
+                      Créditos
+                  </div>
+                    <svg
+                      class="overflow-visible hidden size-4 md:block inline_e97a0d52"
+                      fill="none"
+                      height="16"
+                      viewbox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="m4 6 4 4 4-4"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      ></path>
+                    </svg>
                     </button>
                     <button id="btn-logout" class="tw-p-2 tw-text-gray-500 hover:tw-text-red-500" title="Sair">
                       <svg class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
@@ -869,7 +893,6 @@
                     </div>
                 </div>
 
-                <!-- VIEW: Face Swap -->
                 <div id="view-faceswap" class="view-panel tw-hidden tw-absolute tw-inset-0 tw-flex-col tw-bg-[#FCFCFD]">
                     <!-- Main Canvas Area -->
                     <div class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-overflow-auto tw-p-4 tw-pb-24 md:tw-pb-40">
@@ -951,6 +974,55 @@
                                 </button>
                             </div>
                             <div id="faceswap-error" class="tw-hidden tw-text-xs tw-text-red-500"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: Image Upscale (IA de Realce) -->
+                <div id="view-upscale" class="view-panel tw-hidden tw-absolute tw-inset-0 tw-flex-col tw-bg-[#FCFCFD]">
+                    <div class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-overflow-auto tw-p-4 tw-pb-24">
+                         <div class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-opacity-60">
+                              <div class="tw-relative tw-w-full tw-aspect-square tw-max-w-[500px] tw-mx-auto tw-border-2 tw-border-dashed tw-border-gray-200 tw-rounded-2xl tw-bg-gray-50/50 hover:tw-border-blue-400 tw-transition-all tw-flex tw-items-center tw-justify-center">
+                                  <div class="tw-text-center">
+                                      <svg class="tw-w-16 tw-h-16 tw-text-gray-400 tw-mx-auto tw-mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                                      <p class="tw-text-lg tw-font-medium tw-text-gray-500">Super Resolução AI</p>
+                                      <p class="tw-text-sm tw-text-gray-400">Aumente a qualidade de suas fotos em até 4x</p>
+                                  </div>
+                              </div>                         
+                          </div>
+                    </div>
+                    <div class="tw-absolute tw-bottom-0 tw-left-0 tw-w-full tw-p-4 md:tw-p-6 tw-flex tw-justify-center tw-pointer-events-none tw-z-10">
+                        <div class="tw-w-full tw-max-w-2xl tw-bg-white tw-border tw-border-gray-200 tw-rounded-2xl tw-shadow-xl tw-p-4 tw-pointer-events-auto">
+                            <div class="tw-flex tw-items-center tw-justify-between">
+                                <div class="tw-text-xs tw-font-semibold tw-text-gray-500">Custo: 1 crédito</div>
+                                <button class="tw-bg-[#5666F5] tw-text-white tw-px-6 tw-py-2 tw-rounded-xl tw-font-medium hover:tw-bg-blue-600 tw-transition-all">Melhorar Imagem</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: Video Editor (Corte & Filtros) -->
+                <div id="view-video-editor" class="view-panel tw-hidden tw-absolute tw-inset-0 tw-flex-col tw-bg-[#FCFCFD]">
+                    <div class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-p-4">
+                        <div class="tw-text-center tw-max-w-md">
+                            <div class="tw-w-20 tw-h-20 tw-bg-orange-100 tw-text-orange-600 tw-rounded-2xl tw-flex tw-items-center tw-justify-center tw-mx-auto tw-mb-6">
+                                <svg class="tw-w-10 tw-h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            </div>
+                            <h3 class="tw-text-2xl tw-font-bold tw-text-gray-900 tw-mb-2">Editor de Vídeo Profissional</h3>
+                            <p class="tw-text-gray-500">Em breve: Corte, ajuste e adicione filtros aos seus vídeos gerados por IA em um só lugar.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: AI Avatar (Lip Sync) -->
+                <div id="view-avatar" class="view-panel tw-hidden tw-absolute tw-inset-0 tw-flex-col tw-bg-[#FCFCFD]">
+                    <div class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-p-4">
+                        <div class="tw-text-center tw-max-w-md">
+                            <div class="tw-w-20 tw-h-20 tw-bg-purple-100 tw-text-purple-600 tw-rounded-2xl tw-flex tw-items-center tw-justify-center tw-mx-auto tw-mb-6">
+                                <svg class="tw-w-10 tw-h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <h3 class="tw-text-2xl tw-font-bold tw-text-gray-900 tw-mb-2">Avatar Falante AI</h3>
+                            <p class="tw-text-gray-500">Dê vida às suas fotos. Carregue um áudio e veja seu avatar falar com sincronia labial perfeita.</p>
                         </div>
                     </div>
                 </div>
