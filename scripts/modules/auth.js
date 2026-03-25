@@ -79,6 +79,36 @@ export const auth = {
       };
     }
 
+    // Register form submission
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+      registerForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const email = e.target.email.value;
+        const password = e.target.password.value;
+        const confirmPassword = e.target.confirmPassword.value;
+
+        if (password !== confirmPassword) {
+          ui.showToast('As senhas não coincidem.', 'error');
+          return;
+        }
+        if (password.length < 6) {
+          ui.showToast('A senha deve ter no mínimo 6 caracteres.', 'error');
+          return;
+        }
+
+        try {
+          ui.setLoading('btn-register', true, 'Criando conta...');
+          const data = await api.post('/auth/register', { email, password });
+          this.handleSuccess(data, true);
+        } catch (err) {
+          ui.showToast(err.message, 'error');
+        } finally {
+          ui.setLoading('btn-register', false);
+        }
+      };
+    }
+
     const logoutBtn = document.getElementById('btn-logout');
     if (logoutBtn) logoutBtn.onclick = () => {
       localStorage.clear();
@@ -86,12 +116,12 @@ export const auth = {
     };
   },
 
-  handleSuccess(data) {
+  handleSuccess(data, isNewUser = false) {
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
     this.user = data.user;
     this.updateUI();
-    ui.showToast('Bem-vindo de volta!');
+    ui.showToast(isNewUser ? `Conta criada! Você ganhou ${data.user.credits} créditos.` : 'Bem-vindo de volta!');
     navigation.switchView('view-text-to-image');
     this.showModal(false);
   }

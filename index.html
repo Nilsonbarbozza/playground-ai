@@ -1095,31 +1095,67 @@
       width="1"
     <!-- [MODAL] Autenticação -->
     <div id="auth-modal" class="tw-fixed tw-inset-0 tw-bg-black/50 tw-z-[9999] tw-flex tw-items-center tw-justify-center tw-hidden">
-      <div class="tw-bg-white tw-rounded-2xl tw-p-8 tw-w-full tw-max-w-md tw-relative">
-        <button id="btn-close-auth" class="tw-absolute tw-top-4 tw-right-4 tw-text-gray-400 hover:tw-text-black">
-          <svg class="tw-w-6 tw-h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l18 18" /></svg>
+      <div class="tw-bg-white tw-rounded-2xl tw-p-8 tw-w-full tw-max-w-md tw-relative tw-shadow-2xl">
+        <button id="btn-close-auth" class="tw-absolute tw-top-4 tw-right-4 tw-text-gray-400 hover:tw-text-black tw-transition-colors">
+          <svg class="tw-w-6 tw-h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
         
-        <div class="tw-text-center tw-mb-8">
-          <h2 class="tw-text-2xl tw-font-bold">Bem-vindo ao Playground</h2>
-          <p class="tw-text-gray-500">Faça login para continuar criando</p>
+        <div class="tw-text-center tw-mb-6">
+          <h2 class="tw-text-2xl tw-font-bold" id="auth-modal-title">Bem-vindo ao Playground</h2>
+          <p class="tw-text-gray-500 tw-text-sm" id="auth-modal-subtitle">Faça login para continuar criando</p>
         </div>
 
-        <form id="login-form" class="tw-space-y-4">
-          <div>
-            <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">E-mail</label>
-            <input name="email" type="email" required class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 focus:tw-ring-2 focus:tw-ring-black focus:tw-outline-none" placeholder="exemplo@email.com">
-          </div>
-          <div>
-            <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">Senha</label>
-            <input name="password" type="password" required class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 focus:tw-ring-2 focus:tw-ring-black focus:tw-outline-none" placeholder="••••••••">
-          </div>
-          <button id="btn-login" type="submit" class="tw-w-full tw-bg-black tw-text-white tw-py-3 tw-rounded-xl tw-font-bold hover:tw-bg-gray-800 tw-transition-all">
+        <!-- Tabs -->
+        <div class="tw-flex tw-mb-6 tw-bg-gray-100 tw-rounded-xl tw-p-1">
+          <button id="tab-login" type="button" class="tw-flex-1 tw-py-2 tw-rounded-lg tw-font-medium tw-text-sm tw-bg-white tw-shadow tw-transition-all" onclick="document.getElementById('login-form').classList.remove('tw-hidden'); document.getElementById('register-form').classList.add('tw-hidden'); this.classList.add('tw-bg-white','tw-shadow'); document.getElementById('tab-register').classList.remove('tw-bg-white','tw-shadow'); document.getElementById('auth-modal-title').textContent='Bem-vindo ao Playground'; document.getElementById('auth-modal-subtitle').textContent='Faça login para continuar criando';">
             Entrar
           </button>
+          <button id="tab-register" type="button" class="tw-flex-1 tw-py-2 tw-rounded-lg tw-font-medium tw-text-sm tw-transition-all" onclick="document.getElementById('register-form').classList.remove('tw-hidden'); document.getElementById('login-form').classList.add('tw-hidden'); this.classList.add('tw-bg-white','tw-shadow'); document.getElementById('tab-login').classList.remove('tw-bg-white','tw-shadow'); document.getElementById('auth-modal-title').textContent='Crie sua conta'; document.getElementById('auth-modal-subtitle').textContent='Cadastre-se e ganhe 10 créditos grátis';">
+            Cadastrar
+          </button>
+        </div>
+
+
+        <!-- Login Form -->
+        <form id="login-form" class="tw-space-y-4" data-view="view-login">
+          <div id="view-login">
+            <div class="tw-mb-4">
+              <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">E-mail</label>
+              <input name="email" type="email" required class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 focus:tw-ring-2 focus:tw-ring-black focus:tw-outline-none tw-transition-all" placeholder="exemplo@email.com">
+            </div>
+            <div class="tw-mb-4">
+              <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">Senha</label>
+              <input name="password" type="password" required class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 focus:tw-ring-2 focus:tw-ring-black focus:tw-outline-none tw-transition-all" placeholder="••••••••">
+            </div>
+            <button id="btn-login" type="submit" class="tw-w-full tw-bg-black tw-text-white tw-py-3 tw-rounded-xl tw-font-bold hover:tw-bg-gray-800 tw-transition-all">
+              Entrar
+            </button>
+          </div>
+        </form>
+
+        <!-- Register Form -->
+        <form id="register-form" class="tw-space-y-4 tw-hidden" data-view="view-register">
+          <div id="view-register">
+            <div class="tw-mb-4">
+              <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">E-mail</label>
+              <input name="email" type="email" required class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 focus:tw-ring-2 focus:tw-ring-black focus:tw-outline-none tw-transition-all" placeholder="exemplo@email.com">
+            </div>
+            <div class="tw-mb-4">
+              <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">Senha</label>
+              <input name="password" type="password" required minlength="6" class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 focus:tw-ring-2 focus:tw-ring-black focus:tw-outline-none tw-transition-all" placeholder="Mínimo 6 caracteres">
+            </div>
+            <div class="tw-mb-4">
+              <label class="tw-block tw-text-sm tw-font-medium tw-text-gray-700 tw-mb-1">Confirmar Senha</label>
+              <input name="confirmPassword" type="password" required minlength="6" class="tw-w-full tw-px-4 tw-py-3 tw-rounded-xl tw-border tw-border-gray-200 focus:tw-ring-2 focus:tw-ring-black focus:tw-outline-none tw-transition-all" placeholder="••••••••">
+            </div>
+            <button id="btn-register" type="submit" class="tw-w-full tw-bg-black tw-text-white tw-py-3 tw-rounded-xl tw-font-bold hover:tw-bg-gray-800 tw-transition-all">
+              Criar Conta
+            </button>
+          </div>
         </form>
       </div>
     </div>
+
 
   </body>
 </html>
