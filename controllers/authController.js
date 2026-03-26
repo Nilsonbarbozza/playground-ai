@@ -21,7 +21,11 @@ export const register = async (req, res) => {
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-    res.status(201).json({ token, user: { id: user.id, email: user.email, credits: user.credits } });
+    res.status(201).json({
+      token,
+      user: { id: user.id, email: user.email, credits: user.credits },
+      is_first_signup: true
+    });
   } catch (error) {
     console.error('[Register Error]', error);
     res.status(500).json({ error: 'Erro interno no servidor ao registrar usuario.' });
@@ -44,7 +48,11 @@ export const login = async (req, res) => {
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-    res.status(200).json({ token, user: { id: user.id, email: user.email, credits: user.credits } });
+    res.status(200).json({
+      token,
+      user: { id: user.id, email: user.email, credits: user.credits },
+      is_first_signup: false
+    });
   } catch (error) {
     console.error('[Login Error]', error);
     res.status(500).json({ error: 'Erro interno no servidor ao fazer login.' });
