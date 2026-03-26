@@ -5,9 +5,12 @@ export const submitVideoJob = async (req, res) => {
     const files = req.files;
     const imageFile = files?.find(f => f.fieldname === 'image');
     if (!imageFile) throw new Error('Imagem base ausente.');
+    const prompt = req.body?.prompt || null;
 
-    // Level 3: Submit via Engine
-    const result = await VideoEngine.submit(req.user.id, imageFile.buffer);
+    const result = await VideoEngine.submit(req.user.id, {
+      imageBuffer: imageFile.buffer,
+      prompt
+    });
 
     res.json(result);
   } catch (err) {
@@ -20,17 +23,31 @@ export const submitVideoJob = async (req, res) => {
 export const checkVideoStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    
-    // Level 3: Check and Persist via Engine (Ensures idempotency and no side-effects on GET)
-    const result = await VideoEngine.checkAndPersist(req.user.id, id);
+    const result = await VideoEngine.getStatus(req.user.id, id);
 
-    if (result.status === 'in-progress') {
+    if (result.status === 'queued' || result.status === 'processing') {
       return res.status(202).json(result);
     }
 
     res.json(result);
   } catch (err) {
     console.error('[CONTROLLER_VIDEO_STATUS_ERR]', err.message);
-    res.status(500).json({ success: false, error: err.message });
+    res.status(err.status || 500).json({ success: false, error: err.message });
+  }
+};
+
+export const syncVideoStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await VideoEngine.syncStatus(req.user.id, id);
+
+    if (result.status === 'queued' || result.status === 'processing') {
+      return res.status(202).json(result);
+    }
+
+    res.json(result);
+  } catch (err) {
+    console.error('[CONTROLLER_VIDEO_SYNC_ERR]', err.message);
+    res.status(err.status || 500).json({ success: false, error: err.message });
   }
 };

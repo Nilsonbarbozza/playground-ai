@@ -1,10 +1,10 @@
-import db from '../config/db.js';
+import { UsersRepository } from '../repositories/users.repository.js';
+import { ProjectsRepository } from '../repositories/projects.repository.js';
 
 export const getProfile = async (req, res) => {
   try {
-    const result = await db.query('SELECT id, email, credits, created_at FROM users WHERE id = $1', [req.user.id]);
-    const user = result.rows[0];
-    if (!user) return res.status(404).json({ error: 'Usuário não encontrado.' });
+    const user = await UsersRepository.findProfileById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'Usuario nao encontrado.' });
 
     res.json({ success: true, user });
   } catch (err) {
@@ -14,8 +14,8 @@ export const getProfile = async (req, res) => {
 
 export const getProjects = async (req, res) => {
   try {
-    const result = await db.query('SELECT id, prompt, image_url, module, created_at FROM projects WHERE user_id = $1 ORDER BY created_at DESC', [req.user.id]);
-    res.json({ success: true, projects: result.rows });
+    const projects = await ProjectsRepository.listByUser(req.user.id);
+    res.json({ success: true, projects });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao buscar projetos.' });
   }

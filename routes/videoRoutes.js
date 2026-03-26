@@ -1,5 +1,5 @@
 import express from 'express';
-import { submitVideoJob, checkVideoStatus } from '../controllers/videoController.js';
+import { submitVideoJob, checkVideoStatus, syncVideoStatus } from '../controllers/videoController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { upload } from '../middlewares/uploadMiddleware.js';
 
@@ -9,5 +9,6 @@ router.use(authMiddleware);
 
 router.post('/generate', upload.any(), submitVideoJob);
 router.get('/status/:id', checkVideoStatus);
+router.post('/status/:id/sync', syncVideoStatus);
 
 export default router;

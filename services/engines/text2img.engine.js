@@ -1,39 +1,45 @@
-import db from '../../config/db.js';
+import { randomUUID } from 'crypto';
 import { engineFactory } from '../ai/engineFactory.js';
 import { CreditService } from '../billing/credits.service.js';
 import { StorageService } from '../storage/storage.service.js';
+import { ProjectsRepository } from '../../repositories/projects.repository.js';
 
 export class Text2ImgEngine {
   static async execute(userId, prompt) {
     const cost = Number(process.env.COST_TEXT_TO_IMAGE) || 1;
-    const description = `Geração de Imagem: ${prompt.substring(0, 30)}...`;
+    const description = `Geracao de Imagem: ${prompt.substring(0, 30)}...`;
+    const operationKey = `text2img:${randomUUID()}`;
 
-    // 1. Transactional Credit Deduction
-    await CreditService.useCredits(userId, cost, description);
+    await CreditService.reserveCredits({
+      userId,
+      amount: cost,
+      description,
+      operationKey
+    });
 
     try {
-      // 2. Call AI Provider
       const stability = engineFactory.get('stability');
       const imageBuffer = await stability.generate({ prompt });
 
-      // 3. Persist Asset
       const imageUrl = await StorageService.save(imageBuffer, 'gen', 'png');
 
-      // 4. Create Project Entry
-      const projectRes = await db.query(
-        'INSERT INTO projects (user_id, prompt, image_url, module) VALUES ($1, $2, $3, $4) RETURNING *',
-        [userId, prompt, imageUrl, 'text-to-image']
-      );
+      const project = await ProjectsRepository.create({
+        userId,
+        prompt,
+        imageUrl,
+        module: 'text-to-image'
+      });
+
+      await CreditService.captureReservation(operationKey);
 
       return {
         success: true,
         url: imageUrl,
-        project: projectRes.rows[0]
+        project
       };
     } catch (err) {
-      // 5. Automatic Refund on Failure
-      console.error('[Engine] Text2Img logic failed, refunding...', err.message);
-      await CreditService.refundCredits(userId, cost, description);
+      console.error('[Engine] Text2Img failed, releasing reservation...', err.message);
+      await CreditService.releaseReservation(operationKey, `Text2Img failure: ${err.message}`);
       throw err;
     }
   }

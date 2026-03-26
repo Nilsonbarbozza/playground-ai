@@ -1,31 +1,35 @@
-import db from '../../config/db.js';
+import { randomUUID } from 'crypto';
 import { engineFactory } from '../ai/engineFactory.js';
 import { CreditService } from '../billing/credits.service.js';
 import { StorageService } from '../storage/storage.service.js';
 import * as aiHelper from '../../utils/aiHelper.js';
+import { ProjectsRepository } from '../../repositories/projects.repository.js';
 
 export class ImageEditEngine {
   static async execute(userId, options) {
     const { userPrompt, imageBuffer, maskBuffer } = options;
     const cost = Number(process.env.COST_IMAGE_EDITOR) || 2;
+    const description = `Editor: ${userPrompt.substring(0, 30)}...`;
+    const operationKey = `image-edit:${randomUUID()}`;
 
-    // 1. Transactional Credit Deduction
-    await CreditService.useCredits(userId, cost, `Editor: ${userPrompt.substring(0, 30)}...`);
+    await CreditService.reserveCredits({
+      userId,
+      amount: cost,
+      description,
+      operationKey
+    });
 
     try {
-      // 2. Pre-processing
       const normalizedBase = await aiHelper.normalizeImage(imageBuffer);
       const inputBase64 = `data:image/png;base64,${normalizedBase.toString('base64')}`;
 
-      // 3. Semantic Analysis (OpenAI)
       const openai = engineFactory.get('openai');
       const analysis = await openai.analyzeIntent(userPrompt, inputBase64);
-      
-      const intent = analysis.intent || 'EDIT';
-      let finalPrompt = analysis.prompt || userPrompt;
-      let negPrompt = analysis.negative_prompt || "low quality, text, logos";
 
-      // 4. Advanced Mask Processing & Color Seeding
+      const intent = analysis.intent || 'EDIT';
+      const finalPrompt = analysis.prompt || userPrompt;
+      const negPrompt = analysis.negative_prompt || 'low quality, text, logos';
+
       let finalMask = null;
       let readyBase = normalizedBase;
 
@@ -36,7 +40,6 @@ export class ImageEditEngine {
         }
       }
 
-      // 5. Call AI Provider (Stability)
       const stability = engineFactory.get('stability');
       const outputBuffer = await stability.edit({
         image: readyBase,
@@ -46,25 +49,25 @@ export class ImageEditEngine {
         intent
       });
 
-      // 6. Persist Asset (REAL PERSISTENCE for Level 3)
       const imageUrl = await StorageService.save(outputBuffer, 'edit', 'png');
 
-      // 7. Create Project Entry
-      const projectRes = await db.query(
-        'INSERT INTO projects (user_id, prompt, image_url, module) VALUES ($1, $2, $3, $4) RETURNING *',
-        [userId, finalPrompt, imageUrl, 'image_editor']
-      );
+      const project = await ProjectsRepository.create({
+        userId,
+        prompt: finalPrompt,
+        imageUrl,
+        module: 'image_editor'
+      });
+
+      await CreditService.captureReservation(operationKey);
 
       return {
         success: true,
-        url: imageUrl, // Fixed URL (not base64 anymore!)
-        project: projectRes.rows[0]
+        url: imageUrl,
+        project
       };
-
     } catch (err) {
-      // 8. Automatic Refund
-      console.error('[Engine] ImageEdit logic failed, refunding...', err.message);
-      await CreditService.refundCredits(userId, cost, `Editor Failure: ${userPrompt}`);
+      console.error('[Engine] ImageEdit failed, releasing reservation...', err.message);
+      await CreditService.releaseReservation(operationKey, `ImageEdit failure: ${err.message}`);
       throw err;
     }
   }
