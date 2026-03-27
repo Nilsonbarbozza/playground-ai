@@ -24,17 +24,123 @@ export const billing = {
     const wrapper = document.createElement('div');
     wrapper.id = 'billing-modal';
     wrapper.className =
-      'tw-fixed tw-inset-0 tw-bg-black/50 tw-z-[9998] tw-hidden tw-items-center tw-justify-center tw-p-4';
+      'tw-fixed tw-inset-0 tw-bg-black/40 tw-backdrop-blur-sm tw-z-[9998] tw-hidden tw-items-center tw-justify-center tw-p-4';
     wrapper.innerHTML = `
-      <div class="tw-bg-white tw-w-full tw-max-w-lg tw-rounded-2xl tw-shadow-2xl tw-overflow-hidden">
-        <div class="tw-flex tw-items-center tw-justify-between tw-p-5 tw-border-b tw-border-gray-100">
-          <h3 class="tw-text-lg tw-font-bold tw-text-gray-900">Adicionar Creditos</h3>
-          <button id="billing-modal-close" class="tw-w-8 tw-h-8 tw-rounded-lg tw-border tw-border-gray-200 hover:tw-bg-gray-50">x</button>
+      <div class="tw-bg-[#F9FAFB] tw-w-full tw-max-w-4xl tw-rounded-[32px] tw-shadow-2xl tw-overflow-hidden tw-border tw-border-white/20">
+        <!-- Header -->
+        <div class="tw-flex tw-items-center tw-justify-between tw-px-8 tw-py-6">
+          <h3 class="tw-text-2xl tw-font-bold tw-text-gray-900">Adicionar Créditos</h3>
+          <button id="billing-modal-close" class="tw-text-gray-400 hover:tw-text-gray-600 tw-transition-colors">
+            <svg class="tw-w-6 tw-h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
         </div>
-        <div class="tw-p-5 tw-space-y-4">
-          <p class="tw-text-sm tw-text-gray-600">Escolha um plano para continuar criando com IA.</p>
-          <div id="billing-status" class="tw-hidden tw-text-sm tw-rounded-lg tw-p-3"></div>
-          <div id="billing-packages" class="tw-grid tw-gap-3"></div>
+
+        <div class="tw-px-8 tw-pb-10">
+          <!-- Billing Toggle (Visual Only) -->
+          <div class="tw-flex tw-justify-center tw-mb-10">
+            <div class="tw-bg-gray-100 tw-p-1 tw-rounded-full tw-flex tw-gap-1">
+              <button class="tw-bg-white tw-px-6 tw-py-2 tw-rounded-full tw-text-sm tw-font-semibold tw-shadow-sm">Playground</button>
+                <button data-testid="@ai-playground-v2/sidebar/logo" type="button" class="flex items-center gap-2">
+                  <h1 class="sr-only">VEED AI Playground - Criador de Conteúdo com IA</h1>
+                  <img src="https://res.cloudinary.com/dxwul5fff/image/upload/v1758373981/agente_gpt_icon_butpu3.svg" alt="Logo VEED" class="h-10 w-10 rounded-lg object-cover" />
+                </button>
+            </div>
+          </div>
+
+          <div id="billing-status" class="tw-hidden tw-mb-6 tw-text-sm tw-rounded-xl tw-p-4 tw-border"></div>
+
+          <!-- Plans Grid -->
+          <div id="billing-packages" class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-6">
+            <!-- Functional Plan: Starter -->
+            <div id="plan-starter-container" class="tw-bg-white tw-rounded-3xl tw-border-2 tw-border-green-500 tw-p-8 tw-relative tw-shadow-lg">
+              <div class="tw-absolute -tw-top-4 tw-left-1/2 -tw-translate-x-1/2 tw-bg-[#5666f5] tw-text-white tw-px-4 tw-py-1 tw-rounded-full tw-text-xs tw-font-bold tw-flex tw-items-center tw-gap-1">
+                <svg class="tw-w-3 tw-h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                Uso Profissional
+              </div>
+              <div class="tw-mb-6">
+                <h4 class="tw-text-2xl tw-font-bold tw-text-gray-900">Starter</h4>
+                <p class="tw-text-gray-500 tw-text-sm tw-mt-1">Ferramentas avançadas para produtividade.</p>
+              </div>
+              <div class="tw-mb-8">
+                <span class="tw-text-5xl tw-font-extrabold tw-text-gray-900">R$ 50</span>
+                <span class="tw-text-gray-400 tw-text-sm">/ 500 Créditos</span>
+              </div>
+              
+              <button id="btn-starter-checkout" class="tw-w-full tw-bg-[#5666f5] hover:tw-bg-[#5666f5] tw-text-white tw-font-bold tw-py-4 tw-rounded-2xl tw-mb-8 tw-transition-all tw-shadow-md active:tw-scale-95 tw-flex tw-flex-row tw-items-center tw-justify-center">
+                Pagar
+              </button>
+
+              <div class="tw-space-y-4">
+                <p class="tw-text-xs tw-font-bold tw-text-gray-400 tw-uppercase tw-tracking-wider">Use com quiser:</p>
+                <ul class="tw-space-y-3">
+                  <li class="tw-flex tw-items-start tw-gap-3 tw-text-sm tw-text-gray-700">
+                    <svg class="tw-w-5 tw-h-5 tw-text-[#5666f5] tw-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <span>500 Créditos</span>
+                  </li>
+                  <li class="tw-flex tw-items-start tw-gap-3 tw-text-sm tw-text-gray-700">
+                    <svg class="tw-w-5 tw-h-5 tw-text-[#5666f5] tw-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <span><strong>Imagens:</strong> Texto para Imagem, Editor, Upscale</span>
+                  </li>
+                   <li class="tw-flex tw-items-start tw-gap-3 tw-text-sm tw-text-gray-700">
+                    <svg class="tw-w-5 tw-h-5 tw-text-[#5666f5] tw-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <span><strong>Vídeo:</strong> Texto para Vídeo, Imagem p/ Vídeo, Edições</span>
+                  </li>
+                   <li class="tw-flex tw-items-start tw-gap-3 tw-text-sm tw-text-gray-700">
+                    <svg class="tw-w-5 tw-h-5 tw-text-[#5666f5] tw-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <span><strong>Avatars:</strong> Talking Avatar, FaceSwap</span>
+                  </li>
+                  <li class="tw-flex tw-items-start tw-gap-3 tw-text-sm tw-text-gray-700">
+                    <svg class="tw-w-5 tw-h-5 tw-text-[#5666f5] tw-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <span>Suporte Prioritário</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Visual Plan: Premium (Placeholder) -->
+            <div class="tw-bg-white/50 tw-rounded-3xl tw-border tw-border-gray-200 tw-p-8 tw-opacity-80">
+              <div class="tw-mb-6">
+                <h4 class="tw-text-2xl tw-font-bold tw-text-gray-900">Premium</h4>
+                <p class="tw-text-gray-500 tw-text-sm tw-mt-1">Acesso completo para máxima criatividade.</p>
+              </div>
+              <div class="tw-mb-8">
+                <span class="tw-text-5xl tw-font-extrabold tw-text-gray-900">--</span>
+                <span class="tw-text-gray-400 tw-text-sm">/ em breve</span>
+              </div>
+              
+              <button disabled class="tw-w-full tw-bg-white tw-border tw-border-gray-200 tw-text-gray-400 tw-font-bold tw-py-4 tw-rounded-2xl tw-mb-8">
+                Indisponível
+              </button>
+
+              <div class="tw-space-y-4">
+                 <p class="tw-text-xs tw-font-bold tw-text-gray-400 tw-uppercase tw-tracking-wider">Incluso no plano:</p>
+                 <ul class="tw-space-y-3">
+                  <li class="tw-flex tw-items-start tw-gap-3 tw-text-sm tw-text-gray-400">
+                    <svg class="tw-w-5 tw-h-5 tw-text-gray-300 tw-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <span>Uso Ilimitado</span>
+                  </li>
+                  <li class="tw-flex tw-items-start tw-gap-3 tw-text-sm tw-text-gray-400">
+                    <svg class="tw-w-5 tw-h-5 tw-text-gray-300 tw-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <span>Todos os motores e modelos</span>
+                  </li>
+                  <li class="tw-flex tw-items-start tw-gap-3 tw-text-sm tw-text-gray-400">
+                    <svg class="tw-w-5 tw-h-5 tw-text-gray-300 tw-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <span>Acesso Antecipado a Beta</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Summary -->
+          <div class="tw-mt-10 tw-pt-8 tw-border-t tw-border-gray-100 tw-text-center">
+            <p class="tw-text-xs tw-font-bold tw-text-gray-400 tw-uppercase tw-tracking-widest tw-mb-6">TODOS OS PLANOS INCLUEM:</p>
+            <div class="tw-flex tw-flex-wrap tw-justify-center tw-gap-2">
+              <span class="tw-bg-gray-100 tw-px-4 tw-py-2 tw-rounded-full tw-text-xs tw-font-semibold tw-text-gray-600">Geração Ultra Rápida</span>
+              <span class="tw-bg-gray-100 tw-px-4 tw-py-2 tw-rounded-full tw-text-xs tw-font-semibold tw-text-gray-600">Download em Alta Definição</span>
+              <span class="tw-bg-gray-100 tw-px-4 tw-py-2 tw-rounded-full tw-text-xs tw-font-semibold tw-text-gray-600">Garantia de Reembolso - 7 dias</span>
+            </div>
+          </div>
         </div>
       </div>
     `;
@@ -99,10 +205,11 @@ export const billing = {
     const status = document.getElementById('billing-status');
     if (!status) return;
 
-    status.classList.remove('tw-hidden', 'tw-bg-red-50', 'tw-text-red-700', 'tw-bg-green-50', 'tw-text-green-700', 'tw-bg-blue-50', 'tw-text-blue-700');
-    if (type === 'error') status.classList.add('tw-bg-red-50', 'tw-text-red-700');
-    else if (type === 'success') status.classList.add('tw-bg-green-50', 'tw-text-green-700');
-    else status.classList.add('tw-bg-blue-50', 'tw-text-blue-700');
+    status.classList.remove('tw-hidden', 'tw-bg-red-50', 'tw-text-red-700', 'tw-bg-green-50', 'tw-text-green-700', 'tw-bg-blue-50', 'tw-text-blue-700', 'tw-border-red-100', 'tw-border-green-100', 'tw-border-blue-100');
+    status.classList.add('tw-block');
+    if (type === 'error') status.classList.add('tw-bg-red-50', 'tw-text-red-700', 'tw-border-red-100');
+    else if (type === 'success') status.classList.add('tw-bg-green-50', 'tw-text-green-700', 'tw-border-green-100');
+    else status.classList.add('tw-bg-blue-50', 'tw-text-blue-700', 'tw-border-blue-100');
 
     status.textContent = message;
   },
@@ -111,52 +218,49 @@ export const billing = {
     const status = document.getElementById('billing-status');
     if (!status) return;
     status.classList.add('tw-hidden');
+    status.classList.remove(
+      'tw-block',
+      'tw-bg-red-50',
+      'tw-text-red-700',
+      'tw-bg-green-50',
+      'tw-text-green-700',
+      'tw-bg-blue-50',
+      'tw-text-blue-700',
+      'tw-border-red-100',
+      'tw-border-green-100',
+      'tw-border-blue-100'
+    );
     status.textContent = '';
   },
 
   async loadPackages() {
-    const root = document.getElementById('billing-packages');
-    if (!root) return;
-
-    root.innerHTML = '<div class="tw-text-sm tw-text-gray-500">Carregando planos...</div>';
+    const container = document.getElementById('plan-starter-container');
+    const btn = document.getElementById('btn-starter-checkout');
+    if (!container || !btn) return;
 
     try {
       const data = await api.get('/billing/packages');
       const packages = data.packages || [];
-      if (!packages.length) {
-        root.innerHTML = '<div class="tw-text-sm tw-text-gray-500">Nenhum plano disponivel no momento.</div>';
-        return;
+      // Find the Starter package (assuming it has "Starter" in the name or we use the first one if empty)
+      const starterPkg = packages.find(p => p.name && p.name.toLowerCase().includes('starter')) || packages[0];
+      
+      if (starterPkg) {
+        btn.setAttribute('data-package-id', starterPkg.id);
+        btn.onclick = () => this.startCheckout(starterPkg.id);
+      } else {
+        btn.textContent = 'Erro ao carregar ID';
+        btn.disabled = true;
       }
-
-      root.innerHTML = packages
-        .map(
-          (pkg) => `
-          <button class="billing-package-btn tw-w-full tw-text-left tw-border tw-border-gray-200 hover:tw-border-black tw-rounded-xl tw-p-4 tw-transition" data-package-id="${pkg.id}">
-            <div class="tw-flex tw-items-center tw-justify-between">
-              <div>
-                <p class="tw-font-semibold tw-text-gray-900">${pkg.name}</p>
-                <p class="tw-text-xs tw-text-gray-500">${pkg.credits} creditos</p>
-              </div>
-              <p class="tw-text-base tw-font-bold tw-text-gray-900">R$ ${(pkg.price_brl_cents / 100).toFixed(2).replace('.', ',')}</p>
-            </div>
-          </button>
-        `
-        )
-        .join('');
-
-      root.querySelectorAll('.billing-package-btn').forEach((btn) => {
-        btn.addEventListener('click', () => this.startCheckout(btn.getAttribute('data-package-id')));
-      });
     } catch (err) {
-      root.innerHTML = '<div class="tw-text-sm tw-text-red-600">Erro ao carregar planos.</div>';
-      this.showStatus(err.message, 'error');
+      console.error('Packages load error:', err);
+      this.showStatus('Erro ao carregar pacotes da API.', 'error');
     }
   },
 
   async startCheckout(packageId) {
     if (!packageId || this.state.loading) return;
     this.state.loading = true;
-    this.showStatus('Criando checkout...', 'info');
+    this.showStatus('Criando seu pagamento, aguarde...', 'info');
 
     try {
       const data = await api.post('/billing/checkout-session', { package_id: packageId });
@@ -204,7 +308,7 @@ export const billing = {
         const status = data?.order?.status;
 
         if (status === 'paid') {
-          this.showStatus('Pagamento confirmado. Creditos atualizados!', 'success');
+          this.showStatus('Opá! Pagamento confirmado. Creditos atualizados!', 'success');
           await auth.refreshUser();
           return;
         }
