@@ -1,4 +1,5 @@
 # Design Tokens — VEED - Playground de IA
+
 > Gerado pelo Process Cloner em 17/03/2026 20:37
 > **REGRA PRINCIPAL**: Nunca invente ou substitua estes valores.
 > Toda cor, fonte e espaçamento do projeto deve vir exclusivamente deste arquivo.
@@ -13,11 +14,11 @@
 :root {
   --tw-border-style: none;
   --tw-shadow-color: color-mix(
-          in oklab,
-          color-mix(in oklab, var(--color-black) 20%, transparent)
-            var(--tw-shadow-alpha),
-          transparent
-        );
+    in oklab,
+    color-mix(in oklab, var(--color-black) 20%, transparent)
+      var(--tw-shadow-alpha),
+    transparent
+  );
   --tw-inset-shadow-color: initial;
   --tw-ring-color: var(--color-primary);
   --tw-inset-ring-color: initial;
@@ -41,25 +42,25 @@
 
 ### Uso semântico
 
-- **primary**: `#5666F5`
-- **background**: `#0000`
-- **text**: `#FFFFFF`
-- **border**: `#5457FF`
-- **success**: `#159365`
-- **error**: `#FB3377`
+- **primary**: #5666F5
+- **background**: #0000
+- **text**: #FFFFFF
+- **border**: #5457FF
+- **success**: #159365
+- **error**: #FB3377
 
 ### Cores por frequência de uso
 
-| # | Cor | Uso |
-|---|-----|-----|
-| 1 | `#FFFFFF` | 81x no CSS |
-| 2 | `#6D6D6D` | 28x no CSS |
-| 3 | `#000000` | 16x no CSS |
-| 4 | `#333333` | 11x no CSS |
-| 5 | `#888888` | 8x no CSS |
-| 6 | `#F60859` | 8x no CSS |
-| 7 | `#35916A` | 7x no CSS |
-| 8 | `#5CCD9E` | 7x no CSS |
+| #   | Cor     | Uso        |
+| --- | ------- | ---------- |
+| 1   | #FFFFFF | 81x no CSS |
+| 2   | #6D6D6D | 28x no CSS |
+| 3   | #000000 | 16x no CSS |
+| 4   | #333333 | 11x no CSS |
+| 5   | #888888 | 8x no CSS  |
+| 6   | #F60859 | 8x no CSS  |
+| 7   | #35916A | 7x no CSS  |
+| 8   | #5CCD9E | 7x no CSS  |
 
 ## Tipografia
 
@@ -68,10 +69,12 @@
 ```css
 :root {
   --tw-font-weight: var(--font-weight-bold);
-  --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-      "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-      "Courier New", monospace;
+  --font-sans:
+    ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
   --font-weight-thin: 100;
   --font-weight-light: 300;
   --font-weight-normal: 400;
@@ -99,8 +102,12 @@
 ### Hierarquia tipográfica
 
 ```css
-p { font-size: 12px; }
-small { font-size: 11px; }
+p {
+  font-size: 12px;
+}
+small {
+  font-size: 11px;
+}
 ```
 
 **Pesos utilizados**: `400`, `500`, `600`, `700`, `bold`
@@ -142,4 +149,4 @@ box-shadow: inset 0 0 0 1000px #fff;
 
 ---
 
-*Process Cloner — 17/03/2026 20:37*
+_Process Cloner — 17/03/2026 20:37_

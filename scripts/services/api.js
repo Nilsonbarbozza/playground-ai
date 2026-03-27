@@ -4,7 +4,9 @@
  */
 class ApiService {
   constructor() {
-    this.baseUrl = '/api';
+    const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+    const runningOutsideBackendPort = isLocal && window.location.port && window.location.port !== '3000';
+    this.baseUrl = runningOutsideBackendPort ? 'http://localhost:3000/api' : '/api';
   }
 
   get token() {

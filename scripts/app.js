@@ -5,6 +5,7 @@ import { editor } from './modules/editor.js';
 import { videoModule } from './modules/video.js';
 import { faceswap } from './modules/faceswap.js';
 import { projects } from './modules/projects.js';
+import { billing } from './modules/billing.js';
 
 /**
  * AI Playground - Main Application Entry Point (ES Module)
@@ -17,6 +18,7 @@ class App {
     auth.init();
     navigation.init();
     projects.init();
+    billing.init();
 
     // 2. Initialize Feature Engines
     text2img.init();

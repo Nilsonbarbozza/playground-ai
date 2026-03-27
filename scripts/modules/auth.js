@@ -15,12 +15,13 @@ export const auth = {
       try {
         this.user = JSON.parse(savedUser);
         this.updateUI();
-      } catch (e) {
+      } catch {
         localStorage.removeItem('user');
       }
     } else {
-      this.updateUI(); // Ensure auth-section shows if no user
+      this.updateUI();
     }
+
     this.initListeners();
     document.addEventListener('auth:required', () => this.showModal(true));
     console.log('[Auth] Initialized');
@@ -45,32 +46,29 @@ export const auth = {
 
   showModal(show = true) {
     const modal = document.getElementById('auth-modal');
-    if (modal) {
-      if (show) modal.classList.remove('tw-hidden');
-      else modal.classList.add('tw-hidden');
-    }
+    if (!modal) return;
+    if (show) modal.classList.remove('tw-hidden');
+    else modal.classList.add('tw-hidden');
   },
 
   initListeners() {
-    // Modal controls
     const btnOpen = document.getElementById('btn-open-login');
     if (btnOpen) btnOpen.onclick = () => this.showModal(true);
 
     const btnClose = document.getElementById('btn-close-auth');
     if (btnClose) btnClose.onclick = () => this.showModal(false);
 
-    // Form submission
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
       loginForm.onsubmit = async (e) => {
         e.preventDefault();
         const email = e.target.email.value;
         const password = e.target.password.value;
-        
+
         try {
           ui.setLoading('btn-login', true, 'Entrando...');
           const data = await api.post('/auth/login', { email, password });
-          this.handleSuccess(data);
+          this.handleSuccess(data, false);
         } catch (err) {
           ui.showToast(err.message, 'error');
         } finally {
@@ -79,7 +77,6 @@ export const auth = {
       };
     }
 
-    // Register form submission
     const registerForm = document.getElementById('register-form');
     if (registerForm) {
       registerForm.onsubmit = async (e) => {
@@ -89,11 +86,11 @@ export const auth = {
         const confirmPassword = e.target.confirmPassword.value;
 
         if (password !== confirmPassword) {
-          ui.showToast('As senhas não coincidem.', 'error');
+          ui.showToast('As senhas nao coincidem.', 'error');
           return;
         }
         if (password.length < 6) {
-          ui.showToast('A senha deve ter no mínimo 6 caracteres.', 'error');
+          ui.showToast('A senha deve ter no minimo 6 caracteres.', 'error');
           return;
         }
 
@@ -110,10 +107,12 @@ export const auth = {
     }
 
     const logoutBtn = document.getElementById('btn-logout');
-    if (logoutBtn) logoutBtn.onclick = () => {
-      localStorage.clear();
-      window.location.reload();
-    };
+    if (logoutBtn) {
+      logoutBtn.onclick = () => {
+        localStorage.clear();
+        window.location.reload();
+      };
+    }
   },
 
   handleSuccess(data, isNewUser = false) {
@@ -121,7 +120,19 @@ export const auth = {
     localStorage.setItem('user', JSON.stringify(data.user));
     this.user = data.user;
     this.updateUI();
-    ui.showToast(isNewUser ? `Conta criada! Você ganhou ${data.user.credits} créditos.` : 'Bem-vindo de volta!');
+
+    const isFirstSignup = Boolean(data.is_first_signup) || Boolean(isNewUser);
+    ui.showToast(isFirstSignup ? `Conta criada! Voce ganhou ${data.user.credits} creditos.` : 'Bem-vindo de volta!');
+
+    document.dispatchEvent(
+      new CustomEvent('auth:login-success', {
+        detail: {
+          user: data.user,
+          isFirstSignup
+        }
+      })
+    );
+
     navigation.switchView('view-text-to-image');
     this.showModal(false);
   },
@@ -129,15 +140,13 @@ export const auth = {
   async refreshUser() {
     try {
       const data = await api.get('/user/me');
-      if (data.success) {
-        this.user = data.user;
-        localStorage.setItem('user', JSON.stringify(data.user));
-        this.updateUI();
-        console.log('[Auth] Credits refreshed:', data.user.credits);
-      }
+      if (!data.success) return;
+      this.user = data.user;
+      localStorage.setItem('user', JSON.stringify(data.user));
+      this.updateUI();
+      console.log('[Auth] Credits refreshed:', data.user.credits);
     } catch (err) {
       console.error('[Auth] Failed to refresh user:', err.message);
     }
   }
 };
-
