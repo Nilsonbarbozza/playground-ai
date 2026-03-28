@@ -14,6 +14,7 @@ import generateRoutes from './routes/generateRoutes.js';
 import editRoutes from './routes/editRoutes.js';
 import billingRoutes from './routes/billingRoutes.js';
 import telemetryRoutes from './routes/telemetryRoutes.js';
+import experimentRoutes from './routes/experimentRoutes.js';
 import { stripeWebhook } from './controllers/billingController.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -39,6 +40,7 @@ app.use('/api/generate', generateRoutes);
 app.use('/api/edit', editRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/telemetry', telemetryRoutes);
+app.use('/api/admin/experiments', experimentRoutes);
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/admin/telemetry', (req, res) => res.sendFile(path.join(__dirname, 'admin-telemetry.html')));

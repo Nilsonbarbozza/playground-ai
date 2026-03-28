@@ -167,6 +167,44 @@ async function migrate() {
     console.log('[OK] Tabela credit_ledger_daily criada/verificada.');
 
     await db.query(`
+      CREATE TABLE IF NOT EXISTS ab_experiment_configs (
+        key VARCHAR(120) PRIMARY KEY,
+        config JSONB NOT NULL,
+        updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('[OK] Tabela ab_experiment_configs criada/verificada.');
+
+    await db.query(
+      `INSERT INTO ab_experiment_configs (key, config)
+       VALUES (
+         'topup_modal_v1',
+         '{
+           "experiment_key":"topup_modal_v1",
+           "allocation":{"A":50,"B":50},
+           "variants":{
+             "A":{
+               "modal_title":"Adicionar Créditos",
+               "primary_cta":"Pagar",
+               "starter_badge":"Uso Profissional",
+               "starter_subtitle":"Ferramentas avançadas para produtividade."
+             },
+             "B":{
+               "modal_title":"Desbloquear Créditos",
+               "primary_cta":"Garantir Créditos Agora",
+               "starter_badge":"Oferta Recomendável",
+               "starter_subtitle":"Acesse recursos premium com mais velocidade."
+             }
+           }
+         }'::jsonb
+       )
+       ON CONFLICT (key) DO NOTHING`
+    );
+    console.log('[OK] Config padrão do experimento topup_modal_v1 criada/verificada.');
+
+    await db.query(`
       CREATE TABLE IF NOT EXISTS video_jobs (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,

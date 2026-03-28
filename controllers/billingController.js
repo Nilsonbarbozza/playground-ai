@@ -1,5 +1,6 @@
 import { TopupService } from '../services/billing/topup.service.js';
 import { StripeService } from '../services/billing/stripe.service.js';
+import { TopupModalExperimentService } from '../services/experiments/topup-modal-experiment.service.js';
 
 export const listCreditPackages = async (req, res) => {
   try {
@@ -65,5 +66,15 @@ export const stripeWebhook = async (req, res) => {
   } catch (err) {
     console.error('[BILLING_WEBHOOK_ERR]', err.message);
     res.status(400).json({ success: false, error: `Webhook error: ${err.message}` });
+  }
+};
+
+export const getTopupModalExperimentConfig = async (req, res) => {
+  try {
+    const config = await TopupModalExperimentService.getActiveConfig();
+    res.json({ success: true, config });
+  } catch (err) {
+    console.error('[BILLING_TOPUP_MODAL_CONFIG_ERR]', err.message);
+    res.status(500).json({ success: false, error: err.message });
   }
 };

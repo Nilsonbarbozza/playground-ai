@@ -5,12 +5,32 @@ import { telemetry } from '../services/telemetry.js';
 
 const FIRST_SIGNUP_PROMPT_PREFIX = 'topup:first-signup-shown:';
 const TOPUP_AB_VARIANT_KEY = 'topup:ab-variant';
+const TOPUP_EXPERIMENT_KEY = 'topup_modal_v1';
+const DEFAULT_TOPUP_EXPERIMENT_CONFIG = {
+  experiment_key: TOPUP_EXPERIMENT_KEY,
+  allocation: { A: 50, B: 50 },
+  variants: {
+    A: {
+      modal_title: 'Adicionar Creditos',
+      primary_cta: 'Pagar',
+      starter_badge: 'Uso Profissional',
+      starter_subtitle: 'Ferramentas avancadas para produtividade.'
+    },
+    B: {
+      modal_title: 'Desbloquear Creditos',
+      primary_cta: 'Garantir Creditos Agora',
+      starter_badge: 'Oferta Recomendavel',
+      starter_subtitle: 'Acesse recursos premium com mais velocidade.'
+    }
+  }
+};
 
 export const billing = {
   state: {
     open: false,
     loading: false,
-    abVariant: null
+    abVariant: null,
+    experimentConfig: DEFAULT_TOPUP_EXPERIMENT_CONFIG
   },
 
   init() {
@@ -19,31 +39,54 @@ export const billing = {
     this.bindCreditsButton();
     this.bindGlobalAuthEvents();
     this.handleCheckoutReturn();
+    this.loadExperimentConfig();
     console.log('[Billing] Initialized');
   },
 
   getOrCreateAbVariant() {
-    const existing = localStorage.getItem(TOPUP_AB_VARIANT_KEY);
+    const key = `${TOPUP_AB_VARIANT_KEY}:${this.state.experimentConfig?.experiment_key || TOPUP_EXPERIMENT_KEY}`;
+    const existing = localStorage.getItem(key);
     if (existing === 'A' || existing === 'B') return existing;
 
-    const variant = Math.random() < 0.5 ? 'A' : 'B';
-    localStorage.setItem(TOPUP_AB_VARIANT_KEY, variant);
+    const allocationA = Number(this.state.experimentConfig?.allocation?.A ?? 50);
+    const threshold = Math.min(Math.max(allocationA, 0), 100) / 100;
+    const variant = Math.random() < threshold ? 'A' : 'B';
+    localStorage.setItem(key, variant);
     return variant;
   },
 
+  async loadExperimentConfig() {
+    try {
+      const data = await api.get('/billing/topup-modal-config');
+      if (data?.config?.variants?.A && data?.config?.variants?.B) {
+        this.state.experimentConfig = data.config;
+      }
+    } catch {
+      // Keep local default config; never block billing flow.
+    }
+    this.state.abVariant = this.getOrCreateAbVariant();
+    this.applyVariantUi();
+  },
+
   withAbVariant(extra = {}) {
-    return { ab_variant: this.state.abVariant || 'A', ...extra };
+    return {
+      experiment_key: this.state.experimentConfig?.experiment_key || TOPUP_EXPERIMENT_KEY,
+      ab_variant: this.state.abVariant || 'A',
+      ...extra
+    };
   },
 
   applyVariantUi() {
-    const title = document.querySelector('#billing-modal h3');
+    const title = document.getElementById('billing-modal-title');
+    const badge = document.getElementById('billing-starter-badge');
+    const subtitle = document.getElementById('billing-starter-subtitle');
     const checkoutBtn = document.getElementById('btn-starter-checkout');
-    if (title) {
-      title.textContent = this.state.abVariant === 'B' ? 'Desbloquear Créditos' : 'Adicionar Créditos';
-    }
-    if (checkoutBtn) {
-      checkoutBtn.textContent = this.state.abVariant === 'B' ? 'Garantir Créditos Agora' : 'Pagar';
-    }
+    const variantKey = this.state.abVariant === 'B' ? 'B' : 'A';
+    const variant = this.state.experimentConfig?.variants?.[variantKey] || DEFAULT_TOPUP_EXPERIMENT_CONFIG.variants[variantKey];
+    if (title) title.textContent = variant.modal_title;
+    if (badge) badge.textContent = variant.starter_badge;
+    if (subtitle) subtitle.textContent = variant.starter_subtitle;
+    if (checkoutBtn) checkoutBtn.textContent = variant.primary_cta;
   },
 
   ensureModal() {
@@ -57,7 +100,7 @@ export const billing = {
       <div class="tw-bg-[#F9FAFB] tw-w-full tw-max-w-4xl tw-rounded-[32px] tw-shadow-2xl tw-overflow-hidden tw-border tw-border-white/20">
         <!-- Header -->
         <div class="tw-flex tw-items-center tw-justify-between tw-px-8 tw-py-6">
-          <h3 class="tw-text-2xl tw-font-bold tw-text-gray-900">Adicionar Créditos</h3>
+          <h3 id="billing-modal-title" class="tw-text-2xl tw-font-bold tw-text-gray-900">Adicionar Creditos</h3>
           <button id="billing-modal-close" class="tw-text-gray-400 hover:tw-text-gray-600 tw-transition-colors">
             <svg class="tw-w-6 tw-h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
@@ -81,13 +124,13 @@ export const billing = {
           <div id="billing-packages" class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-6">
             <!-- Functional Plan: Starter -->
             <div id="plan-starter-container" class="tw-bg-white tw-rounded-3xl tw-border-2 tw-border-green-500 tw-p-8 tw-relative tw-shadow-lg">
-              <div class="tw-absolute -tw-top-4 tw-left-1/2 -tw-translate-x-1/2 tw-bg-[#5666f5] tw-text-white tw-px-4 tw-py-1 tw-rounded-full tw-text-xs tw-font-bold tw-flex tw-items-center tw-gap-1">
+              <div id="billing-starter-badge" class="tw-absolute -tw-top-4 tw-left-1/2 -tw-translate-x-1/2 tw-bg-[#5666f5] tw-text-white tw-px-4 tw-py-1 tw-rounded-full tw-text-xs tw-font-bold tw-flex tw-items-center tw-gap-1">
                 <svg class="tw-w-3 tw-h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                 Uso Profissional
               </div>
               <div class="tw-mb-6">
                 <h4 class="tw-text-2xl tw-font-bold tw-text-gray-900">Starter</h4>
-                <p class="tw-text-gray-500 tw-text-sm tw-mt-1">Ferramentas avançadas para produtividade.</p>
+                <p id="billing-starter-subtitle" class="tw-text-gray-500 tw-text-sm tw-mt-1">Ferramentas avancadas para produtividade.</p>
               </div>
               <div class="tw-mb-8">
                 <span class="tw-text-5xl tw-font-extrabold tw-text-gray-900">R$ 50</span>

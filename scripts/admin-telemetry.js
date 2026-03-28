@@ -211,6 +211,69 @@ async function request(path) {
   return payload;
 }
 
+function fillAbEditor(config) {
+  const variants = config?.variants || {};
+  const A = variants.A || {};
+  const B = variants.B || {};
+  document.getElementById('ab-a-title').value = A.modal_title || '';
+  document.getElementById('ab-b-title').value = B.modal_title || '';
+  document.getElementById('ab-a-cta').value = A.primary_cta || '';
+  document.getElementById('ab-b-cta').value = B.primary_cta || '';
+  document.getElementById('ab-a-badge').value = A.starter_badge || '';
+  document.getElementById('ab-b-badge').value = B.starter_badge || '';
+  document.getElementById('ab-a-subtitle').value = A.starter_subtitle || '';
+  document.getElementById('ab-b-subtitle').value = B.starter_subtitle || '';
+  document.getElementById('ab-a-allocation').value = number(config?.allocation?.A || 50);
+}
+
+function readAbEditorPayload() {
+  const allocationA = Math.min(Math.max(number(document.getElementById('ab-a-allocation')?.value), 0), 100);
+  return {
+    allocation: { A: allocationA },
+    variants: {
+      A: {
+        modal_title: cleanInput('ab-a-title', 120),
+        primary_cta: cleanInput('ab-a-cta', 80),
+        starter_badge: cleanInput('ab-a-badge', 80),
+        starter_subtitle: cleanInput('ab-a-subtitle', 180)
+      },
+      B: {
+        modal_title: cleanInput('ab-b-title', 120),
+        primary_cta: cleanInput('ab-b-cta', 80),
+        starter_badge: cleanInput('ab-b-badge', 80),
+        starter_subtitle: cleanInput('ab-b-subtitle', 180)
+      }
+    }
+  };
+}
+
+async function loadAbEditor() {
+  try {
+    const data = await request('/admin/experiments/topup-modal');
+    if (data?.config) fillAbEditor(data.config);
+  } catch {
+    // Non-blocking: keep dashboard usable if config endpoint is temporarily unavailable.
+  }
+}
+
+async function saveAbEditor() {
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('Sem token. Faça login novamente.');
+  const payload = readAbEditorPayload();
+  const response = await fetch(`${getApiBase()}/admin/experiments/topup-modal`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(payload)
+  });
+  const json = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(json.error || `Erro HTTP ${response.status}`);
+  if (json?.config) fillAbEditor(json.config);
+  return json;
+}
+
 async function loadDashboard() {
   const rangeHoursInput = document.getElementById('range-hours');
   const rangeHours = Math.min(Math.max(number(rangeHoursInput.value), 1), 720);
@@ -306,6 +369,15 @@ async function loadDashboard() {
 }
 
 document.getElementById('btn-refresh').addEventListener('click', () => loadDashboard());
+document.getElementById('btn-ab-save')?.addEventListener('click', async () => {
+  try {
+    setNotice('Salvando configuração A/B...');
+    await saveAbEditor();
+    setNotice('Configuração A/B salva com sucesso.');
+  } catch (err) {
+    setNotice(String(err.message || 'Falha ao salvar configuração A/B.'), true);
+  }
+});
 document.getElementById('btn-clear-filters').addEventListener('click', () => {
   const fields = ['filter-email', 'filter-event', 'filter-route', 'filter-date-from', 'filter-date-to'];
   fields.forEach((id) => {
@@ -328,3 +400,4 @@ document.getElementById('range-hours').addEventListener('keydown', (event) => {
 });
 
 loadDashboard();
+loadAbEditor();
