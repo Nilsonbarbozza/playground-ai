@@ -4,290 +4,904 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Telemetry</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.2/dist/apexcharts.min.js"></script>
     <style>
       :root {
-        --bg: #0b1220;
-        --panel: #131d33;
-        --panel-2: #1a2744;
-        --text: #e6edf7;
-        --muted: #9fb0d0;
-        --ok: #16a34a;
-        --warn: #d97706;
-        --critical: #dc2626;
-        --line: #2a3a60;
+        --bg: #080d14;
+        --surface: #0d1422;
+        --panel: #111827;
+        --panel-2: #17233a;
+        --border: #1c2d47;
+        --border-2: #243558;
+        --text: #e2e8f4;
+        --muted: #4e6a8f;
+        --muted-2: #7fa0c8;
+        --accent: #10b981;
+        --accent-2: #059669;
+        --blue: #3b82f6;
+        --warn: #f59e0b;
+        --critical: #ef4444;
+        --ok: #10b981;
+        --line: #1c2d47;
+        --r: 10px;
+        --nav-h: 58px;
       }
-
-      * {
+      *,
+      *::before,
+      *::after {
         box-sizing: border-box;
-      }
-
-      body {
         margin: 0;
-        font-family: "Segoe UI", Arial, sans-serif;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        background: var(--bg);
         color: var(--text);
-        background: radial-gradient(circle at 0% 0%, #1a2340 0, var(--bg) 45%);
+        font-size: 14px;
+        line-height: 1.6;
+        min-height: 100vh;
       }
 
-      .container {
-        max-width: 1080px;
-        margin: 0 auto;
-        padding: 24px 16px 40px;
+      /* ─── TOPNAV ─── */
+      .topnav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        height: var(--nav-h);
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        padding: 0 24px;
+        gap: 16px;
+      }
+      .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+        letter-spacing: -0.01em;
+        flex-shrink: 0;
+      }
+      .nav-logo-icon {
+        width: 28px;
+        height: 28px;
+        background: var(--accent);
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .nav-logo-icon svg {
+        width: 15px;
+        height: 15px;
+      }
+      .nav-sep {
+        width: 1px;
+        height: 18px;
+        background: var(--border-2);
+      }
+      .nav-page {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--muted-2);
+      }
+      .nav-spacer {
+        flex: 1;
+      }
+      .nav-live {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12px;
+        color: var(--muted-2);
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 5px 13px;
+      }
+      .live-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+        animation: blink 2s ease-in-out infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.4;
+          transform: scale(0.8);
+        }
       }
 
-      h1 {
-        margin: 0 0 8px;
-        font-size: 28px;
+      /* ─── FILTER BAR ─── */
+      .filter-bar {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 10px 24px;
       }
-
-      .muted {
+      .filter-inner {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+      .fl {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+      }
+      .filter-bar input {
+        background: var(--panel);
+        border: 1px solid var(--border-2);
+        border-radius: var(--r);
+        color: var(--text);
+        font-family: inherit;
+        font-size: 13px;
+        padding: 6px 11px;
+        outline: none;
+        height: 33px;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      .filter-bar input[type="number"] {
+        width: 76px;
+      }
+      .filter-bar input[type="text"] {
+        width: 150px;
+      }
+      .filter-bar input[type="datetime-local"] {
+        width: 176px;
+        color-scheme: dark;
+      }
+      .filter-bar input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+      }
+      .filter-bar input::placeholder {
         color: var(--muted);
       }
-
-      .toolbar {
-        margin: 16px 0 20px;
-        display: flex;
-        gap: 10px;
+      .fsep {
+        width: 1px;
+        height: 20px;
+        background: var(--border-2);
+      }
+      .btn {
+        display: inline-flex;
         align-items: center;
-        flex-wrap: wrap;
-      }
-
-      input,
-      button {
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        background: var(--panel-2);
-        color: var(--text);
-        padding: 10px 12px;
-        font-size: 14px;
-      }
-
-      button {
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: var(--r);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 500;
         cursor: pointer;
+        border: 1px solid transparent;
+        transition: all 0.15s ease;
+        height: 33px;
+        white-space: nowrap;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+      .btn-primary:hover {
+        background: var(--accent-2);
+        border-color: var(--accent-2);
+      }
+      .btn-ghost {
+        background: var(--panel);
+        color: var(--muted-2);
+        border-color: var(--border-2);
+      }
+      .btn-ghost:hover {
+        color: var(--text);
+        background: var(--panel-2);
+      }
+
+      /* ─── MAIN ─── */
+      .main {
+        max-width: 98vw;
+        margin: 0 auto;
+        padding: 28px 32px 64px;
+      }
+
+      /* ─── PAGE LAYOUT: coluna principal + sidebar ─── */
+      .page-layout {
+        display: grid;
+        grid-template-columns: 1fr 480px;
+        gap: 24px;
+        align-items: start;
+      }
+      @media (max-width: 1100px) {
+        .page-layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .page-col {
+        min-width: 0;
+      }
+
+      .page-sidebar {
+        position: sticky;
+        top: calc(var(--nav-h) + 16px);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        min-width: 0;
+      }
+
+      /* ─── NOTICE ─── */
+      #notice {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        padding: 10px 15px;
+        font-size: 13px;
+        color: var(--muted-2);
+        margin-bottom: 26px;
+      }
+
+      /* ─── SECTION ─── */
+      .sec {
+        margin-bottom: 30px;
+        animation: up 0.3s ease both;
+      }
+      .sec:nth-child(3) {
+        animation-delay: 0.05s;
+      }
+      .sec:nth-child(4) {
+        animation-delay: 0.1s;
+      }
+      .sec:nth-child(5) {
+        animation-delay: 0.15s;
+      }
+      .sec:nth-child(6) {
+        animation-delay: 0.2s;
+      }
+      .sec:nth-child(7) {
+        animation-delay: 0.24s;
+      }
+      .sec:nth-child(8) {
+        animation-delay: 0.28s;
+      }
+      @keyframes up {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .sec-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 13px;
+      }
+      .sec-title {
+        font-size: 11px;
         font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
       }
 
-      .toolbar-sep {
-        width: 100%;
-        height: 0;
-      }
-
+      /* ─── GRID CARDS (ops-grid, funnel-grid) ─── */
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
         gap: 12px;
       }
-
       .card {
         background: var(--panel);
-        border: 1px solid var(--line);
+        border: 1px solid var(--border);
         border-radius: 12px;
-        padding: 14px;
+        padding: 18px 18px 15px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          border-color 0.2s,
+          transform 0.2s;
       }
-
+      .card::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent), transparent);
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .card:hover {
+        border-color: var(--border-2);
+        transform: translateY(-2px);
+      }
+      .card:hover::after {
+        opacity: 1;
+      }
+      #funnel-grid .card::after {
+        background: linear-gradient(90deg, var(--blue), transparent);
+      }
       .k {
-        font-size: 12px;
+        font-size: 11px;
+        font-weight: 500;
         color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
       }
-
       .v {
-        margin-top: 8px;
-        font-size: 24px;
-        font-weight: 700;
+        margin-top: 10px;
+        font-size: 26px;
+        font-weight: 600;
+        color: var(--text);
+        font-family: "IBM Plex Mono", monospace;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
       }
 
-      .section {
-        margin-top: 20px;
+      /* ─── CHARTS ROW ─── */
+      .charts-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 30px;
       }
-
-      .section h2 {
-        margin: 0 0 10px;
-        font-size: 18px;
+      @media (max-width: 840px) {
+        .charts-row {
+          grid-template-columns: 1fr;
+        }
       }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
+      .chart-card {
         background: var(--panel);
-        border: 1px solid var(--line);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px 18px 10px;
+      }
+      .chart-title {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 14px;
+      }
+
+      /* ─── TWO COL ─── */
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 30px;
+      }
+      @media (max-width: 840px) {
+        .two-col {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ─── TABLE ─── */
+      .table-wrap {
+        background: var(--panel);
+        border: 1px solid var(--border);
         border-radius: 12px;
         overflow: hidden;
       }
-
-      th,
-      td {
-        padding: 10px;
-        border-bottom: 1px solid var(--line);
-        text-align: left;
-        font-size: 14px;
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: transparent;
+        border: none;
       }
-
       th {
-        color: var(--muted);
+        padding: 10px 14px;
+        text-align: left;
+        font-size: 11px;
         font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        background: rgba(13, 20, 34, 0.7);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
       }
-
+      td {
+        padding: 10px 14px;
+        font-size: 13px;
+        color: var(--muted-2);
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+      }
       tr:last-child td {
         border-bottom: none;
       }
-
-      .status-ok {
-        color: var(--ok);
+      tbody tr {
+        transition: background 0.1s;
+      }
+      tbody tr:hover td {
+        background: rgba(28, 45, 71, 0.45);
+        color: var(--text);
+      }
+      td:first-child {
+        color: var(--text);
+        font-weight: 500;
+      }
+      .mono {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
       }
 
-      .status-warn {
-        color: var(--warn);
-      }
-
+      /* ─── STATUS BADGES ─── */
+      .status-ok,
+      .status-warn,
       .status-critical {
-        color: var(--critical);
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 9px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+      .status-ok {
+        background: rgba(16, 185, 129, 0.12);
+        color: #34d399;
+      }
+      .status-warn {
+        background: rgba(245, 158, 11, 0.12);
+        color: #fbbf24;
+      }
+      .status-critical {
+        background: rgba(239, 68, 68, 0.12);
+        color: #f87171;
+      }
+      .status-ok::before,
+      .status-warn::before,
+      .status-critical::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+      }
+      .status-ok::before {
+        background: #34d399;
+      }
+      .status-warn::before {
+        background: #fbbf24;
+      }
+      .status-critical::before {
+        background: #f87171;
       }
 
-      .notice {
-        margin-top: 14px;
-        padding: 12px;
-        background: var(--panel);
-        border: 1px solid var(--line);
-        border-radius: 10px;
+      /* ─── SCROLLBAR ─── */
+      ::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--surface);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border-2);
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #2d4470;
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1>Telemetry Admin</h1>
-      <div class="muted">Visão operacional de eventos e funil de créditos.</div>
+    <!-- TOPNAV -->
+    <header class="topnav">
+      <div class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="white"
+            stroke-width="2.5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
+          </svg>
+        </div>
+        Telemetry Admin
+      </div>
+      <div class="nav-sep"></div>
+      <span class="nav-page">Visão operacional de eventos e créditos</span>
+      <div class="nav-spacer"></div>
+      <div class="nav-live">
+        <span class="live-dot"></span>
+        Live
+      </div>
+    </header>
 
-      <div class="toolbar">
-        <label for="range-hours">Janela (horas)</label>
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <div class="filter-inner">
+        <span class="fl">Janela</span>
         <input id="range-hours" type="number" min="1" max="720" value="24" />
-        <label for="filter-limit">Limite</label>
+        <span class="fl" style="margin-left: -4px">h</span>
+        <div class="fsep"></div>
+        <span class="fl">Limite</span>
         <input id="filter-limit" type="number" min="1" max="500" value="200" />
-        <div class="toolbar-sep"></div>
-        <input id="filter-email" type="text" placeholder="Filtrar por email" />
-        <input id="filter-event" type="text" placeholder="Filtrar por evento" />
-        <input id="filter-route" type="text" placeholder="Filtrar por módulo/rota" />
-        <label for="filter-date-from">De</label>
+        <div class="fsep"></div>
+        <input id="filter-email" type="text" placeholder="E-mail" />
+        <input id="filter-event" type="text" placeholder="Evento" />
+        <input id="filter-route" type="text" placeholder="Módulo / rota" />
+        <div class="fsep"></div>
+        <span class="fl">De</span>
         <input id="filter-date-from" type="datetime-local" />
-        <label for="filter-date-to">Até</label>
+        <span class="fl">Até</span>
         <input id="filter-date-to" type="datetime-local" />
-        <button id="btn-refresh" type="button">Atualizar</button>
-        <button id="btn-clear-filters" type="button">Limpar Filtros</button>
-      </div>
-
-      <div id="notice" class="notice muted">Carregando...</div>
-
-      <div class="section">
-        <h2>Status Operacional</h2>
-        <div id="ops-grid" class="grid"></div>
-      </div>
-
-      <div class="section">
-        <h2>Insights Automáticos</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Severidade</th>
-              <th>Título</th>
-              <th>Detalhe</th>
-              <th>Ação sugerida</th>
-            </tr>
-          </thead>
-          <tbody id="insights-list"></tbody>
-        </table>
-      </div>
-
-      <div class="section">
-        <h2>Funil Top-up</h2>
-        <div id="funnel-grid" class="grid"></div>
-      </div>
-
-      <div class="section">
-        <h2>Top Views</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>View</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody id="top-views"></tbody>
-        </table>
-      </div>
-
-      <div class="section">
-        <h2>Top Features</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Feature</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody id="top-features"></tbody>
-        </table>
-      </div>
-
-      <div class="section">
-        <h2>Erros por Módulo</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Módulo</th>
-              <th>Evento</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody id="errors-by-module"></tbody>
-        </table>
-      </div>
-
-      <div class="section">
-        <h2>Interações Recentes (Usuário + Horário)</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Data/Hora</th>
-              <th>Email</th>
-              <th>Evento</th>
-              <th>Módulo/Rota</th>
-            </tr>
-          </thead>
-          <tbody id="recent-interactions"></tbody>
-        </table>
-      </div>
-
-      <div class="section">
-        <h2>Consumo de Créditos por Módulo</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Módulo</th>
-              <th>Créditos Gastos</th>
-              <th>Créditos Adicionados</th>
-              <th>Eventos</th>
-            </tr>
-          </thead>
-          <tbody id="credit-usage-modules"></tbody>
-        </table>
-      </div>
-
-      <div class="section">
-        <h2>Movimentação de Créditos (Usuário + Onde)</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Data/Hora</th>
-              <th>Email</th>
-              <th>Tipo</th>
-              <th>Módulo</th>
-              <th>Qtd</th>
-              <th>Descrição</th>
-            </tr>
-          </thead>
-          <tbody id="credit-movements"></tbody>
-        </table>
+        <div class="fsep"></div>
+        <button id="btn-refresh" type="button" class="btn btn-primary">
+          <svg
+            width="13"
+            height="13"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+          Atualizar
+        </button>
+        <button id="btn-clear-filters" type="button" class="btn btn-ghost">
+          Limpar filtros
+        </button>
       </div>
     </div>
 
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <!-- Notice (full width, acima do layout) -->
+      <div id="notice">
+        <svg
+          width="14"
+          height="14"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        Carregando…
+      </div>
+
+      <div class="page-layout">
+        <!-- ══════════ COLUNA PRINCIPAL ══════════ -->
+        <div class="page-col">
+          <!-- Status Operacional -->
+          <div class="sec">
+            <div class="sec-head">
+              <span class="sec-title">Status Operacional</span>
+            </div>
+            <div id="ops-grid" class="grid"></div>
+          </div>
+
+          <!-- ApexCharts -->
+          <div class="charts-row sec">
+            <div class="chart-card">
+              <div class="chart-title">Atividade — Eventos / hora</div>
+              <div id="chart-activity-timeline"></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Créditos — Gastos vs Adicionados</div>
+              <div id="chart-credits-overview"></div>
+            </div>
+          </div>
+
+          <!-- Insights -->
+          <div class="sec">
+            <div class="sec-head">
+              <span class="sec-title">Insights Automáticos</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Severidade</th>
+                    <th>Título</th>
+                    <th>Detalhe</th>
+                    <th>Ação sugerida</th>
+                  </tr>
+                </thead>
+                <tbody id="insights-list"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="sec">
+            <div class="sec-head">
+              <span class="sec-title">Experimento A/B — Top-up</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Variante</th>
+                    <th>Modal Opened</th>
+                    <th>Checkout Started</th>
+                    <th>Order Paid</th>
+                    <th>Start Rate %</th>
+                    <th>Paid After Start %</th>
+                  </tr>
+                </thead>
+                <tbody id="experiments-topup"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Top Features (coluna principal) -->
+          <div class="sec">
+            <div class="sec-head">
+              <span class="sec-title">Top Features</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Feature</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody id="top-features"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Erros por Módulo -->
+          <div class="sec">
+            <div class="sec-head">
+              <span class="sec-title">Erros por Módulo</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Módulo</th>
+                    <th>Evento</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody id="errors-by-module"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Consumo de Créditos por Módulo -->
+          <div class="sec">
+            <div class="sec-head">
+              <span class="sec-title">Consumo de Créditos por Módulo</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Módulo</th>
+                    <th>Créditos Gastos</th>
+                    <th>Créditos Adicionados</th>
+                    <th>Eventos</th>
+                  </tr>
+                </thead>
+                <tbody id="credit-usage-modules"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Movimentação de Créditos -->
+          <div class="sec">
+            <div class="sec-head">
+              <span class="sec-title">Movimentação de Créditos</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data / Hora</th>
+                    <th>E-mail</th>
+                    <th>Tipo</th>
+                    <th>Módulo</th>
+                    <th>Qtd</th>
+                    <th>Descrição</th>
+                  </tr>
+                </thead>
+                <tbody id="credit-movements"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- /COLUNA PRINCIPAL -->
+
+        <!-- ══════════ SIDEBAR DIREITA ══════════ -->
+        <aside class="page-sidebar">
+          <!-- Funil Top-up -->
+          <div class="sec" style="margin-bottom: 0">
+            <div class="sec-head">
+              <span class="sec-title">Funil Top-up</span>
+            </div>
+            <div
+              id="funnel-grid"
+              class="grid"
+              style="grid-template-columns: 1fr"
+            ></div>
+          </div>
+
+          <!-- Top Views -->
+          <div class="sec" style="margin-bottom: 0">
+            <div class="sec-head"><span class="sec-title">Top Views</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>View</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody id="top-views"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Interações Recentes -->
+          <div class="sec" style="margin-bottom: 0">
+            <div class="sec-head">
+              <span class="sec-title">Interações Recentes</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data / Hora</th>
+                    <th>E-mail</th>
+                    <th>Evento</th>
+                    <th>Módulo / Rota</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-interactions"></tbody>
+              </table>
+            </div>
+          </div>
+        </aside>
+        <!-- /SIDEBAR DIREITA -->
+      </div>
+      <!-- /page-layout -->
+    </main>
+
+    <!-- APEXCHARTS INIT — atualizado dinamicamente por scripts/admin-telemetry.js -->
+    <script>
+      (function () {
+        var base = {
+          chart: {
+            background: "transparent",
+            fontFamily: "'IBM Plex Sans', sans-serif",
+            toolbar: { show: false },
+            animations: { enabled: true, easing: "easeinout", speed: 700 },
+          },
+          theme: { mode: "dark" },
+          grid: {
+            borderColor: "#1c2d47",
+            strokeDashArray: 3,
+            xaxis: { lines: { show: false } },
+          },
+          tooltip: { theme: "dark", style: { fontSize: "12px" } },
+        };
+
+        var actOpts = {
+          chart: Object.assign({}, base.chart, { type: "area", height: 195 }),
+          theme: base.theme,
+          grid: base.grid,
+          tooltip: base.tooltip,
+          series: [{ name: "Eventos", data: [] }],
+          colors: ["#10b981"],
+          fill: {
+            type: "gradient",
+            gradient: {
+              shadeIntensity: 1,
+              opacityFrom: 0.3,
+              opacityTo: 0.02,
+              stops: [0, 95],
+            },
+          },
+          stroke: { curve: "smooth", width: 2 },
+          dataLabels: { enabled: false },
+          xaxis: {
+            categories: [],
+            labels: { style: { colors: "#4e6a8f", fontSize: "11px" } },
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+          },
+          yaxis: { labels: { style: { colors: "#4e6a8f", fontSize: "11px" } } },
+        };
+
+        var credOpts = {
+          chart: Object.assign({}, base.chart, { type: "bar", height: 195 }),
+          theme: base.theme,
+          grid: base.grid,
+          tooltip: base.tooltip,
+          series: [
+            { name: "Gastos", data: [] },
+            { name: "Adicionados", data: [] },
+          ],
+          colors: ["#ef4444", "#10b981"],
+          plotOptions: { bar: { columnWidth: "52%", borderRadius: 3 } },
+          dataLabels: { enabled: false },
+          xaxis: {
+            categories: [],
+            labels: { style: { colors: "#4e6a8f", fontSize: "11px" } },
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+          },
+          yaxis: { labels: { style: { colors: "#4e6a8f", fontSize: "11px" } } },
+          legend: {
+            position: "top",
+            horizontalAlign: "right",
+            labels: { colors: "#7fa0c8" },
+            markers: { radius: 3 },
+          },
+        };
+
+        document.addEventListener("DOMContentLoaded", function () {
+          window.AdminCharts = {};
+          var el1 = document.getElementById("chart-activity-timeline");
+          var el2 = document.getElementById("chart-credits-overview");
+          if (el1) {
+            window.AdminCharts.activity = new ApexCharts(el1, actOpts);
+            window.AdminCharts.activity.render();
+          }
+          if (el2) {
+            window.AdminCharts.credits = new ApexCharts(el2, credOpts);
+            window.AdminCharts.credits.render();
+          }
+        });
+      })();
+    </script>
+
+    <!-- módulo JS existente — não alterar -->
     <script type="module" src="/scripts/admin-telemetry.js"></script>
   </body>
 </html>

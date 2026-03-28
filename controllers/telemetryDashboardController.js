@@ -49,3 +49,13 @@ export const getTelemetryDashboardInsights = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
+
+export const getTelemetryDashboardExperiment = async (req, res) => {
+  try {
+    const data = await TelemetryDashboardService.getTopupExperiment(req.query || {});
+    res.json({ success: true, ...data });
+  } catch (err) {
+    console.error('[TELEMETRY_DASHBOARD_EXPERIMENT_ERR]', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};

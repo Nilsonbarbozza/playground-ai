@@ -96,6 +96,18 @@ function creditMovementsRows(items) {
     .join('');
 }
 
+function topupExperimentRows(items) {
+  if (!Array.isArray(items) || items.length === 0) {
+    return '<tr><td colspan="6" class="muted">Sem dados de experimento no período.</td></tr>';
+  }
+  return items
+    .map((item) => {
+      const variant = item.ab_variant || 'unknown';
+      return `<tr><td>${variant}</td><td>${number(item.modal_opened)}</td><td>${number(item.checkout_started)}</td><td>${number(item.order_paid)}</td><td>${number(item.checkout_start_rate_percent)}%</td><td>${number(item.paid_after_start_rate_percent)}%</td></tr>`;
+    })
+    .join('');
+}
+
 function setNotice(message, isError = false) {
   const notice = document.getElementById('notice');
   notice.textContent = message;
@@ -108,12 +120,69 @@ function cleanInput(id, maxLen = 255) {
   return String(el.value || '').trim().slice(0, maxLen);
 }
 
+function safeDateToIso(raw) {
+  if (!raw) return '';
+  const date = new Date(raw);
+  if (!Number.isFinite(date.getTime())) return '';
+  return date.toISOString();
+}
+
+function hourKeyBRT(value) {
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return null;
+  const formatter = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Fortaleza',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    hour12: false
+  });
+  return formatter.format(date);
+}
+
+function updateCharts(interactions, usageByModule) {
+  const charts = window.AdminCharts || {};
+
+  if (charts.activity) {
+    const buckets = new Map();
+    (Array.isArray(interactions) ? interactions : []).forEach((item) => {
+      const timestamp = Date.parse(item.created_at || '');
+      if (!Number.isFinite(timestamp)) return;
+      const hourEpoch = Math.floor(timestamp / 3600000) * 3600000;
+      buckets.set(hourEpoch, (buckets.get(hourEpoch) || 0) + 1);
+    });
+    const epochs = Array.from(buckets.keys()).sort((a, b) => a - b);
+    const labels = epochs.map((epoch) => hourKeyBRT(epoch));
+    const data = epochs.map((epoch) => buckets.get(epoch) || 0);
+
+    charts.activity.updateOptions({ xaxis: { categories: labels } }, false, true);
+    charts.activity.updateSeries([{ name: 'Eventos', data }], true);
+  }
+
+  if (charts.credits) {
+    const rows = Array.isArray(usageByModule) ? usageByModule : [];
+    const categories = rows.map((item) => item.module || 'other');
+    const spent = rows.map((item) => number(item.credits_spent));
+    const added = rows.map((item) => number(item.credits_added));
+
+    charts.credits.updateOptions({ xaxis: { categories } }, false, true);
+    charts.credits.updateSeries(
+      [
+        { name: 'Gastos', data: spent },
+        { name: 'Adicionados', data: added }
+      ],
+      true
+    );
+  }
+}
+
 function readFilters() {
   const limit = Math.min(Math.max(number(document.getElementById('filter-limit')?.value), 1), 500);
   const dateFromRaw = cleanInput('filter-date-from', 40);
   const dateToRaw = cleanInput('filter-date-to', 40);
-  const dateFrom = dateFromRaw ? new Date(dateFromRaw).toISOString() : '';
-  const dateTo = dateToRaw ? new Date(dateToRaw).toISOString() : '';
+  const dateFrom = safeDateToIso(dateFromRaw);
+  const dateTo = safeDateToIso(dateToRaw);
 
   return {
     limit,
@@ -168,12 +237,13 @@ async function loadDashboard() {
   setNotice('Carregando dados...');
 
   try {
-    const [opsRes, summaryRes, interactionsRes, insightsRes, creditsRes] = await Promise.all([
+    const [opsRes, summaryRes, interactionsRes, insightsRes, creditsRes, topupExpRes] = await Promise.all([
       request(`/telemetry/dashboard/ops?range_hours=${rangeHours}`),
       request(`/telemetry/dashboard/summary?range_hours=${rangeHours}`),
       request(`/telemetry/dashboard/interactions?${interactionQuery.toString()}`),
       request(`/telemetry/dashboard/insights?range_hours=${rangeHours}`),
-      request(`/telemetry/dashboard/credits?${creditsQuery.toString()}`)
+      request(`/telemetry/dashboard/credits?${creditsQuery.toString()}`),
+      request(`/telemetry/dashboard/experiments/topup?range_hours=${rangeHours}`)
     ]);
 
     const ops = opsRes.ops || {};
@@ -208,15 +278,18 @@ async function loadDashboard() {
       'total'
     ]);
     document.getElementById('insights-list').innerHTML = insightsRows(insightsRes.insights);
+    document.getElementById('experiments-topup').innerHTML = topupExperimentRows(topupExpRes.variants);
     document.getElementById('recent-interactions').innerHTML = interactionsRows(interactionsRes.interactions);
     document.getElementById('credit-usage-modules').innerHTML = creditUsageRows(creditsRes.usage_by_module);
     document.getElementById('credit-movements').innerHTML = creditMovementsRows(creditsRes.movements);
+    updateCharts(interactionsRes.interactions, creditsRes.usage_by_module);
 
     const generatedAt = summary.generated_at || ops.generated_at || new Date().toISOString();
+    const winnerVariant = topupExpRes?.winner?.ab_variant || '-';
     setNotice(
       `Atualizado em ${formatDateTimeBRT(generatedAt)} (BRT) | janela: ${rangeHours}h | insights: ${number(
         insightsRes.total_insights
-      )} | interacoes: ${number(interactionsRes.total)} | mov. créditos: ${Array.isArray(creditsRes.movements) ? creditsRes.movements.length : 0}`
+      )} | melhor variante: ${winnerVariant} | interacoes: ${number(interactionsRes.total)} | mov. créditos: ${Array.isArray(creditsRes.movements) ? creditsRes.movements.length : 0}`
     );
   } catch (err) {
     const msg = String(err.message || 'Falha ao carregar telemetria.');

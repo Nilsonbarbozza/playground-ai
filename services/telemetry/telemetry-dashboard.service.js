@@ -326,4 +326,41 @@ export class TelemetryDashboardService {
       insights
     };
   }
+
+  static async getTopupExperiment(query = {}) {
+    const rangeHoursRaw = asInt(query.range_hours, 24);
+    const rangeHours = Math.min(Math.max(rangeHoursRaw, 1), 24 * 30);
+    const rows = await TelemetryAnalyticsRepository.getTopupExperimentByVariant(rangeHours);
+    const includeUnknown = String(query.include_unknown || 'false').toLowerCase() === 'true';
+
+    const safeRate = (num, den) => (den > 0 ? Number(((num / den) * 100).toFixed(2)) : 0);
+    const mapped = rows.map((row) => {
+      const modalOpened = Number(row.modal_opened || 0);
+      const checkoutStarted = Number(row.checkout_started || 0);
+      const orderPaid = Number(row.order_paid || 0);
+      return {
+        ab_variant: row.ab_variant,
+        modal_opened: modalOpened,
+        checkout_started: checkoutStarted,
+        checkout_success_return: Number(row.checkout_success_return || 0),
+        checkout_cancel_return: Number(row.checkout_cancel_return || 0),
+        order_paid: orderPaid,
+        order_not_paid: Number(row.order_not_paid || 0),
+        checkout_start_rate_percent: safeRate(checkoutStarted, modalOpened),
+        paid_after_start_rate_percent: safeRate(orderPaid, checkoutStarted)
+      };
+    });
+    const variants = includeUnknown ? mapped : mapped.filter((v) => v.ab_variant === 'A' || v.ab_variant === 'B');
+
+    const ranked = [...variants]
+      .filter((v) => v.ab_variant === 'A' || v.ab_variant === 'B')
+      .sort((a, b) => b.paid_after_start_rate_percent - a.paid_after_start_rate_percent);
+
+    return {
+      range_hours: rangeHours,
+      generated_at: new Date().toISOString(),
+      variants,
+      winner: ranked[0] || null
+    };
+  }
 }

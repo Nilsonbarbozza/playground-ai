@@ -242,4 +242,31 @@ export class TelemetryAnalyticsRepository {
     );
     return result.rows;
   }
+
+  static async getTopupExperimentByVariant(rangeHours) {
+    const result = await db.query(
+      `SELECT
+         COALESCE(NULLIF(te.props->>'ab_variant', ''), 'unknown') AS ab_variant,
+         COUNT(*) FILTER (WHERE te.event_name = 'topup_modal_opened')::int AS modal_opened,
+         COUNT(*) FILTER (WHERE te.event_name = 'topup_checkout_started')::int AS checkout_started,
+         COUNT(*) FILTER (WHERE te.event_name = 'topup_checkout_returned_success')::int AS checkout_success_return,
+         COUNT(*) FILTER (WHERE te.event_name = 'topup_checkout_returned_cancel')::int AS checkout_cancel_return,
+         COUNT(*) FILTER (WHERE te.event_name = 'topup_order_paid')::int AS order_paid,
+         COUNT(*) FILTER (WHERE te.event_name = 'topup_order_not_paid')::int AS order_not_paid
+       FROM telemetry_events te
+       WHERE te.created_at >= NOW() - ($1::int * INTERVAL '1 hour')
+         AND te.event_name IN (
+           'topup_modal_opened',
+           'topup_checkout_started',
+           'topup_checkout_returned_success',
+           'topup_checkout_returned_cancel',
+           'topup_order_paid',
+           'topup_order_not_paid'
+         )
+       GROUP BY COALESCE(NULLIF(te.props->>'ab_variant', ''), 'unknown')
+       ORDER BY ab_variant ASC`,
+      [rangeHours]
+    );
+    return result.rows;
+  }
 }

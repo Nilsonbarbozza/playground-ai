@@ -4,19 +4,46 @@ import { auth } from './auth.js';
 import { telemetry } from '../services/telemetry.js';
 
 const FIRST_SIGNUP_PROMPT_PREFIX = 'topup:first-signup-shown:';
+const TOPUP_AB_VARIANT_KEY = 'topup:ab-variant';
 
 export const billing = {
   state: {
     open: false,
-    loading: false
+    loading: false,
+    abVariant: null
   },
 
   init() {
+    this.state.abVariant = this.getOrCreateAbVariant();
     this.ensureModal();
     this.bindCreditsButton();
     this.bindGlobalAuthEvents();
     this.handleCheckoutReturn();
     console.log('[Billing] Initialized');
+  },
+
+  getOrCreateAbVariant() {
+    const existing = localStorage.getItem(TOPUP_AB_VARIANT_KEY);
+    if (existing === 'A' || existing === 'B') return existing;
+
+    const variant = Math.random() < 0.5 ? 'A' : 'B';
+    localStorage.setItem(TOPUP_AB_VARIANT_KEY, variant);
+    return variant;
+  },
+
+  withAbVariant(extra = {}) {
+    return { ab_variant: this.state.abVariant || 'A', ...extra };
+  },
+
+  applyVariantUi() {
+    const title = document.querySelector('#billing-modal h3');
+    const checkoutBtn = document.getElementById('btn-starter-checkout');
+    if (title) {
+      title.textContent = this.state.abVariant === 'B' ? 'Desbloquear Créditos' : 'Adicionar Créditos';
+    }
+    if (checkoutBtn) {
+      checkoutBtn.textContent = this.state.abVariant === 'B' ? 'Garantir Créditos Agora' : 'Pagar';
+    }
   },
 
   ensureModal() {
@@ -161,7 +188,7 @@ export const billing = {
     btn.addEventListener('click', () => {
       telemetry.track('topup_cta_clicked', {
         route_or_feature: 'credits-dropdown',
-        props: { trigger: 'header_credits' }
+        props: this.withAbVariant({ trigger: 'header_credits' })
       });
       this.openModal({ trigger: 'header_credits' });
     });
@@ -181,7 +208,7 @@ export const billing = {
       localStorage.setItem(key, '1');
       telemetry.track('topup_cta_clicked', {
         route_or_feature: 'billing-modal',
-        props: { trigger: 'first_signup_auto' }
+        props: this.withAbVariant({ trigger: 'first_signup_auto' })
       });
       this.openModal({ message: 'Conta criada com sucesso. Escolha um plano para adicionar creditos.', trigger: 'first_signup_auto' });
     });
@@ -194,6 +221,7 @@ export const billing = {
     this.state.open = true;
     modal.classList.remove('tw-hidden');
     modal.classList.add('tw-flex');
+    this.applyVariantUi();
 
     if (options.message) {
       this.showStatus(options.message, 'info');
@@ -203,9 +231,7 @@ export const billing = {
 
     telemetry.track('topup_modal_opened', {
       route_or_feature: 'billing-modal',
-      props: {
-        trigger: options.trigger || 'unknown'
-      }
+      props: this.withAbVariant({ trigger: options.trigger || 'unknown' })
     });
 
     await this.loadPackages();
@@ -216,7 +242,8 @@ export const billing = {
     if (!modal) return;
     this.state.open = false;
     telemetry.track('topup_modal_closed', {
-      route_or_feature: 'billing-modal'
+      route_or_feature: 'billing-modal',
+      props: this.withAbVariant()
     });
     modal.classList.remove('tw-flex');
     modal.classList.add('tw-hidden');
@@ -268,6 +295,7 @@ export const billing = {
       if (starterPkg) {
         btn.setAttribute('data-package-id', starterPkg.id);
         btn.onclick = () => this.startCheckout(starterPkg.id);
+        this.applyVariantUi();
       } else {
         btn.textContent = 'Erro ao carregar ID';
         btn.disabled = true;
@@ -286,7 +314,7 @@ export const billing = {
     try {
       telemetry.track('topup_checkout_started', {
         route_or_feature: 'billing-checkout',
-        props: { package_id: packageId }
+        props: this.withAbVariant({ package_id: packageId })
       });
       const data = await api.post('/billing/checkout-session', { package_id: packageId });
       if (!data.checkout_url) throw new Error('Checkout URL nao retornada.');
@@ -307,7 +335,7 @@ export const billing = {
     if (checkoutState === 'cancel') {
       telemetry.track('topup_checkout_returned_cancel', {
         route_or_feature: 'billing-checkout',
-        props: { order_id: orderId }
+        props: this.withAbVariant({ order_id: orderId })
       });
       this.openModal({ message: 'Pagamento cancelado. Escolha um plano para tentar novamente.' });
       this.cleanupCheckoutParams();
@@ -317,7 +345,7 @@ export const billing = {
     if (checkoutState === 'success') {
       telemetry.track('topup_checkout_returned_success', {
         route_or_feature: 'billing-checkout',
-        props: { order_id: orderId }
+        props: this.withAbVariant({ order_id: orderId })
       });
       this.openModal({ message: 'Pagamento recebido. Validando confirmacao...' });
       this.pollOrderStatus(orderId);
@@ -344,7 +372,7 @@ export const billing = {
         if (status === 'paid') {
           telemetry.track('topup_order_paid', {
             route_or_feature: 'billing-order',
-            props: { order_id: orderId }
+            props: this.withAbVariant({ order_id: orderId })
           });
           this.showStatus('Opá! Pagamento confirmado. Creditos atualizados!', 'success');
           await auth.refreshUser();
@@ -354,7 +382,7 @@ export const billing = {
         if (status === 'failed' || status === 'expired') {
           telemetry.track('topup_order_not_paid', {
             route_or_feature: 'billing-order',
-            props: { order_id: orderId, status }
+            props: this.withAbVariant({ order_id: orderId, status })
           });
           this.showStatus(`Pagamento ${status}. Tente novamente.`, 'error');
           return;

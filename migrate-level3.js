@@ -133,6 +133,40 @@ async function migrate() {
     console.log('[OK] Tabela telemetry_events criada/verificada.');
 
     await db.query(`
+      CREATE TABLE IF NOT EXISTS telemetry_events_daily (
+        day DATE NOT NULL,
+        event_name VARCHAR(120) NOT NULL,
+        route_or_feature VARCHAR(180) NOT NULL DEFAULT 'unknown',
+        source VARCHAR(40) NOT NULL DEFAULT 'web',
+        total_events INTEGER NOT NULL DEFAULT 0,
+        unique_actors INTEGER NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (day, event_name, route_or_feature, source)
+      )
+    `);
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_telemetry_events_daily_day ON telemetry_events_daily(day DESC)`);
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_telemetry_events_daily_event_name ON telemetry_events_daily(event_name)`);
+    console.log('[OK] Tabela telemetry_events_daily criada/verificada.');
+
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS credit_ledger_daily (
+        day DATE NOT NULL,
+        module VARCHAR(64) NOT NULL DEFAULT 'other',
+        movement_type VARCHAR(16) NOT NULL,
+        total_credits INTEGER NOT NULL DEFAULT 0,
+        total_events INTEGER NOT NULL DEFAULT 0,
+        unique_users INTEGER NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (day, module, movement_type)
+      )
+    `);
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_credit_ledger_daily_day ON credit_ledger_daily(day DESC)`);
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_credit_ledger_daily_module ON credit_ledger_daily(module)`);
+    console.log('[OK] Tabela credit_ledger_daily criada/verificada.');
+
+    await db.query(`
       CREATE TABLE IF NOT EXISTS video_jobs (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,

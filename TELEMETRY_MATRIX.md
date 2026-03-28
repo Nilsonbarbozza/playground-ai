@@ -42,6 +42,7 @@ Este documento define os eventos rastreados para produto, billing, operações e
 - `topup_checkout_started`: `package_id`
 - `topup_checkout_returned_*`: `order_id`
 - `topup_order_not_paid`: `order_id`, `status`
+- `topup_*` (experimento): `ab_variant` (`A` ou `B`)
 
 ## Uso do dashboard admin
 
@@ -50,5 +51,6 @@ Este documento define os eventos rastreados para produto, billing, operações e
 - `GET /api/telemetry/dashboard/interactions`
 - `GET /api/telemetry/dashboard/credits`
 - `GET /api/telemetry/dashboard/insights`
+- `GET /api/telemetry/dashboard/experiments/topup`
 
 Todos os endpoints acima são protegidos por `adminMiddleware`.
