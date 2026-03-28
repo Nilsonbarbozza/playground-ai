@@ -13,6 +13,7 @@ import faceswapRoutes from './routes/faceswapRoutes.js';
 import generateRoutes from './routes/generateRoutes.js';
 import editRoutes from './routes/editRoutes.js';
 import billingRoutes from './routes/billingRoutes.js';
+import telemetryRoutes from './routes/telemetryRoutes.js';
 import { stripeWebhook } from './controllers/billingController.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -37,8 +38,10 @@ app.use('/api/faceswap', faceswapRoutes);
 app.use('/api/generate', generateRoutes);
 app.use('/api/edit', editRoutes);
 app.use('/api/billing', billingRoutes);
+app.use('/api/telemetry', telemetryRoutes);
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/admin/telemetry', (req, res) => res.sendFile(path.join(__dirname, 'admin-telemetry.html')));
 app.use('/scripts', express.static(path.join(__dirname, 'scripts')));
 app.use('/styles', express.static(path.join(__dirname, 'styles')));
 app.use('/images', express.static(path.join(__dirname, 'images')));

@@ -1,6 +1,7 @@
 import { api } from '../services/api.js';
 import { ui } from './ui.js';
 import { navigation } from './navigation.js';
+import { telemetry } from '../services/telemetry.js';
 
 /**
  * Authentication Module
@@ -122,6 +123,11 @@ export const auth = {
     this.updateUI();
 
     const isFirstSignup = Boolean(data.is_first_signup) || Boolean(isNewUser);
+    telemetry.track(isFirstSignup ? 'auth_register_success' : 'auth_login_success', {
+      route_or_feature: 'auth',
+      props: { user_id: data.user?.id || null }
+    });
+    telemetry.flush();
     ui.showToast(isFirstSignup ? `Conta criada! Voce ganhou ${data.user.credits} creditos.` : 'Bem-vindo de volta!');
 
     document.dispatchEvent(

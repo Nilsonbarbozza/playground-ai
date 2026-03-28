@@ -112,6 +112,27 @@ async function migrate() {
     console.log('[OK] Tabela webhook_events criada/verificada.');
 
     await db.query(`
+      CREATE TABLE IF NOT EXISTS telemetry_events (
+        id BIGSERIAL PRIMARY KEY,
+        event_name VARCHAR(120) NOT NULL,
+        user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        session_id VARCHAR(120),
+        view_id VARCHAR(120),
+        route_or_feature VARCHAR(180),
+        level VARCHAR(40),
+        error_code VARCHAR(120),
+        error_message_short VARCHAR(350),
+        source VARCHAR(40) NOT NULL DEFAULT 'web',
+        props JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_telemetry_events_created_at ON telemetry_events(created_at DESC)`);
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_telemetry_events_event_name ON telemetry_events(event_name)`);
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_telemetry_events_user_id ON telemetry_events(user_id)`);
+    console.log('[OK] Tabela telemetry_events criada/verificada.');
+
+    await db.query(`
       CREATE TABLE IF NOT EXISTS video_jobs (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,

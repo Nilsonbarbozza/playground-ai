@@ -2,6 +2,8 @@
  * API Service - Single Client for AI Playground
  * Handles authentication headers, error management, and response parsing.
  */
+import { telemetry } from './telemetry.js';
+
 class ApiService {
   constructor() {
     const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
@@ -55,6 +57,7 @@ class ApiService {
       return data;
     } catch (err) {
       console.error(`[API_ERR] ${endpoint}:`, err.message);
+      telemetry.trackError('api.request', `${endpoint}: ${err.message}`);
       throw err;
     }
   }

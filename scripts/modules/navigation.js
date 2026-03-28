@@ -1,4 +1,5 @@
 import { projects } from './projects.js';
+import { telemetry } from '../services/telemetry.js';
 
 /**
  * Navigation Module
@@ -15,6 +16,8 @@ export const navigation = {
     'view-avatar',
     'view-projects'
   ],
+  _lastViewId: null,
+  _lastViewOpenedAt: null,
 
   init() {
     this.initSidebar();
@@ -23,6 +26,10 @@ export const navigation = {
   },
 
   switchView(viewId) {
+    const now = Date.now();
+    const previousDuration = this._lastViewOpenedAt ? now - this._lastViewOpenedAt : null;
+    const previousViewId = this._lastViewId;
+
     this.views.forEach(id => {
       const el = document.getElementById(id);
       if (el) el.classList.toggle('tw-hidden', id !== viewId);
@@ -47,6 +54,18 @@ export const navigation = {
     if (viewId === 'view-projects') {
       projects.loadGallery();
     }
+
+    if (previousViewId && Number.isFinite(previousDuration) && previousDuration >= 0) {
+      telemetry.track('view_time_spent', {
+        view_id: previousViewId,
+        route_or_feature: previousViewId,
+        props: { duration_ms: previousDuration }
+      });
+    }
+
+    telemetry.trackView(viewId, previousDuration);
+    this._lastViewId = viewId;
+    this._lastViewOpenedAt = now;
   },
 
   initViewSwitching() {

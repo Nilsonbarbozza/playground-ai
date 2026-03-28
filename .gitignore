@@ -4,4 +4,7 @@ node_modules/
 *.log
 openai.py
 uploads/
-skills/
+skills/   
+AGENT_OPERATIONS_POLICY.md
+RUNBOOK_PROD.md
+RUNBOOK_STAGING.md

@@ -1,6 +1,7 @@
 import { api } from '../services/api.js';
 import { ui } from './ui.js';
 import { auth } from './auth.js';
+import { telemetry } from '../services/telemetry.js';
 
 const FIRST_SIGNUP_PROMPT_PREFIX = 'topup:first-signup-shown:';
 
@@ -157,7 +158,13 @@ export const billing = {
   bindCreditsButton() {
     const btn = document.querySelector('[data-testid="@ai-playground-v2/credits-dropdown"]');
     if (!btn) return;
-    btn.addEventListener('click', () => this.openModal());
+    btn.addEventListener('click', () => {
+      telemetry.track('topup_cta_clicked', {
+        route_or_feature: 'credits-dropdown',
+        props: { trigger: 'header_credits' }
+      });
+      this.openModal({ trigger: 'header_credits' });
+    });
   },
 
   bindGlobalAuthEvents() {
@@ -172,7 +179,11 @@ export const billing = {
       if (alreadyShown) return;
 
       localStorage.setItem(key, '1');
-      this.openModal({ message: 'Conta criada com sucesso. Escolha um plano para adicionar creditos.' });
+      telemetry.track('topup_cta_clicked', {
+        route_or_feature: 'billing-modal',
+        props: { trigger: 'first_signup_auto' }
+      });
+      this.openModal({ message: 'Conta criada com sucesso. Escolha um plano para adicionar creditos.', trigger: 'first_signup_auto' });
     });
   },
 
@@ -190,6 +201,13 @@ export const billing = {
       this.hideStatus();
     }
 
+    telemetry.track('topup_modal_opened', {
+      route_or_feature: 'billing-modal',
+      props: {
+        trigger: options.trigger || 'unknown'
+      }
+    });
+
     await this.loadPackages();
   },
 
@@ -197,6 +215,9 @@ export const billing = {
     const modal = document.getElementById('billing-modal');
     if (!modal) return;
     this.state.open = false;
+    telemetry.track('topup_modal_closed', {
+      route_or_feature: 'billing-modal'
+    });
     modal.classList.remove('tw-flex');
     modal.classList.add('tw-hidden');
   },
@@ -263,10 +284,15 @@ export const billing = {
     this.showStatus('Criando seu pagamento, aguarde...', 'info');
 
     try {
+      telemetry.track('topup_checkout_started', {
+        route_or_feature: 'billing-checkout',
+        props: { package_id: packageId }
+      });
       const data = await api.post('/billing/checkout-session', { package_id: packageId });
       if (!data.checkout_url) throw new Error('Checkout URL nao retornada.');
       window.location.href = data.checkout_url;
     } catch (err) {
+      telemetry.trackError('billing.startCheckout', err.message);
       this.showStatus(err.message, 'error');
       this.state.loading = false;
     }
@@ -279,12 +305,20 @@ export const billing = {
     if (!checkoutState || !orderId) return;
 
     if (checkoutState === 'cancel') {
+      telemetry.track('topup_checkout_returned_cancel', {
+        route_or_feature: 'billing-checkout',
+        props: { order_id: orderId }
+      });
       this.openModal({ message: 'Pagamento cancelado. Escolha um plano para tentar novamente.' });
       this.cleanupCheckoutParams();
       return;
     }
 
     if (checkoutState === 'success') {
+      telemetry.track('topup_checkout_returned_success', {
+        route_or_feature: 'billing-checkout',
+        props: { order_id: orderId }
+      });
       this.openModal({ message: 'Pagamento recebido. Validando confirmacao...' });
       this.pollOrderStatus(orderId);
       this.cleanupCheckoutParams();
@@ -308,12 +342,20 @@ export const billing = {
         const status = data?.order?.status;
 
         if (status === 'paid') {
+          telemetry.track('topup_order_paid', {
+            route_or_feature: 'billing-order',
+            props: { order_id: orderId }
+          });
           this.showStatus('Opá! Pagamento confirmado. Creditos atualizados!', 'success');
           await auth.refreshUser();
           return;
         }
 
         if (status === 'failed' || status === 'expired') {
+          telemetry.track('topup_order_not_paid', {
+            route_or_feature: 'billing-order',
+            props: { order_id: orderId, status }
+          });
           this.showStatus(`Pagamento ${status}. Tente novamente.`, 'error');
           return;
         }

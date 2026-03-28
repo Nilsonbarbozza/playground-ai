@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { spawn } from 'child_process';
 import db from '../config/db.js';
 
 dotenv.config();
@@ -17,6 +18,10 @@ const EXIT = {
   UNEXPECTED: 99
 };
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function withTimeout(promise, timeoutMs, label) {
   let timer = null;
   const timeoutPromise = new Promise((_, reject) => {
@@ -30,6 +35,38 @@ async function fetchJson(url, options = {}) {
   const contentType = res.headers.get('content-type') || '';
   const data = contentType.includes('application/json') ? await res.json() : { raw: await res.text() };
   return { status: res.status, data };
+}
+
+function startServer() {
+  return spawn('node', ['server.js'], {
+    cwd: process.cwd(),
+    stdio: 'ignore',
+    windowsHide: true
+  });
+}
+
+async function isServerHealthy() {
+  try {
+    const health = await fetchJson(`${BASE_URL}/api/health`);
+    return health.status === 200;
+  } catch {
+    return false;
+  }
+}
+
+async function ensureServerHealthy() {
+  const alreadyHealthy = await isServerHealthy();
+  if (alreadyHealthy) return { startedServer: null, healthy: true };
+
+  const startedServer = startServer();
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < 30000) {
+    if (await isServerHealthy()) {
+      return { startedServer, healthy: true };
+    }
+    await sleep(1000);
+  }
+  return { startedServer, healthy: false };
 }
 
 async function checkEnvFlags() {
@@ -119,6 +156,7 @@ async function checkApiFlow() {
 }
 
 async function run() {
+  let startedServer = null;
   try {
     const env = await checkEnvFlags();
     if (!env.ok) {
@@ -130,6 +168,13 @@ async function run() {
     if (!dbCheck.ok) {
       console.error(JSON.stringify({ ok: false, reason: 'db-invalid', dbCheck }, null, 2));
       process.exit(EXIT.DB_FAIL);
+    }
+
+    const serverState = await ensureServerHealthy();
+    startedServer = serverState.startedServer;
+    if (!serverState.healthy) {
+      console.error(JSON.stringify({ ok: false, reason: 'health-failed', baseUrl: BASE_URL }, null, 2));
+      process.exit(EXIT.HEALTH_FAIL);
     }
 
     const api = await checkApiFlow();
@@ -165,6 +210,10 @@ async function run() {
   } catch (err) {
     console.error(JSON.stringify({ ok: false, reason: 'unexpected-error', error: err.message }, null, 2));
     process.exit(EXIT.UNEXPECTED);
+  } finally {
+    if (startedServer && !startedServer.killed) {
+      startedServer.kill('SIGTERM');
+    }
   }
 }
 
