@@ -6,10 +6,18 @@ export const submitVideoJob = async (req, res) => {
     const imageFile = files?.find(f => f.fieldname === 'image');
     if (!imageFile) throw new Error('Imagem base ausente.');
     const prompt = req.body?.prompt || null;
+    const cfg_scale = req.body?.cfg_scale;
+    const motion_bucket_id = req.body?.motion_bucket_id;
+    const seed = req.body?.seed;
+    const profile = req.body?.profile;
 
     const result = await VideoEngine.submit(req.user.id, {
       imageBuffer: imageFile.buffer,
-      prompt
+      prompt,
+      cfg_scale,
+      motion_bucket_id,
+      seed,
+      profile
     });
 
     res.json(result);

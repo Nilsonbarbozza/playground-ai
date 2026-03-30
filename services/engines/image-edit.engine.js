@@ -7,7 +7,7 @@ import { ProjectsRepository } from '../../repositories/projects.repository.js';
 
 export class ImageEditEngine {
   static async execute(userId, options) {
-    const { userPrompt, imageBuffer, maskBuffer } = options;
+    const { userPrompt, imageBuffer, maskBuffer, seed, output_format } = options;
     const cost = Number(process.env.COST_IMAGE_EDITOR) || 2;
     const description = `Editor: ${userPrompt.substring(0, 30)}...`;
     const operationKey = `image-edit:${randomUUID()}`;
@@ -46,7 +46,11 @@ export class ImageEditEngine {
         mask: finalMask,
         prompt: finalPrompt,
         negative_prompt: negPrompt,
-        intent
+        intent,
+        seed,
+        output_format,
+        userId,
+        module: 'image-editor'
       });
 
       const imageUrl = await StorageService.save(outputBuffer, 'edit', 'png');

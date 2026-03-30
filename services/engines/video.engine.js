@@ -6,7 +6,7 @@ import { VideoJobsService } from '../jobs/video-jobs.service.js';
 import { ProjectsService } from '../projects/projects.service.js';
 
 export class VideoEngine {
-  static async submit(userId, { imageBuffer, prompt }) {
+  static async submit(userId, { imageBuffer, prompt, cfg_scale, motion_bucket_id, seed, profile }) {
     const cost = Number(process.env.COST_TEXT_TO_VIDEO) || 5;
     const description = 'Geracao de Video (Job Submission)';
     const operationKey = `video-submit:${randomUUID()}`;
@@ -19,8 +19,23 @@ export class VideoEngine {
     });
 
     try {
+      const selectedProfile = String(profile || 'balanced').toLowerCase();
+      const profileDefaults =
+        selectedProfile === 'fast'
+          ? { cfg_scale: 1.5, motion_bucket_id: 90 }
+          : selectedProfile === 'pro'
+          ? { cfg_scale: 2.2, motion_bucket_id: 140 }
+          : { cfg_scale: 1.8, motion_bucket_id: 127 };
+
       const stability = engineFactory.get('stability');
-      const providerJobId = await stability.submitVideoJob(imageBuffer);
+      const providerJobId = await stability.submitVideoJob({
+        imageBuffer,
+        cfg_scale: cfg_scale ?? profileDefaults.cfg_scale,
+        motion_bucket_id: motion_bucket_id ?? profileDefaults.motion_bucket_id,
+        seed,
+        userId,
+        module: 'video-submit'
+      });
 
       const job = await VideoJobsService.createSubmittedJob({
         userId,
@@ -74,7 +89,10 @@ export class VideoEngine {
       }
 
       const stability = engineFactory.get('stability');
-      const response = await stability.getVideoStatus(job.provider_job_id);
+      const response = await stability.getVideoStatus(job.provider_job_id, {
+        userId,
+        module: 'video-status-sync'
+      });
 
       if (response.status === 202) {
         const updated = await VideoJobsService.updateStatusWithClient(client, job.id, 'processing');

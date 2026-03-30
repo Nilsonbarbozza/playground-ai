@@ -2,7 +2,7 @@ import { ImageEditEngine } from '../services/engines/image-edit.engine.js';
 
 export const editImage = async (req, res) => {
   try {
-    const { prompt: userPrompt } = req.body;
+    const { prompt: userPrompt, seed, output_format } = req.body;
     const files = req.files;
 
     if (!userPrompt) throw new Error('Prompt não enviado.');
@@ -17,7 +17,9 @@ export const editImage = async (req, res) => {
     const result = await ImageEditEngine.execute(req.user.id, {
       userPrompt,
       imageBuffer: imageFile.buffer,
-      maskBuffer: maskFile?.buffer
+      maskBuffer: maskFile?.buffer,
+      seed,
+      output_format
     });
 
     res.json(result);

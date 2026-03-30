@@ -2,11 +2,18 @@ import { Text2ImgEngine } from '../services/engines/text2img.engine.js';
 
 export const generateImage = async (req, res) => {
   try {
-    const { prompt } = req.body;
+    const { prompt, negative_prompt, aspect_ratio, seed, output_format, style_preset, profile } = req.body;
     if (!prompt) throw new Error('Prompt não enviado.');
 
     // Delegamos TUDO para a Engine (Billing -> AI -> Storage -> DB)
-    const result = await Text2ImgEngine.execute(req.user.id, prompt);
+    const result = await Text2ImgEngine.execute(req.user.id, prompt, {
+      negative_prompt,
+      aspect_ratio,
+      seed,
+      output_format,
+      style_preset,
+      profile
+    });
 
     res.json(result);
   } catch (err) {
