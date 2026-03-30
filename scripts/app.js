@@ -2,6 +2,7 @@ import { auth } from './modules/auth.js';
 import { navigation } from './modules/navigation.js';
 import { text2img } from './modules/text2img.js';
 import { editor } from './modules/editor.js';
+import { upscale } from './modules/upscale.js';
 import { videoModule } from './modules/video.js';
 import { faceswap } from './modules/faceswap.js';
 import { projects } from './modules/projects.js';
@@ -25,6 +26,7 @@ class App {
     // 2. Initialize Feature Engines
     text2img.init();
     editor.init();
+    upscale.init();
     videoModule.init();
     faceswap.init();
     
