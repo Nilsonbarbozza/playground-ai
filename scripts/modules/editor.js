@@ -1,6 +1,7 @@
 import { api } from '../services/api.js';
 import { ui } from './ui.js';
 import { auth } from './auth.js';
+import { telemetry } from '../services/telemetry.js';
 
 /**
  * Image Editor Module (Level 3)
@@ -9,6 +10,27 @@ import { auth } from './auth.js';
 export const editor = {
   elements: {},
   canvasObj: { ctx: null, isDrawing: false, lastX: 0, lastY: 0 },
+  activeTool: 'brush',
+  maskHistory: [],
+  maxHistory: 20,
+  viewport: {
+    scale: 1,
+    tx: 0,
+    ty: 0,
+    minScale: 0.5,
+    maxScale: 4,
+    isPanning: false,
+    panStartX: 0,
+    panStartY: 0
+  },
+  previewObjectUrl: null,
+  previewFile: null,
+  previewLoadTimer: null,
+  previewLoadTimeoutMs: 3500,
+  lastPreviewSrc: null,
+  lastPreviewIsBlob: false,
+  previewRetryCount: 0,
+  previewLoadInFlight: false,
   currentState: 'IDLE',
   originalImage: new Image(),
 
@@ -28,6 +50,9 @@ export const editor = {
       placeholder: document.getElementById('uploader-placeholder'),
       previewContainer: document.getElementById('preview-container'),
       previewImg: document.getElementById('preview-img'),
+      previewFallback: document.getElementById('preview-fallback'),
+      previewFallbackText: document.getElementById('preview-fallback-text'),
+      previewFallbackReload: document.getElementById('preview-fallback-reload'),
       maskCanvas: document.getElementById('mask-canvas'),
       removeBtn: document.getElementById('remove-img'),
       fileInput: document.getElementById('file-input'),
@@ -39,6 +64,15 @@ export const editor = {
       spinner: document.getElementById('loading-spinner'),
       errorDisplay: document.getElementById('error-message'),
       brushSize: document.getElementById('brush-size'),
+      brushSizeValue: document.getElementById('brush-size-value'),
+      toolBrush: document.getElementById('tool-brush'),
+      toolEraser: document.getElementById('tool-eraser'),
+      toolPan: document.getElementById('tool-pan'),
+      zoomInBtn: document.getElementById('zoom-in-btn'),
+      zoomOutBtn: document.getElementById('zoom-out-btn'),
+      zoomResetBtn: document.getElementById('zoom-reset-btn'),
+      zoomLevel: document.getElementById('zoom-level'),
+      undoMask: document.getElementById('undo-mask'),
       clearMask: document.getElementById('clear-mask'),
       downloadBtn: document.getElementById('btn-download-editor')
     };
@@ -62,19 +96,22 @@ export const editor = {
 
     switch (state) {
       case 'IDLE':
+        this.clearPreviewObjectUrl();
+        this.previewFile = null;
+        this.previewRetryCount = 0;
+        this.previewLoadInFlight = false;
+        this.clearPreviewLoadWatch();
+        this.hidePreviewFallback();
         el.placeholder.classList.remove('tw-hidden');
         el.fileInput.value = '';
-        this.clearCanvas();
+        this.clearCanvas(true);
+        this.resetViewport();
         break;
       case 'PREVIEW':
         el.previewContainer.classList.remove('tw-hidden');
         el.controls.classList.remove('tw-hidden');
         if (data.src) {
-          el.previewImg.src = data.src;
-          this.originalImage.src = data.src;
-          el.maskCanvas.width = 1024;
-          el.maskCanvas.height = 1024;
-          this.clearCanvas();
+          this.loadPreviewSource(data.src, { resetEditor: data.resetEditor !== false });
         }
         break;
       case 'PROCESSING':
@@ -94,14 +131,131 @@ export const editor = {
     }
   },
 
+  clearPreviewObjectUrl() {
+    if (this.previewObjectUrl) {
+      URL.revokeObjectURL(this.previewObjectUrl);
+      this.previewObjectUrl = null;
+    }
+  },
+
+  clearPreviewLoadWatch() {
+    if (this.previewLoadTimer) {
+      clearTimeout(this.previewLoadTimer);
+      this.previewLoadTimer = null;
+    }
+    if (this.elements.previewImg) {
+      this.elements.previewImg.onload = null;
+      this.elements.previewImg.onerror = null;
+    }
+    this.previewLoadInFlight = false;
+  },
+
+  hidePreviewFallback() {
+    if (this.elements.previewFallback) this.elements.previewFallback.classList.add('tw-hidden');
+  },
+
+  showPreviewFallback(message) {
+    if (this.elements.previewFallbackText) {
+      this.elements.previewFallbackText.innerText = message || 'Preview indisponivel.';
+    }
+    if (this.elements.previewFallback) {
+      this.elements.previewFallback.classList.remove('tw-hidden');
+    }
+  },
+
+  trackPreviewEvent(eventName, extraProps = {}) {
+    telemetry.track(eventName, {
+      route_or_feature: 'image-editor',
+      props: {
+        source_kind: this.lastPreviewIsBlob ? 'blob' : 'url',
+        retry_count: this.previewRetryCount,
+        zoom_percent: Math.round(this.viewport.scale * 100),
+        ...extraProps
+      }
+    });
+  },
+
+  loadPreviewSource(src, { resetEditor = true } = {}) {
+    const { previewImg, maskCanvas } = this.elements;
+    if (!previewImg || !maskCanvas) return;
+
+    if (this.previewObjectUrl && !String(src).startsWith('blob:')) {
+      this.clearPreviewObjectUrl();
+    }
+
+    this.clearPreviewLoadWatch();
+    this.hidePreviewFallback();
+    this.lastPreviewSrc = src;
+    this.lastPreviewIsBlob = String(src).startsWith('blob:');
+    this.previewLoadInFlight = true;
+
+    previewImg.onload = () => {
+      this.clearPreviewLoadWatch();
+      this.hidePreviewFallback();
+      this.trackPreviewEvent('editor_preview_loaded', {
+        natural_width: previewImg.naturalWidth || null,
+        natural_height: previewImg.naturalHeight || null
+      });
+    };
+    previewImg.onerror = () => {
+      this.clearPreviewLoadWatch();
+      this.showPreviewFallback('Falha ao carregar preview.');
+      this.trackPreviewEvent('editor_preview_load_error', {
+        reason: 'img_onerror'
+      });
+    };
+    this.previewLoadTimer = setTimeout(() => {
+      if (!previewImg.complete || previewImg.naturalWidth === 0) {
+        this.showPreviewFallback('Preview demorou para carregar.');
+        this.trackPreviewEvent('editor_preview_timeout', {
+          timeout_ms: this.previewLoadTimeoutMs
+        });
+      }
+    }, this.previewLoadTimeoutMs);
+
+    previewImg.src = src;
+    this.originalImage.src = src;
+
+    if (resetEditor) {
+      maskCanvas.width = 1024;
+      maskCanvas.height = 1024;
+      this.clearCanvas(true);
+      this.resetViewport();
+    }
+  },
+
+  retryPreviewLoad() {
+    if (!this.lastPreviewSrc && !this.previewFile) return;
+    this.previewRetryCount += 1;
+    this.trackPreviewEvent('editor_preview_retry_click');
+
+    if (this.lastPreviewIsBlob && this.previewFile) {
+      this.clearPreviewObjectUrl();
+      this.previewObjectUrl = URL.createObjectURL(this.previewFile);
+      this.lastPreviewSrc = this.previewObjectUrl;
+      this.lastPreviewIsBlob = true;
+      this.loadPreviewSource(this.previewObjectUrl, { resetEditor: false });
+      return;
+    }
+
+    const baseSrc = String(this.lastPreviewSrc || '');
+    if (!baseSrc) return;
+    const cacheBust = `cb=${Date.now()}`;
+    const nextSrc = baseSrc.includes('?') ? `${baseSrc}&${cacheBust}` : `${baseSrc}?${cacheBust}`;
+    this.lastPreviewSrc = nextSrc;
+    this.lastPreviewIsBlob = false;
+    this.loadPreviewSource(nextSrc, { resetEditor: false });
+  },
+
   initCanvas() {
     const cvs = this.elements.maskCanvas;
     if (!cvs) return;
+    cvs.style.touchAction = 'none';
 
     const getMousePos = (e) => {
       const rect = cvs.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const clientX = e.clientX;
+      const clientY = e.clientY;
       return {
         x: (clientX - rect.left) * (1024 / rect.width),
         y: (clientY - rect.top) * (1024 / rect.height)
@@ -111,7 +265,15 @@ export const editor = {
     const startDrawing = (e) => {
       if (this.currentState !== 'PREVIEW') return;
       e.preventDefault();
+      if (this.activeTool === 'pan') {
+        this.viewport.isPanning = true;
+        this.viewport.panStartX = e.clientX - this.viewport.tx;
+        this.viewport.panStartY = e.clientY - this.viewport.ty;
+        this.syncToolUI();
+        return;
+      }
       this.canvasObj.isDrawing = true;
+      this.saveHistory();
       const { x, y } = getMousePos(e);
       this.canvasObj.lastX = x;
       this.canvasObj.lastY = y;
@@ -122,7 +284,9 @@ export const editor = {
       e.preventDefault();
       const { x, y } = getMousePos(e);
       const ctx = this.canvasObj.ctx;
-      ctx.strokeStyle = 'rgba(59, 130, 246, 0.5)';
+      if (!ctx) return;
+      ctx.globalCompositeOperation = this.activeTool === 'eraser' ? 'destination-out' : 'source-over';
+      ctx.strokeStyle = this.activeTool === 'eraser' ? 'rgba(0,0,0,1)' : 'rgba(59, 130, 246, 0.5)';
       ctx.lineJoin = 'round';
       ctx.lineCap = 'round';
       ctx.lineWidth = parseInt(this.elements.brushSize.value, 10);
@@ -134,21 +298,166 @@ export const editor = {
       this.canvasObj.lastY = y;
     };
 
-    cvs.addEventListener('mousedown', startDrawing);
-    cvs.addEventListener('mousemove', draw);
-    window.addEventListener('mouseup', () => this.canvasObj.isDrawing = false);
-    
-    // Touch support
-    cvs.addEventListener('touchstart', startDrawing);
-    cvs.addEventListener('touchmove', draw);
-    cvs.addEventListener('touchend', () => this.canvasObj.isDrawing = false);
+    const stopDrawing = () => {
+      this.canvasObj.isDrawing = false;
+      if (this.viewport.isPanning) {
+        this.viewport.isPanning = false;
+        this.syncToolUI();
+      }
+    };
 
-    this.elements.clearMask.onclick = () => this.clearCanvas();
+    const panMove = (e) => {
+      if (!this.viewport.isPanning || this.currentState !== 'PREVIEW') return;
+      e.preventDefault();
+      this.viewport.tx = e.clientX - this.viewport.panStartX;
+      this.viewport.ty = e.clientY - this.viewport.panStartY;
+      this.applyViewportTransform();
+    };
+
+    const onWheelZoom = (e) => {
+      if (this.currentState !== 'PREVIEW') return;
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.1 : 0.9;
+      this.zoomAtPoint(factor, e.clientX, e.clientY);
+    };
+
+    cvs.addEventListener('pointerdown', startDrawing);
+    cvs.addEventListener('pointermove', draw);
+    cvs.addEventListener('pointermove', panMove);
+    cvs.addEventListener('wheel', onWheelZoom, { passive: false });
+    window.addEventListener('pointerup', stopDrawing);
+    cvs.addEventListener('pointerleave', stopDrawing);
+
+    this.elements.clearMask.onclick = () => this.clearCanvas(true);
+    if (this.elements.undoMask) this.elements.undoMask.onclick = () => this.undoMask();
+    if (this.elements.toolBrush) this.elements.toolBrush.onclick = () => this.setTool('brush');
+    if (this.elements.toolEraser) this.elements.toolEraser.onclick = () => this.setTool('eraser');
+    if (this.elements.toolPan) this.elements.toolPan.onclick = () => this.setTool('pan');
+    if (this.elements.zoomInBtn) this.elements.zoomInBtn.onclick = () => this.zoomAtCenter(1.1);
+    if (this.elements.zoomOutBtn) this.elements.zoomOutBtn.onclick = () => this.zoomAtCenter(0.9);
+    if (this.elements.zoomResetBtn) this.elements.zoomResetBtn.onclick = () => this.resetViewport();
+    if (this.elements.brushSize) {
+      this.elements.brushSize.oninput = () => {
+        if (this.elements.brushSizeValue) {
+          this.elements.brushSizeValue.innerText = `${this.elements.brushSize.value}px`;
+        }
+      };
+      if (this.elements.brushSizeValue) {
+        this.elements.brushSizeValue.innerText = `${this.elements.brushSize.value}px`;
+      }
+    }
+    this.syncToolUI();
   },
 
-  clearCanvas() {
+  setTool(tool) {
+    this.activeTool = ['brush', 'eraser', 'pan'].includes(tool) ? tool : 'brush';
+    this.viewport.isPanning = false;
+    this.syncToolUI();
+  },
+
+  syncToolUI() {
+    const { toolBrush, toolEraser, toolPan, maskCanvas } = this.elements;
+    if (!toolBrush || !toolEraser || !toolPan) return;
+    const setActiveState = (button, isActive) => {
+      button.classList.toggle('tw-border-blue-600', isActive);
+      button.classList.toggle('tw-text-blue-700', isActive);
+      button.classList.toggle('tw-bg-blue-50', isActive);
+
+      button.classList.toggle('tw-border-slate-300', !isActive);
+      button.classList.toggle('tw-text-slate-700', !isActive);
+      button.classList.toggle('tw-bg-white', !isActive);
+    };
+
+    const brushOn = this.activeTool === 'brush';
+    const eraserOn = this.activeTool === 'eraser';
+    const panOn = this.activeTool === 'pan';
+    setActiveState(toolBrush, brushOn);
+    setActiveState(toolEraser, eraserOn);
+    setActiveState(toolPan, panOn);
+
+    if (maskCanvas) {
+      const brushCursor =
+        'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%231e40af\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M15.2 5.2l3.6 3.6M16.7 3.7a2.5 2.5 0 1 1 3.6 3.6L6.5 21H3v-3.5L16.7 3.7z\'/></svg>") 2 20, crosshair';
+      const eraserCursor =
+        'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%230f172a\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M20 20H7l-4-4 9-9 8 8-5 5z\'/><path d=\'M13 7l4 4\'/></svg>") 2 20, crosshair';
+
+      if (panOn && this.viewport.isPanning) maskCanvas.style.cursor = 'grabbing';
+      else if (panOn) maskCanvas.style.cursor = 'grab';
+      else if (eraserOn) maskCanvas.style.cursor = eraserCursor;
+      else maskCanvas.style.cursor = brushCursor;
+    }
+  },
+
+  applyViewportTransform() {
+    const { previewImg, maskCanvas } = this.elements;
+    if (!previewImg || !maskCanvas) return;
+    const transform = `translate(${this.viewport.tx}px, ${this.viewport.ty}px) scale(${this.viewport.scale})`;
+    previewImg.style.transform = transform;
+    maskCanvas.style.transform = transform;
+    previewImg.style.transformOrigin = 'center center';
+    maskCanvas.style.transformOrigin = 'center center';
+    if (this.elements.zoomLevel) {
+      this.elements.zoomLevel.innerText = `${Math.round(this.viewport.scale * 100)}%`;
+    }
+  },
+
+  zoomAtCenter(factor) {
+    const rect = this.elements.previewContainer?.getBoundingClientRect();
+    if (!rect) return;
+    this.zoomAtPoint(factor, rect.left + rect.width / 2, rect.top + rect.height / 2);
+  },
+
+  zoomAtPoint(factor, clientX, clientY) {
+    const container = this.elements.previewContainer;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const nextScale = Math.max(this.viewport.minScale, Math.min(this.viewport.maxScale, this.viewport.scale * factor));
+    if (Math.abs(nextScale - this.viewport.scale) < 0.0001) return;
+
+    const localX = clientX - rect.left;
+    const localY = clientY - rect.top;
+    const worldX = (localX - this.viewport.tx) / this.viewport.scale;
+    const worldY = (localY - this.viewport.ty) / this.viewport.scale;
+
+    this.viewport.scale = nextScale;
+    this.viewport.tx = localX - worldX * nextScale;
+    this.viewport.ty = localY - worldY * nextScale;
+    this.applyViewportTransform();
+  },
+
+  resetViewport() {
+    this.viewport.scale = 1;
+    this.viewport.tx = 0;
+    this.viewport.ty = 0;
+    this.viewport.isPanning = false;
+    this.applyViewportTransform();
+    this.syncToolUI();
+  },
+
+  saveHistory() {
+    if (!this.canvasObj.ctx || !this.elements.maskCanvas) return;
+    try {
+      const snapshot = this.canvasObj.ctx.getImageData(0, 0, this.elements.maskCanvas.width, this.elements.maskCanvas.height);
+      this.maskHistory.push(snapshot);
+      if (this.maskHistory.length > this.maxHistory) this.maskHistory.shift();
+    } catch {
+      // Ignore history failures; editing should continue.
+    }
+  },
+
+  undoMask() {
+    const snapshot = this.maskHistory.pop();
+    if (!snapshot || !this.canvasObj.ctx) return;
+    this.canvasObj.ctx.putImageData(snapshot, 0, 0);
+  },
+
+  clearCanvas(resetHistory = false) {
     if (this.canvasObj.ctx) {
       this.canvasObj.ctx.clearRect(0, 0, this.elements.maskCanvas.width, this.elements.maskCanvas.height);
+      this.canvasObj.ctx.globalCompositeOperation = 'source-over';
+    }
+    if (resetHistory) {
+      this.maskHistory = [];
     }
   },
 
@@ -157,13 +466,17 @@ export const editor = {
     
     el.uploader.onclick = () => { if(this.currentState === 'IDLE') el.fileInput.click(); };
     el.removeBtn.onclick = (e) => { e.stopPropagation(); this.setState('IDLE'); };
+    if (el.previewFallbackReload) {
+      el.previewFallbackReload.onclick = () => this.retryPreviewLoad();
+    }
     
     el.fileInput.onchange = (e) => {
       const file = e.target.files[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onload = (ev) => this.setState('PREVIEW', { src: ev.target.result });
-        reader.readAsDataURL(file);
+        this.clearPreviewObjectUrl();
+        this.previewFile = file;
+        this.previewObjectUrl = URL.createObjectURL(file);
+        this.setState('PREVIEW', { src: this.previewObjectUrl });
       }
     };
 

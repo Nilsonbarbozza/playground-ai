@@ -363,4 +363,42 @@ export class TelemetryDashboardService {
       winner: ranked[0] || null
     };
   }
+
+  static async getEditorPreviewMetrics(query = {}) {
+    const rangeHoursRaw = asInt(query.range_hours, 24);
+    const rangeHours = Math.min(Math.max(rangeHoursRaw, 1), 24 * 30);
+
+    const rows = await TelemetryAnalyticsRepository.getEventCountsByName(rangeHours, [
+      'editor_preview_loaded',
+      'editor_preview_timeout',
+      'editor_preview_load_error',
+      'editor_preview_retry_click'
+    ]);
+
+    const map = Object.fromEntries(rows.map((row) => [row.event_name, Number(row.total || 0)]));
+    const loaded = map.editor_preview_loaded || 0;
+    const timeout = map.editor_preview_timeout || 0;
+    const loadError = map.editor_preview_load_error || 0;
+    const retryClick = map.editor_preview_retry_click || 0;
+
+    const attempts = loaded + timeout + loadError;
+    const safeRate = (num, den) => (den > 0 ? Number(((num / den) * 100).toFixed(2)) : 0);
+
+    return {
+      range_hours: rangeHours,
+      generated_at: new Date().toISOString(),
+      totals: {
+        attempts,
+        loaded,
+        timeout,
+        load_error: loadError,
+        retry_click: retryClick
+      },
+      rates: {
+        timeout_rate_percent: safeRate(timeout, attempts),
+        load_error_rate_percent: safeRate(loadError, attempts),
+        retry_rate_percent: safeRate(retryClick, attempts)
+      }
+    };
+  }
 }

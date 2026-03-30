@@ -2,6 +2,7 @@ import express from 'express';
 import { ingestTelemetryEvents } from '../controllers/telemetryController.js';
 import {
   getTelemetryDashboardCredits,
+  getTelemetryDashboardEditorPreview,
   getTelemetryDashboardExperiment,
   getTelemetryDashboardInteractions,
   getTelemetryDashboardInsights,
@@ -19,5 +20,6 @@ router.get('/dashboard/interactions', adminMiddleware, getTelemetryDashboardInte
 router.get('/dashboard/credits', adminMiddleware, getTelemetryDashboardCredits);
 router.get('/dashboard/insights', adminMiddleware, getTelemetryDashboardInsights);
 router.get('/dashboard/experiments/topup', adminMiddleware, getTelemetryDashboardExperiment);
+router.get('/dashboard/editor-preview', adminMiddleware, getTelemetryDashboardEditorPreview);
 
 export default router;

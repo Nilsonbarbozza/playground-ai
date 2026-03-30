@@ -59,3 +59,13 @@ export const getTelemetryDashboardExperiment = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
+
+export const getTelemetryDashboardEditorPreview = async (req, res) => {
+  try {
+    const data = await TelemetryDashboardService.getEditorPreviewMetrics(req.query || {});
+    res.json({ success: true, ...data });
+  } catch (err) {
+    console.error('[TELEMETRY_DASHBOARD_EDITOR_PREVIEW_ERR]', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};

@@ -269,4 +269,24 @@ export class TelemetryAnalyticsRepository {
     );
     return result.rows;
   }
+
+  static async getEventCountsByName(rangeHours, eventNames = []) {
+    const names = Array.isArray(eventNames)
+      ? eventNames
+          .map((name) => String(name || '').trim())
+          .filter((name) => name.length > 0)
+          .slice(0, 50)
+      : [];
+    if (!names.length) return [];
+
+    const result = await db.query(
+      `SELECT event_name, COUNT(*)::int AS total
+       FROM telemetry_events
+       WHERE created_at >= NOW() - ($1::int * INTERVAL '1 hour')
+         AND event_name = ANY($2::text[])
+       GROUP BY event_name`,
+      [rangeHours, names]
+    );
+    return result.rows;
+  }
 }

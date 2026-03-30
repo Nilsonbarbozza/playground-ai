@@ -300,13 +300,14 @@ async function loadDashboard() {
   setNotice('Carregando dados...');
 
   try {
-    const [opsRes, summaryRes, interactionsRes, insightsRes, creditsRes, topupExpRes] = await Promise.all([
+    const [opsRes, summaryRes, interactionsRes, insightsRes, creditsRes, topupExpRes, editorPreviewRes] = await Promise.all([
       request(`/telemetry/dashboard/ops?range_hours=${rangeHours}`),
       request(`/telemetry/dashboard/summary?range_hours=${rangeHours}`),
       request(`/telemetry/dashboard/interactions?${interactionQuery.toString()}`),
       request(`/telemetry/dashboard/insights?range_hours=${rangeHours}`),
       request(`/telemetry/dashboard/credits?${creditsQuery.toString()}`),
-      request(`/telemetry/dashboard/experiments/topup?range_hours=${rangeHours}`)
+      request(`/telemetry/dashboard/experiments/topup?range_hours=${rangeHours}`),
+      request(`/telemetry/dashboard/editor-preview?range_hours=${rangeHours}`)
     ]);
 
     const ops = opsRes.ops || {};
@@ -315,12 +316,18 @@ async function loadDashboard() {
     const status = String(ops.status || 'unknown');
     const statusClass = `status-${status}`;
 
+    const previewTotals = editorPreviewRes?.totals || {};
+    const previewRates = editorPreviewRes?.rates || {};
+
     document.getElementById('ops-grid').innerHTML = [
       card('Status', status.toUpperCase(), statusClass),
       card('Checkout Start %', `${number(ops.key_metrics?.checkout_start_rate_percent)}%`),
       card('Checkout Abandon %', `${number(ops.key_metrics?.checkout_abandon_rate_percent)}%`),
       card('Paid After Start %', `${number(ops.key_metrics?.paid_after_start_rate_percent)}%`),
-      card('Erros Totais', number(ops.key_metrics?.errors_total))
+      card('Erros Totais', number(ops.key_metrics?.errors_total)),
+      card('Preview Timeout %', `${number(previewRates.timeout_rate_percent)}%`),
+      card('Preview Retry %', `${number(previewRates.retry_rate_percent)}%`),
+      card('Preview Attempts', number(previewTotals.attempts))
     ].join('');
 
     const funnel = summary.funnel || {};
