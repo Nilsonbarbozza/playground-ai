@@ -7,20 +7,26 @@ export const upscaleImage = async (req, res) => {
     if (!imageFile) throw new Error('Imagem nao enviada.');
 
     const {
-      prompt = '',
       intent = 'both',
       factor = '2x',
       quality_profile = 'balanced',
-      output_format = 'png'
+      output_format = 'png',
+      size_preset = '',
+      width = '',
+      height = '',
+      fit = 'cover'
     } = req.body || {};
 
     const result = await UpscaleEngine.execute(req.user.id, {
       imageBuffer: imageFile.buffer,
-      prompt,
       intent,
       factor,
       qualityProfile: quality_profile,
-      outputFormat: output_format
+      outputFormat: output_format,
+      sizePreset: size_preset,
+      width,
+      height,
+      fit
     });
 
     res.json(result);
@@ -33,4 +39,3 @@ export const upscaleImage = async (req, res) => {
     });
   }
 };
-

@@ -26,7 +26,10 @@ export const upscale = {
       loader: document.getElementById('upscale-loader'),
       error: document.getElementById('upscale-error'),
       downloadBtn: document.getElementById('btn-download-upscale'),
-      promptInput: document.getElementById('upscale-prompt'),
+      sizePreset: document.getElementById('upscale-size-preset'),
+      widthInput: document.getElementById('upscale-width'),
+      heightInput: document.getElementById('upscale-height'),
+      fit: document.getElementById('upscale-fit'),
       intent: document.getElementById('upscale-intent'),
       factor: document.getElementById('upscale-factor'),
       quality: document.getElementById('upscale-quality'),
@@ -40,6 +43,25 @@ export const upscale = {
     this.elements.removeBtn?.addEventListener('click', () => this.reset());
     this.elements.generateBtn?.addEventListener('click', () => this.handleGenerate());
     this.elements.downloadBtn?.addEventListener('click', () => this.downloadResult());
+    this.elements.sizePreset?.addEventListener('change', () => this.syncSizeControls());
+    this.syncSizeControls();
+  },
+
+  syncSizeControls() {
+    const preset = this.elements.sizePreset?.value || 'none';
+    const isCustom = preset === 'custom';
+    const usesFixedSize = preset !== 'none';
+
+    this.elements.widthInput?.classList.toggle('tw-hidden', !isCustom);
+    this.elements.heightInput?.classList.toggle('tw-hidden', !isCustom);
+
+    if (this.elements.factor) {
+      this.elements.factor.disabled = usesFixedSize;
+      this.elements.factor.classList.toggle('tw-opacity-50', usesFixedSize);
+      this.elements.factor.title = usesFixedSize
+        ? 'Escala desativada ao usar tamanho fixo.'
+        : '';
+    }
   },
 
   setView(isPreview) {
@@ -81,6 +103,44 @@ export const upscale = {
     this.elements.spinner.classList.toggle('tw-hidden', !loading);
   },
 
+  setProcessingState(loading) {
+    if (loading) {
+      this.elements.placeholder?.classList.add('tw-hidden');
+      this.elements.previewContainer?.classList.add('tw-hidden');
+      this.elements.loader?.classList.remove('tw-hidden');
+      this.elements.loader?.classList.add('tw-flex');
+      return;
+    }
+    this.elements.loader?.classList.add('tw-hidden');
+    this.elements.loader?.classList.remove('tw-flex');
+  },
+
+  resolveResultUrl(data) {
+    return (
+      data?.url ||
+      data?.imageUrl ||
+      data?.project?.imageUrl ||
+      ''
+    );
+  },
+
+  async applyResultPreview(url) {
+    if (!this.elements.previewImg || !url) return;
+    const resolved = new URL(url, window.location.origin).toString();
+    const cacheBusted = `${resolved}${resolved.includes('?') ? '&' : '?'}t=${Date.now()}`;
+
+    await new Promise((resolve, reject) => {
+      const probe = new Image();
+      probe.onload = resolve;
+      probe.onerror = reject;
+      probe.src = cacheBusted;
+    });
+
+    this.clearObjectUrl();
+    this.currentFile = null;
+    this.elements.previewImg.src = cacheBusted;
+  },
+
   async resolveInputFile() {
     if (this.currentFile) return this.currentFile;
     const src = this.elements.previewImg?.src || '';
@@ -95,30 +155,54 @@ export const upscale = {
     if (!inputFile) return ui.showToast('Envie uma imagem para iniciar o upscale.', 'warning');
 
     this.hideError();
+    const previousPreviewSrc = this.elements.previewImg?.src || '';
+    if (this.elements.previewImg) this.elements.previewImg.src = '';
     this.setLoading(true);
-    this.elements.loader?.classList.remove('tw-hidden');
-    this.elements.loader?.classList.add('tw-flex');
+    this.setProcessingState(true);
 
     try {
       const formData = new FormData();
       formData.append('image', inputFile);
-      formData.append('prompt', String(this.elements.promptInput?.value || '').trim());
       formData.append('intent', this.elements.intent?.value || 'both');
       formData.append('factor', this.elements.factor?.value || '2x');
       formData.append('quality_profile', this.elements.quality?.value || 'balanced');
       formData.append('output_format', this.elements.format?.value || 'png');
+      formData.append('size_preset', this.elements.sizePreset?.value || 'none');
+      formData.append('fit', this.elements.fit?.value || 'cover');
+
+      const width = String(this.elements.widthInput?.value || '').trim();
+      const height = String(this.elements.heightInput?.value || '').trim();
+      const isCustom = (this.elements.sizePreset?.value || '') === 'custom';
+      if (isCustom) {
+        if (!width || !height) {
+          throw new Error('Informe largura e altura para tamanho personalizado.');
+        }
+        formData.append('width', width);
+        formData.append('height', height);
+      }
 
       const data = await api.post('/upscale', formData, true);
-      if (this.elements.previewImg && data?.url) this.elements.previewImg.src = data.url;
+      const resultUrl = this.resolveResultUrl(data);
+      if (!resultUrl) throw new Error('Upscale concluido, mas a URL do resultado nao foi retornada.');
+      try {
+        await this.applyResultPreview(resultUrl);
+      } catch {
+        if (this.elements.previewImg) this.elements.previewImg.src = resultUrl;
+      }
       this.setView(true);
       auth.refreshUser();
       ui.showToast('Upscale concluido com sucesso.');
     } catch (err) {
+      if (previousPreviewSrc && this.elements.previewImg) {
+        this.elements.previewImg.src = previousPreviewSrc;
+        this.setView(true);
+      } else {
+        this.setView(false);
+      }
       this.showError(err.message || 'Falha no upscale.');
     } finally {
       this.setLoading(false);
-      this.elements.loader?.classList.add('tw-hidden');
-      this.elements.loader?.classList.remove('tw-flex');
+      this.setProcessingState(false);
     }
   },
 
@@ -140,4 +224,3 @@ export const upscale = {
     this.setView(false);
   }
 };
-
