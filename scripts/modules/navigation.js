@@ -79,18 +79,20 @@ export const navigation = {
 
   initSidebar() {
     const sidebar = document.getElementById('sidebar');
-    const openBtn = document.getElementById('btn-open-sidebar');
-    const closeBtn = document.getElementById('btn-close-sidebar');
+    const openBtn = document.getElementById('mobile-hamburger');
+    const closeBtn = document.getElementById('mobile-sidebar-close');
+    const toggleBtn = document.getElementById('sidebar-toggle-btn');
 
     if (openBtn) openBtn.onclick = () => this.openSidebar();
     if (closeBtn) closeBtn.onclick = () => this.closeSidebar();
+    if (toggleBtn) toggleBtn.onclick = () => this.closeSidebar();
 
     // Click outside to close (Mobile)
     document.addEventListener('click', (e) => {
       if (window.innerWidth < 1024 && 
           sidebar && !sidebar.classList.contains('-tw-translate-x-full') && 
           !sidebar.contains(e.target) && 
-          e.target !== openBtn) {
+          openBtn && !openBtn.contains(e.target)) {
         this.closeSidebar();
       }
     });

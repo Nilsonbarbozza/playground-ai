@@ -21,6 +21,18 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function extractProviderBody(err) {
+  try {
+    const raw = err?.response?.data;
+    if (!raw) return '';
+    if (Buffer.isBuffer(raw)) return raw.toString('utf8').slice(0, 400);
+    if (typeof raw === 'string') return raw.slice(0, 400);
+    return JSON.stringify(raw).slice(0, 400);
+  } catch {
+    return '';
+  }
+}
+
 export class StabilityProvider extends BaseProvider {
   async requestWithRetry({ requestFn, telemetry = {}, params = {} }) {
     const retries = asInt(process.env.STABILITY_RETRY_ATTEMPTS, 2, 0, 5);
@@ -229,61 +241,116 @@ export class StabilityProvider extends BaseProvider {
     formData.append('cfg_scale', String(safeCfgScale));
     formData.append('motion_bucket_id', String(safeMotion));
 
-    const response = await this.requestWithRetry({
-      telemetry: {
-        userId,
-        module,
-        provider: 'stability',
-        model: 'image-to-video',
-        operation: 'submit_video_job'
-      },
-      params: {
-        seed: safeSeed,
-        cfg_scale: safeCfgScale,
-        motion_bucket_id: safeMotion
-      },
-      requestFn: ({ timeoutMs }) =>
-        axios.post(
-          'https://api.stability.ai/v2beta/image-to-video',
-          formData,
-          {
-            headers: {
-              ...formData.getHeaders(),
-              Authorization: `Bearer ${this.apiKey}`
-            },
-            timeout: timeoutMs
-          }
-        )
-    });
+    const endpoints = [
+      'https://api.stability.ai/v2beta/image-to-video',
+      'https://api.stability.ai/v2alpha/image-to-video',
+      'https://api.stability.ai/v2alpha/generation/image-to-video'
+    ];
 
-    return response.data.id; // job id
+    let lastErr = null;
+    const attempts = [];
+    for (const endpoint of endpoints) {
+      try {
+        const submitData = new FormData();
+        submitData.append('image', imageBuffer, { filename: 'image.png', contentType: 'image/png' });
+        submitData.append('seed', String(safeSeed));
+        submitData.append('cfg_scale', String(safeCfgScale));
+        submitData.append('motion_bucket_id', String(safeMotion));
+
+        const response = await this.requestWithRetry({
+          telemetry: {
+            userId,
+            module,
+            provider: 'stability',
+            model: 'image-to-video',
+            operation: 'submit_video_job'
+          },
+          params: {
+            endpoint,
+            seed: safeSeed,
+            cfg_scale: safeCfgScale,
+            motion_bucket_id: safeMotion
+          },
+          requestFn: ({ timeoutMs }) =>
+            axios.post(
+              endpoint,
+              submitData,
+              {
+                headers: {
+                  ...submitData.getHeaders(),
+                  Authorization: `Bearer ${this.apiKey}`
+                },
+                timeout: timeoutMs
+              }
+            )
+        });
+
+        return response.data.id;
+      } catch (err) {
+        lastErr = err;
+        const status = err?.response?.status;
+        attempts.push(`${endpoint} -> ${status || err?.code || 'error'}`);
+        if (status === 404) continue;
+        throw err;
+      }
+    }
+
+    const diag = attempts.length ? ` Endpoints testados: ${attempts.join(' | ')}` : '';
+    const reason = lastErr?.message ? ` Motivo: ${lastErr.message}` : '';
+    const providerBody = extractProviderBody(lastErr);
+    const detail = providerBody ? ` Provider: ${providerBody}` : '';
+    throw new Error(`Falha ao submeter job de video na Stability.${reason}${diag}${detail}`);
   }
 
   async getVideoStatus(jobId, options = {}) {
     const { userId = null, module = 'video' } = options;
-    const response = await this.requestWithRetry({
-      telemetry: {
-        userId,
-        module,
-        provider: 'stability',
-        model: 'image-to-video',
-        operation: 'get_video_status'
-      },
-      params: { job_id: String(jobId || '').slice(0, 80) },
-      requestFn: ({ timeoutMs }) =>
-        axios.get(
-          `https://api.stability.ai/v2beta/image-to-video/result/${jobId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${this.apiKey}`,
-              Accept: "video/*"
-            },
-            responseType: 'arraybuffer',
-            validateStatus: undefined,
-            timeout: timeoutMs
-          }
-        )
-    });
-    return response; // 200 with data or 202
+    const endpoints = [
+      `https://api.stability.ai/v2beta/image-to-video/result/${jobId}`,
+      `https://api.stability.ai/v2alpha/image-to-video/result/${jobId}`,
+      `https://api.stability.ai/v2alpha/generation/image-to-video/result/${jobId}`
+    ];
+
+    let lastErr = null;
+    const attempts = [];
+    for (const endpoint of endpoints) {
+      try {
+        const response = await this.requestWithRetry({
+          telemetry: {
+            userId,
+            module,
+            provider: 'stability',
+            model: 'image-to-video',
+            operation: 'get_video_status'
+          },
+          params: { endpoint, job_id: String(jobId || '').slice(0, 80) },
+          requestFn: ({ timeoutMs }) =>
+            axios.get(
+              endpoint,
+              {
+                headers: {
+                  Authorization: `Bearer ${this.apiKey}`,
+                  Accept: 'video/*'
+                },
+                responseType: 'arraybuffer',
+                validateStatus: undefined,
+                timeout: timeoutMs
+              }
+            )
+        });
+        return response;
+      } catch (err) {
+        lastErr = err;
+        const status = err?.response?.status;
+        attempts.push(`${endpoint} -> ${status || err?.code || 'error'}`);
+        if (status === 404) continue;
+        throw err;
+      }
+    }
+
+    const diag = attempts.length ? ` Endpoints testados: ${attempts.join(' | ')}` : '';
+    const reason = lastErr?.message ? ` Motivo: ${lastErr.message}` : '';
+    const providerBody = extractProviderBody(lastErr);
+    const detail = providerBody ? ` Provider: ${providerBody}` : '';
+    throw new Error(`Falha ao consultar status do video na Stability.${reason}${diag}${detail}`);
   }
 }
