@@ -8,8 +8,27 @@ import { auth } from './auth.js';
 export const text2img = {
   prefsKey: 't2i_generation_prefs_v1',
   controlState: {
-    stylePresets: ['photographic', 'cinematic', 'digital-art', 'anime', 'comic-book', 'line-art'],
-    aspectRatios: ['1:1', '9:16', '16:9', '4:5', '5:4', '3:2', '2:3'],
+    stylePresets: [
+      'none',
+      '3d-model',
+      'analog-film',
+      'anime',
+      'cinematic',
+      'comic-book',
+      'digital-art',
+      'enhance',
+      'fantasy-art',
+      'isometric',
+      'line-art',
+      'low-poly',
+      'modeling-compound',
+      'neon-punk',
+      'origami',
+      'photographic',
+      'pixel-art',
+      'tile-texture'
+    ],
+    aspectRatios: ['21:9', '16:9', '3:2', '5:4', '1:1', '4:5', '2:3', '9:16', '9:21'],
     profiles: ['fast', 'balanced', 'pro']
   },
 
@@ -192,12 +211,15 @@ export const text2img = {
     const profileBtn = document.getElementById('t2i-profile-btn');
     const seedInput = document.getElementById('t2i-seed-input');
 
+    const styleValue = String(styleBtn?.getAttribute('data-value') || '').toLowerCase();
     const payload = {
       prompt,
-      style_preset: styleBtn?.getAttribute('data-value') || undefined,
       aspect_ratio: aspectBtn?.getAttribute('data-value') || undefined,
       profile: profileBtn?.getAttribute('data-value') || 'balanced'
     };
+    if (styleValue && styleValue !== 'none') {
+      payload.style_preset = styleValue;
+    }
 
     const seedRaw = String(seedInput?.value || '').trim();
     if (seedRaw !== '') {
@@ -225,7 +247,12 @@ export const text2img = {
 
     btn.addEventListener('click', async () => {
       const prompt = input.value.trim();
-      if (!prompt) return ui.showToast('Digite um prompt.', 'warning');
+      errorDiv.classList.add('tw-hidden');
+      if (!prompt) {
+        errorDiv.textContent = 'Algo de errado! Verifique seu prompt. Tente novamente!';
+        errorDiv.classList.remove('tw-hidden');
+        return;
+      }
 
       try {
         // UI State: Processing
@@ -247,13 +274,17 @@ export const text2img = {
         // Refresh user credits in UI
         auth.refreshUser();
       } catch (err) {
-        errorDiv.textContent = err.message;
+        errorDiv.textContent = err.message || 'Algo de errado! Verifique seu prompt. Tente novamente!';
         errorDiv.classList.remove('tw-hidden');
         loader.classList.add('tw-hidden');
         placeholder.classList.remove('tw-hidden');
       } finally {
         btn.disabled = false;
       }
+    });
+
+    input.addEventListener('input', () => {
+      errorDiv.classList.add('tw-hidden');
     });
 
     // Download Handler

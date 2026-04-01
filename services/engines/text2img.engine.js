@@ -28,10 +28,20 @@ export class Text2ImgEngine {
     });
 
     try {
+      const openai = engineFactory.get('openai');
+      const enhanced = await openai.enhanceTextToImagePrompt(prompt, options?.style_preset);
+      
+      const finalPrompt = enhanced.final_prompt || prompt;
+      let finalNegativePrompt = enhanced.negative_prompt || 'low quality, blurry, deformed';
+      
+      if (options?.negative_prompt) {
+        finalNegativePrompt = `${options.negative_prompt}, ${finalNegativePrompt}`;
+      }
+
       const stability = engineFactory.get('stability');
       const imageBuffer = await stability.generate({
-        prompt,
-        negative_prompt: options?.negative_prompt || null,
+        prompt: finalPrompt,
+        negative_prompt: finalNegativePrompt,
         aspect_ratio: options?.aspect_ratio || null,
         seed: options?.seed,
         output_format: finalOutputFormat,

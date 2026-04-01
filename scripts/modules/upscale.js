@@ -6,6 +6,43 @@ export const upscale = {
   elements: {},
   currentFile: null,
   previewObjectUrl: null,
+  controlState: {
+    sizePresets: [
+      { value: 'none', label: 'Tamanho original' },
+      { value: 'reels', label: 'Instagram Reels (1080x1920)' },
+      { value: 'stories', label: 'Instagram Stories (1080x1920)' },
+      { value: 'youtube', label: 'YouTube Thumb (1280x720)' },
+      { value: 'shorts', label: 'YouTube Shorts (1080x1920)' },
+      { value: 'linkedin', label: 'LinkedIn Post (1200x627)' },
+      { value: 'square', label: 'Quadrado (1080x1080)' },
+      { value: 'custom', label: 'Custom (L x A)' }
+    ],
+    fits: [
+      { value: 'cover', label: 'Preencher' },
+      { value: 'contain', label: 'Manter tudo' },
+      { value: 'fill', label: 'Esticar' }
+    ],
+    intents: [
+      { value: 'both', label: 'Enhance + Upscale' },
+      { value: 'resize', label: 'Upscale' },
+      { value: 'quality', label: 'Enhance' }
+    ],
+    factors: [
+      { value: '2x', label: '2x Zoom' },
+      { value: '4x', label: '4x Zoom' },
+      { value: '8x', label: '8x Zoom' }
+    ],
+    qualityProfiles: [
+      { value: 'fast', label: 'Velocidade: Fast' },
+      { value: 'balanced', label: 'Velocidade: Balanced' },
+      { value: 'pro', label: 'Velocidade: Pro' }
+    ],
+    formats: [
+      { value: 'png', label: 'PNG' },
+      { value: 'jpeg', label: 'JPEG' },
+      { value: 'webp', label: 'WEBP' }
+    ]
+  },
 
   init() {
     this.mapElements();
@@ -27,13 +64,19 @@ export const upscale = {
       error: document.getElementById('upscale-error'),
       downloadBtn: document.getElementById('btn-download-upscale'),
       sizePreset: document.getElementById('upscale-size-preset'),
+      sizePresetLabel: document.getElementById('upscale-size-preset-label'),
       widthInput: document.getElementById('upscale-width'),
       heightInput: document.getElementById('upscale-height'),
       fit: document.getElementById('upscale-fit'),
+      fitLabel: document.getElementById('upscale-fit-label'),
       intent: document.getElementById('upscale-intent'),
+      intentLabel: document.getElementById('upscale-intent-label'),
       factor: document.getElementById('upscale-factor'),
+      factorLabel: document.getElementById('upscale-factor-label'),
       quality: document.getElementById('upscale-quality'),
-      format: document.getElementById('upscale-format')
+      qualityLabel: document.getElementById('upscale-quality-label'),
+      format: document.getElementById('upscale-format'),
+      formatLabel: document.getElementById('upscale-format-label')
     };
   },
 
@@ -43,12 +86,58 @@ export const upscale = {
     this.elements.removeBtn?.addEventListener('click', () => this.reset());
     this.elements.generateBtn?.addEventListener('click', () => this.handleGenerate());
     this.elements.downloadBtn?.addEventListener('click', () => this.downloadResult());
-    this.elements.sizePreset?.addEventListener('change', () => this.syncSizeControls());
+    this.bindCycleControls();
     this.syncSizeControls();
   },
 
+  bindCycleControls() {
+    this.elements.sizePreset?.addEventListener('click', () => {
+      this.cycleControl(this.controlState.sizePresets, this.elements.sizePreset, this.elements.sizePresetLabel);
+      this.syncSizeControls();
+    });
+
+    this.elements.fit?.addEventListener('click', () => {
+      this.cycleControl(this.controlState.fits, this.elements.fit, this.elements.fitLabel);
+    });
+
+    this.elements.intent?.addEventListener('click', () => {
+      this.cycleControl(this.controlState.intents, this.elements.intent, this.elements.intentLabel);
+    });
+
+    this.elements.factor?.addEventListener('click', () => {
+      if (this.elements.factor?.disabled) return;
+      this.cycleControl(this.controlState.factors, this.elements.factor, this.elements.factorLabel);
+    });
+
+    this.elements.quality?.addEventListener('click', () => {
+      this.cycleControl(this.controlState.qualityProfiles, this.elements.quality, this.elements.qualityLabel);
+    });
+
+    this.elements.format?.addEventListener('click', () => {
+      this.cycleControl(this.controlState.formats, this.elements.format, this.elements.formatLabel);
+    });
+  },
+
+  getControlValue(element, fallback = '') {
+    if (!element) return fallback;
+    if (element.tagName === 'SELECT') return element.value || fallback;
+    return element.getAttribute('data-value') || fallback;
+  },
+
+  cycleControl(options, element, labelElement) {
+    if (!element || !Array.isArray(options) || options.length === 0) return;
+
+    const current = this.getControlValue(element, options[0].value);
+    const currentIndex = options.findIndex((option) => option.value === current);
+    const nextIndex = (currentIndex + 1) % options.length;
+    const nextOption = options[nextIndex];
+
+    element.setAttribute('data-value', nextOption.value);
+    if (labelElement) labelElement.textContent = nextOption.label;
+  },
+
   syncSizeControls() {
-    const preset = this.elements.sizePreset?.value || 'none';
+    const preset = this.getControlValue(this.elements.sizePreset, 'none');
     const isCustom = preset === 'custom';
     const usesFixedSize = preset !== 'none';
 
@@ -58,6 +147,7 @@ export const upscale = {
     if (this.elements.factor) {
       this.elements.factor.disabled = usesFixedSize;
       this.elements.factor.classList.toggle('tw-opacity-50', usesFixedSize);
+      this.elements.factor.classList.toggle('tw-cursor-not-allowed', usesFixedSize);
       this.elements.factor.title = usesFixedSize
         ? 'Escala desativada ao usar tamanho fixo.'
         : '';
@@ -163,16 +253,16 @@ export const upscale = {
     try {
       const formData = new FormData();
       formData.append('image', inputFile);
-      formData.append('intent', this.elements.intent?.value || 'both');
-      formData.append('factor', this.elements.factor?.value || '2x');
-      formData.append('quality_profile', this.elements.quality?.value || 'balanced');
-      formData.append('output_format', this.elements.format?.value || 'png');
-      formData.append('size_preset', this.elements.sizePreset?.value || 'none');
-      formData.append('fit', this.elements.fit?.value || 'cover');
+      formData.append('intent', this.getControlValue(this.elements.intent, 'both'));
+      formData.append('factor', this.getControlValue(this.elements.factor, '2x'));
+      formData.append('quality_profile', this.getControlValue(this.elements.quality, 'balanced'));
+      formData.append('output_format', this.getControlValue(this.elements.format, 'png'));
+      formData.append('size_preset', this.getControlValue(this.elements.sizePreset, 'none'));
+      formData.append('fit', this.getControlValue(this.elements.fit, 'cover'));
 
       const width = String(this.elements.widthInput?.value || '').trim();
       const height = String(this.elements.heightInput?.value || '').trim();
-      const isCustom = (this.elements.sizePreset?.value || '') === 'custom';
+      const isCustom = this.getControlValue(this.elements.sizePreset, '') === 'custom';
       if (isCustom) {
         if (!width || !height) {
           throw new Error('Informe largura e altura para tamanho personalizado.');

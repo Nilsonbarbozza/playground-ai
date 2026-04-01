@@ -293,11 +293,11 @@
                       </div>
                       <div class="flex flex-col gap-3 px-4" data-testid="@ai-playground-v2/sidebar-category">
                         <div
-                          class="overflow-hidden px-3 font-semibold text-sm leading-4 inline_d217cf3d"
-                          data-testid="@ai-playground-v2/sidebar-category/title"
+                        class="overflow-hidden px-3 font-semibold text-sm leading-4 inline_d217cf3d"
+                        data-testid="@ai-playground-v2/sidebar-category/title"
                         >
-                          <h3 class="whitespace-nowrap text-left inline_22c898d5">
-                            <span>Vídeo</span>
+                        <h3 class="whitespace-nowrap text-left inline_22c898d5 tw-flex tw-flex-row tw-items-center">
+                          <span>Vídeo</span><span class="tw-inline-flex tw-items-center tw-ml-2 tw-text-[#5666F5] tw-text-[10px] tw-font-bold"><svg class="tw-w-3 tw-h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.7 6.3l3 3m-9.9 9.9 9.9-9.9-3-3-9.9 9.9-.6 3.6 3.6-.6z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3l2 2"></path></svg>Em breve</span></span
                           </h3>
                         </div>
                         <div class="flex flex-col gap-2" data-testid="@ai-playground-v2/sidebar-category/items">
@@ -331,9 +331,9 @@
                               ></path></svg
                             ><span
                               class="flex flex-1 items-center justify-between gap-2 overflow-hidden whitespace-nowrap font-medium text-sm leading-[140%] inline_ab09c04b"
-                              ><span class="tw-text-gray-900"
-                                ><span>Texto para Vídeo</span></span
-                              ></span
+                              ><span class="tw-text-gray-900 tw-flex tw-items-center"
+                                ><span>Texto para Vídeo</span>
+                              </span
                             ></button
                           ><button
                             class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-transparent text-gray-500 hover:bg-gray-100 flex h-10 min-w-10 justify-start px-3 w-full"
@@ -373,9 +373,9 @@
                               </defs></svg
                             ><span
                               class="flex flex-1 items-center justify-between gap-2 overflow-hidden whitespace-nowrap font-medium text-sm leading-[140%] inline_ab09c04b"
-                              ><span class="tw-text-gray-900"
-                                ><span>Imagem para Vídeo</span></span
-                              ></span
+                              ><span class="tw-text-gray-900 tw-flex tw-items-center"
+                                ><span>Imagem para Vídeo</span>
+                              </span
                             ></button
                           ><button
                             class="relative items-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 [&amp;_svg]:pointer-events-none bg-transparent text-gray-500 hover:bg-gray-100 flex h-10 min-w-10 justify-start px-3 w-full"
@@ -404,9 +404,9 @@
                               ></path></svg
                             ><span
                               class="flex flex-1 items-center justify-between gap-2 overflow-hidden whitespace-nowrap font-medium text-sm leading-[140%] inline_ab09c04b"
-                              ><span class="tw-text-gray-900"
-                                ><span>Edições de Vídeo</span></span
-                              ></span
+                              ><span class="tw-text-gray-900 tw-flex tw-items-center"
+                                ><span>Edições de Vídeo</span>
+                              </span
                             >
                           </button>
                         </div>
@@ -760,15 +760,13 @@
                                     AgenteGPT Inpaint
                                   </span>
                                   <span class="tw-text-gray-300">|</span>
-                                  <span class="hover:tw-text-gray-900 tw-transition-colors">Custo: 5 créditos</span>
+                                  <span class="hover:tw-text-gray-900 tw-transition-colors">Modo: Ultra</span>
                               </div>
                               <div id="btn-text" class="tw-hidden">Editar com IA</div> <!-- Mantendo o ID para compatibilidade JS -->
                           </div>
+                          <div id="error-message" class="tw-hidden tw-w-full tw-border-t tw-border-gray-50 tw-text-red-400 tw-text-[11px] md:tw-text-xs tw-font-semibold">Algo de errado! Verifique seu prompt ou mask. Tente novamente!</div>
                       </div>
                   </div>
-                  
-                  <!-- Error Message Popup -->
-                  <div id="error-message" class="tw-hidden tw-absolute tw-bottom-24 tw-left-1/2 tw--translate-x-1/2 tw-bg-red-50 tw-text-red-600 tw-px-4 tw-py-2 tw-rounded-lg tw-border tw-border-red-100 tw-text-sm tw-shadow-sm tw-z-50"></div>
                 </div> <!-- Closes flex content-center (Line 600) -->
               </div> <!-- Closes grid (Line 597) -->
             </div> <!-- /#view-image-editor -->
@@ -813,7 +811,7 @@
                               </div>                         
                           </div>
                          <!-- Generated Image -->
-                        <div class="tw-relative tw-group tw-max-w-[450px] tw-max-h-[450px] tw-flex tw-items-center tw-justify-center">
+                        <div class="tw-relative tw-group tw-max-w-[700px] tw-min-w[450px] tw-max-h-[700px] tw-min-h[450px] tw-flex tw-items-center tw-justify-center">
                              <img id="t2i-preview-img" class="tw-hidden tw-max-w-full tw-max-h-full tw-object-contain tw-rounded-xl tw-shadow-2xl" />
                              
                              <!-- Download Button -->
@@ -881,7 +879,7 @@
                                     <svg class="tw-w-4 tw-h-4 tw-ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                                 </button>
                             </div>
-                            <div id="t2i-error" class="tw-hidden tw-text-xs tw-text-red-500 tw-mt-1"></div>
+                            <div id="t2i-error" class="tw-hidden tw-w-full tw-border-t tw-border-gray-50 tw-pt-2 tw-text-red-300 tw-text-[11px] md:tw-text-xs tw-font-semibold">Algo de errado! Verifique seu prompt. Tente novamente!</div>
                         </div>
                     </div>
                 </div>
@@ -1120,24 +1118,15 @@
                                     <svg class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                     <input id="upscale-file-input" name="image" accept="image/*" class="tw-hidden" type="file" />
                                 </div>
-                                <select id="upscale-size-preset" class="tw-text-[#4A5DDF] hover:tw-text-gray-900 tw-transition-colors tw-p-2 md:tw-p-3 tw-flex-1 tw-min-w-[120px] tw-text-xs md:tw-text-sm tw-rounded-lg">
-                                    <option class="tw-text-gray-900 tw-p-2" value="none" selected>Tamanho original</option>
-                                    <option class="tw-text-gray-900 tw-p-2" value="reels">Instagram Reels (1080x1920)</option>
-                                    <option class="tw-text-gray-900 tw-p-2" value="stories">Instagram Stories (1080x1920)</option>
-                                    <option class="tw-text-gray-900 tw-p-2" value="youtube">YouTube Thumb (1280x720)</option>
-                                    <option class="tw-text-gray-900 tw-p-2" value="shorts">YouTube Shorts (1080x1920)</option>
-                                    <option class="tw-text-gray-900 tw-p-2" value="linkedin">LinkedIn Post (1200x627)</option>
-                                    <option class="tw-text-gray-900 tw-p-2" value="square">Quadrado (1080x1080)</option>
-                                    <option class="tw-text-gray-900 tw-p-2" value="custom">Custom (L x A)</option>
-                                </select>
+                                <button id="upscale-size-preset" type="button" data-value="none" class="tw-text-[#4A5DDF] hover:tw-text-gray-900 tw-transition-colors tw-p-2 md:tw-p-3 tw-flex-1 tw-min-w-[120px] tw-text-xs md:tw-text-sm tw-rounded-lg tw-text-left">
+                                    <span id="upscale-size-preset-label">Tamanho original</span>
+                                </button>
                                 <span class="tw-text-gray-300">|</span>
                                 <input id="upscale-width" type="number" min="1" max="8192" placeholder="Larg." class="tw-hidden tw-h-10 tw-w-20 md:tw-w-24 tw-bg-gray-50 tw-border tw-border-gray-200 tw-rounded-lg tw-px-2 tw-text-xs md:tw-text-sm tw-font-semibold tw-text-gray-700 tw-outline-none focus:tw-border-[#5666F5] focus:tw-ring-2 focus:tw-ring-[#5666F5]/15" />
                                 <input id="upscale-height" type="number" min="1" max="8192" placeholder="Alt." class="tw-hidden tw-h-10 tw-w-20 md:tw-w-24 tw-bg-gray-50 tw-border tw-border-gray-200 tw-rounded-lg tw-px-2 tw-text-xs md:tw-text-sm tw-font-semibold tw-text-gray-700 tw-outline-none focus:tw-border-[#5666F5] focus:tw-ring-2 focus:tw-ring-[#5666F5]/15" />
-                                <select id="upscale-fit" class="hover:tw-text-gray-900 tw-transition-colors tw-p-2 md:tw-p-3 tw-text-xs md:tw-text-sm tw-shrink-0 tw-rounded-lg">
-                                    <option value="cover" selected>Preencher</option>
-                                    <option value="contain">Manter tudo</option>
-                                    <option value="fill">Esticar</option>
-                                </select>
+                                <button id="upscale-fit" type="button" data-value="cover" class="hover:tw-text-gray-900 tw-transition-colors tw-p-2 md:tw-p-3 tw-text-xs md:tw-text-sm tw-shrink-0 tw-rounded-lg tw-text-left">
+                                    <span id="upscale-fit-label">Preencher</span>
+                                </button>
                             </div>
 
                             <!-- Controls Row -->
@@ -1146,38 +1135,30 @@
                                 <div class="tw-flex tw-flex-wrap tw-items-center tw-gap-2 md:tw-gap-3 tw-text-[11px] md:tw-text-xs tw-font-semibold tw-text-gray-600">
                                     <div class="tw-flex tw-items-center tw-gap-1.5 tw-h-8 tw-border tw-border-gray-200 tw-rounded-lg tw-px-2 hover:tw-border-gray-300 tw-transition-colors">
                                         <svg class="tw-w-3.5 tw-h-3.5 tw-text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18"></path></svg>
-                                        <select id="upscale-intent" class="hover:tw-text-gray-900 tw-transition-colors">
-                                            <option value="both" selected>Enhance + Upscale</option>
-                                            <option value="resize">Apenas Upscale</option>
-                                            <option value="quality">Apenas Enhance</option>
-                                        </select>
+                                        <button id="upscale-intent" type="button" data-value="both" class="hover:tw-text-gray-900 tw-transition-colors tw-text-left">
+                                            <span id="upscale-intent-label">Enhance + Upscale</span>
+                                        </button>
                                     </div>
                                     <span class="tw-text-gray-300">|</span>
                                     <div class="tw-flex tw-items-center tw-gap-1.5 tw-h-8 tw-border tw-border-gray-200 tw-rounded-lg tw-px-2 hover:tw-border-gray-300 tw-transition-colors">
                                         <svg class="tw-w-3.5 tw-h-3.5 tw-text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5"></path></svg>
-                                        <select id="upscale-factor" class="hover:tw-text-gray-900 tw-transition-colors ">
-                                            <option value="2x" selected>2x Zoom</option>
-                                            <option value="4x">4x Zoom</option>
-                                            <option value="8x">8x Zoom</option>
-                                        </select>
+                                        <button id="upscale-factor" type="button" data-value="2x" class="hover:tw-text-gray-900 tw-transition-colors tw-text-left">
+                                            <span id="upscale-factor-label">2x Zoom</span>
+                                        </button>
                                     </div>
                                     <span class="tw-text-gray-300">|</span>
                                     <div class="tw-flex tw-items-center tw-gap-1.5 tw-h-8 tw-border tw-border-gray-200 tw-rounded-lg tw-px-2 hover:tw-border-gray-300 tw-transition-colors">
                                         <svg class="tw-w-3.5 tw-h-3.5 tw-text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        <select id="upscale-quality" class="hover:tw-text-gray-900 tw-transition-colors">
-                                            <option value="fast">Velocidade: Fast</option>
-                                            <option value="balanced" selected>Velocidade: Balanced</option>
-                                            <option value="pro">Velocidade: Pro</option>
-                                        </select>
+                                        <button id="upscale-quality" type="button" data-value="balanced" class="hover:tw-text-gray-900 tw-transition-colors tw-text-left">
+                                            <span id="upscale-quality-label">Velocidade: Balanced</span>
+                                        </button>
                                     </div>
                                     <span class="tw-text-gray-300">|</span>
                                     <div class="tw-flex tw-items-center tw-gap-1.5 tw-h-8 tw-border tw-border-gray-200 tw-rounded-lg tw-px-2 hover:tw-border-gray-300 tw-transition-colors">
                                         <svg class="tw-w-3.5 tw-h-3.5 tw-text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10v10H7z"></path></svg>
-                                        <select id="upscale-format" class="hover:tw-text-gray-900 tw-transition-colors">
-                                            <option value="png" selected>PNG</option>
-                                            <option value="jpeg">JPEG</option>
-                                            <option value="webp">WEBP</option>
-                                        </select>
+                                        <button id="upscale-format" type="button" data-value="png" class="hover:tw-text-gray-900 tw-transition-colors tw-text-left">
+                                            <span id="upscale-format-label">PNG</span>
+                                        </button>
                                     </div>
                                 </div>
 

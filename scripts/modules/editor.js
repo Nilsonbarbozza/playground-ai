@@ -461,6 +461,17 @@ export const editor = {
     }
   },
 
+  hasMaskSelection() {
+    const canvas = this.elements.maskCanvas;
+    const ctx = this.canvasObj.ctx;
+    if (!canvas || !ctx) return false;
+    const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    for (let i = 3; i < data.length; i += 4) {
+      if (data[i] > 0) return true;
+    }
+    return false;
+  },
+
   initListeners() {
     const el = this.elements;
     
@@ -497,7 +508,22 @@ export const editor = {
 
   async handleGenerate() {
     const promptValue = this.elements.promptInput.value.trim();
-    if (!promptValue) return ui.showToast('Digite um prompt para a edição.', 'warning');
+    const hasMask = this.hasMaskSelection();
+
+    if (!promptValue && hasMask) {
+      this.setState('ERROR', { message: 'Adicione um prompt para usar a mascara.' });
+      return;
+    }
+
+    if (promptValue && !hasMask) {
+      this.setState('ERROR', { message: 'Pinte a area da mascara antes de gerar a edicao.' });
+      return;
+    }
+
+    if (!promptValue) {
+      this.setState('ERROR', { message: 'Digite um prompt para a edicao.' });
+      return;
+    }
 
     this.setState('PROCESSING');
 

@@ -27,8 +27,18 @@ export class ImageEditEngine {
       const analysis = await openai.analyzeIntent(userPrompt, inputBase64);
 
       const intent = analysis.intent || 'EDIT';
-      const finalPrompt = analysis.prompt || userPrompt;
-      const negPrompt = analysis.negative_prompt || 'low quality, text, logos';
+      let finalPrompt = analysis.prompt || userPrompt;
+      let negPrompt = analysis.negative_prompt || 'low quality, text, logos';
+
+      if (intent === 'EDIT') {
+        const antiMutationConstraints = 'mutated, changed shape, different model, deformed, distorted, cartoon, artificial, new additions, extra parts, 3d render';
+        negPrompt = `${negPrompt}, ${antiMutationConstraints}`;
+        
+        if (analysis.target_hex && analysis.target_color_name && analysis.target_color_name.trim() !== '') {
+          const c = analysis.target_color_name.trim();
+          finalPrompt = `${finalPrompt}, colored strictly ${c}, pure ${c}, ${c} surface, 100% ${c}`;
+        }
+      }
 
       let finalMask = null;
       let readyBase = normalizedBase;
