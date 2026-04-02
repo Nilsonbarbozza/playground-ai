@@ -169,7 +169,7 @@ export const billing = {
             </div>
 
             <!-- Visual Plan: Premium (Placeholder) -->
-            <div class="tw-bg-white/50 tw-rounded-3xl tw-border tw-border-gray-200 tw-p-8 tw-opacity-80">
+            <div class="tw-hidden lg:tw-block tw-bg-white/50 tw-rounded-3xl tw-border tw-border-gray-200 tw-p-8 tw-opacity-80">
               <div class="tw-mb-6">
                 <h4 class="tw-text-2xl tw-font-bold tw-text-gray-900">Premium</h4>
                 <p class="tw-text-gray-500 tw-text-sm tw-mt-1">Acesso completo para máxima criatividade.</p>
