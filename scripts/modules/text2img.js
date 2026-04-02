@@ -293,9 +293,10 @@ export const text2img = {
       downloadBtn.onclick = () => {
         const src = previewImg.src;
         if (src && !src.includes('placeholder')) {
+          const extension = src.split('.').pop().split(/[?#]/)[0] || 'png';
           const a = document.createElement('a');
           a.href = src;
-          a.download = `ai-image-${Date.now()}.png`;
+          a.download = `ai-image-${Date.now()}.${extension}`;
           a.click();
         }
       };

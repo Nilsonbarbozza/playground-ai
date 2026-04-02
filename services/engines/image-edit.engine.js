@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import sharp from 'sharp';
 import { engineFactory } from '../ai/engineFactory.js';
 import { CreditService } from '../billing/credits.service.js';
 import { StorageService } from '../storage/storage.service.js';
@@ -8,6 +9,25 @@ import { ProjectsRepository } from '../../repositories/projects.repository.js';
 export class ImageEditEngine {
   static async execute(userId, options) {
     const { userPrompt, imageBuffer, maskBuffer, seed, output_format } = options;
+    const allowedOutputFormats = new Set(['png', 'jpeg', 'webp']);
+    let normalizedOutputFormat = String(output_format || '').toLowerCase().trim();
+    
+    // Alias comum: jpg -> jpeg
+    if (normalizedOutputFormat === 'jpg') normalizedOutputFormat = 'jpeg';
+
+    // Se o formato enviado não for reconhecido ou for o padrão (png), tentamos o smart fallback pelo prompt
+    if (!allowedOutputFormats.has(normalizedOutputFormat) || normalizedOutputFormat === 'png') {
+      const promptLower = String(userPrompt).toLowerCase();
+      if (promptLower.includes('webp')) normalizedOutputFormat = 'webp';
+      else if (promptLower.includes('jpg') || promptLower.includes('jpeg')) normalizedOutputFormat = 'jpeg';
+    }
+
+    let safeOutputFormat = allowedOutputFormats.has(normalizedOutputFormat)
+      ? normalizedOutputFormat
+      : 'png';
+    const finalExt = safeOutputFormat === 'jpeg' ? 'jpg' : safeOutputFormat;
+    const parsedSeed = Number.parseInt(seed, 10);
+    const safeSeed = Number.isInteger(parsedSeed) && parsedSeed >= 0 ? parsedSeed : 0;
     const cost = Number(process.env.COST_IMAGE_EDITOR) || 2;
     const description = `Editor: ${userPrompt.substring(0, 30)}...`;
     const operationKey = `image-edit:${randomUUID()}`;
@@ -57,13 +77,39 @@ export class ImageEditEngine {
         prompt: finalPrompt,
         negative_prompt: negPrompt,
         intent,
-        seed,
-        output_format,
+        seed: safeSeed,
+        output_format: safeOutputFormat,
         userId,
         module: 'image-editor'
       });
 
-      const imageUrl = await StorageService.save(outputBuffer, 'edit', 'png');
+      // --- RESTAURAR TRANSPARÊNCIA ORIGINAL ---
+      // A Stability AI não lida bem com fundos transparentes (gera ruído/preto no fundo).
+      // Agora usamos o Alpha original como um "Stencil" (máscara de corte) sobre o resultado da IA.
+      let finalOutputBuffer = outputBuffer;
+      const originalMetadata = await sharp(imageBuffer).metadata();
+      
+      if (originalMetadata.hasAlpha && (safeOutputFormat === 'png' || safeOutputFormat === 'webp')) {
+        const outMeta = await sharp(outputBuffer).metadata();
+        const extractedAlpha = await sharp(imageBuffer)
+          .ensureAlpha()
+          .extractChannel(3) // Pega apenas a transparência original
+          .resize(outMeta.width, outMeta.height)
+          .toBuffer();
+          
+        finalOutputBuffer = await sharp(outputBuffer)
+          .ensureAlpha()
+          .composite([{ 
+            input: extractedAlpha, 
+            blend: 'dest-in' // Corta o resultado da IA exatamente no formato da silhueta original
+          }])
+          .toFormat(safeOutputFormat)
+          .toBuffer();
+      } else {
+        finalOutputBuffer = await sharp(outputBuffer).toFormat(safeOutputFormat).toBuffer();
+      }
+
+      const imageUrl = await StorageService.save(finalOutputBuffer, 'edit', finalExt);
 
       const project = await ProjectsRepository.create({
         userId,
@@ -77,7 +123,11 @@ export class ImageEditEngine {
       return {
         success: true,
         url: imageUrl,
-        project
+        project,
+        applied: {
+          seed: safeSeed,
+          output_format: safeOutputFormat
+        }
       };
     } catch (err) {
       console.error('[Engine] ImageEdit failed, releasing reservation...', err.message);

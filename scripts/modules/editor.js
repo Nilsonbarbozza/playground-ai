@@ -33,6 +33,9 @@ export const editor = {
   previewLoadInFlight: false,
   currentState: 'IDLE',
   originalImage: new Image(),
+  controlState: {
+    outputFormats: ['png', 'jpeg', 'webp']
+  },
 
   init() {
     this.originalImage.crossOrigin = "anonymous";
@@ -41,6 +44,7 @@ export const editor = {
     
     this.initCanvas();
     this.initListeners();
+    this.bindFormatControl();
     console.log('[Editor] Initialized');
   },
 
@@ -74,7 +78,10 @@ export const editor = {
       zoomLevel: document.getElementById('zoom-level'),
       undoMask: document.getElementById('undo-mask'),
       clearMask: document.getElementById('clear-mask'),
-      downloadBtn: document.getElementById('btn-download-editor')
+      downloadBtn: document.getElementById('btn-download-editor'),
+      seedInput: document.getElementById('editor-seed-input'),
+      outputFormat: document.getElementById('editor-output-format'),
+      outputFormatLabel: document.getElementById('editor-output-format-label')
     };
     if (this.elements.maskCanvas) {
       this.canvasObj.ctx = this.elements.maskCanvas.getContext('2d');
@@ -196,6 +203,12 @@ export const editor = {
         natural_width: previewImg.naturalWidth || null,
         natural_height: previewImg.naturalHeight || null
       });
+      if (resetEditor) {
+        maskCanvas.width = Math.max(1, previewImg.naturalWidth || 1);
+        maskCanvas.height = Math.max(1, previewImg.naturalHeight || 1);
+        this.clearCanvas(true);
+        this.resetViewport();
+      }
     };
     previewImg.onerror = () => {
       this.clearPreviewLoadWatch();
@@ -216,12 +229,7 @@ export const editor = {
     previewImg.src = src;
     this.originalImage.src = src;
 
-    if (resetEditor) {
-      maskCanvas.width = 1024;
-      maskCanvas.height = 1024;
-      this.clearCanvas(true);
-      this.resetViewport();
-    }
+    // Mask canvas resolution is synced on image load to preserve original dimensions.
   },
 
   retryPreviewLoad() {
@@ -256,9 +264,11 @@ export const editor = {
       const rect = cvs.getBoundingClientRect();
       const clientX = e.clientX;
       const clientY = e.clientY;
+      const widthScale = rect.width > 0 ? cvs.width / rect.width : 1;
+      const heightScale = rect.height > 0 ? cvs.height / rect.height : 1;
       return {
-        x: (clientX - rect.left) * (1024 / rect.width),
-        y: (clientY - rect.top) * (1024 / rect.height)
+        x: (clientX - rect.left) * widthScale,
+        y: (clientY - rect.top) * heightScale
       };
     };
 
@@ -497,13 +507,34 @@ export const editor = {
       el.downloadBtn.onclick = () => {
         const src = el.previewImg.src;
         if (src && !src.includes('placeholder')) {
+          const extension = src.split('.').pop().split(/[?#]/)[0] || 'png';
           const a = document.createElement('a');
           a.href = src;
-          a.download = `edited-image-${Date.now()}.png`;
+          a.download = `edited-image-${Date.now()}.${extension}`;
           a.click();
         }
       };
     }
+  },
+
+  bindFormatControl() {
+    const button = this.elements.outputFormat;
+    if (!button) return;
+
+    button.addEventListener('click', () => {
+      const current = button.getAttribute('data-value') || this.controlState.outputFormats[0];
+      const currentIndex = this.controlState.outputFormats.indexOf(current);
+      const nextIndex = (currentIndex + 1) % this.controlState.outputFormats.length;
+      const next = this.controlState.outputFormats[nextIndex];
+      button.setAttribute('data-value', next);
+      if (this.elements.outputFormatLabel) {
+        this.elements.outputFormatLabel.textContent = next.toUpperCase();
+      }
+    });
+  },
+
+  getSelectedOutputFormat() {
+    return this.elements.outputFormat?.getAttribute('data-value') || this.controlState.outputFormats[0];
   },
 
   async handleGenerate() {
@@ -528,18 +559,12 @@ export const editor = {
     this.setState('PROCESSING');
 
     try {
-      // Prepare 1024x1024 square image for AI
+      // Preserve the current image native resolution (no forced square crop/padding).
       const baseCanvas = document.createElement('canvas');
-      baseCanvas.width = 1024; 
-      baseCanvas.height = 1024;
+      baseCanvas.width = Math.max(1, this.originalImage.naturalWidth || this.originalImage.width || 1);
+      baseCanvas.height = Math.max(1, this.originalImage.naturalHeight || this.originalImage.height || 1);
       const bCtx = baseCanvas.getContext('2d');
-      bCtx.fillStyle = '#000'; 
-      bCtx.fillRect(0, 0, 1024, 1024);
-      
-      const ratio = Math.min(1024/this.originalImage.width, 1024/this.originalImage.height);
-      const nw = this.originalImage.width * ratio;
-      const nh = this.originalImage.height * ratio;
-      bCtx.drawImage(this.originalImage, (1024-nw)/2, (1024-nh)/2, nw, nh);
+      bCtx.drawImage(this.originalImage, 0, 0, baseCanvas.width, baseCanvas.height);
 
       const imageBlob = await new Promise(r => baseCanvas.toBlob(r, 'image/png'));
       const maskBlob = await new Promise(r => this.elements.maskCanvas.toBlob(r, 'image/png'));
@@ -548,6 +573,11 @@ export const editor = {
       formData.append('image', imageBlob);
       formData.append('mask', maskBlob);
       formData.append('prompt', promptValue);
+      formData.append('output_format', this.getSelectedOutputFormat());
+      const seedValue = String(this.elements.seedInput?.value || '').trim();
+      if (seedValue !== '') {
+        formData.append('seed', seedValue);
+      }
 
       // Call API Service
       const data = await api.post('/edit', formData, true);

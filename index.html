@@ -764,6 +764,20 @@
                               </div>
                               <div id="btn-text" class="tw-hidden">Editar com IA</div> <!-- Mantendo o ID para compatibilidade JS -->
                           </div>
+                          <div class="tw-flex tw-flex-wrap tw-items-center tw-justify-between tw-gap-3 tw-border-t tw-border-gray-50 tw-text-xs">
+                              <label class="tw-flex tw-items-center tw-gap-2 tw-flex-1 tw-max-w-[280px] tw-border tw-border-gray-200 tw-rounded-xl tw-px-3 tw-py-2 tw-text-gray-500 tw-font-semibold tw-text-[11px]">
+                                <span class="tw-uppercase tw-tracking-wider tw-text-[10px]">Seed</span>
+                                <input id="editor-seed-input" type="number" min="0" step="1" placeholder="aleatório" class="tw-w-full tw-bg-transparent tw-outline-none tw-border-none tw-text-[11px] tw-text-gray-900 tw-font-semibold" />
+                              </label>
+                              <div class="tw-flex tw-items-center tw-gap-2">
+                                <button id="editor-output-format" type="button" data-value="png" class="tw-flex tw-items-center tw-gap-2 tw-h-10 tw-border tw-border-gray-200 tw-rounded-xl tw-px-3 tw-text-xs tw-font-semibold tw-text-gray-600 hover:tw-border-gray-400 tw-transition-colors">
+                                  <span class="tw-text-[10px]">Formato</span>
+                                  <span id="editor-output-format-label" class="tw-text-gray-900">PNG</span>
+                                </button>
+                                <span class="tw-text-gray-300 tw-text-[10px]">|</span>
+                                <span class="tw-text-gray-400 tw-text-[10px]">Saída da IA</span>
+                              </div>
+                          </div>
                           <div id="error-message" class="tw-hidden tw-w-full tw-border-t tw-border-gray-50 tw-text-red-400 tw-text-[11px] md:tw-text-xs tw-font-semibold">Algo de errado! Verifique seu prompt ou mask. Tente novamente!</div>
                       </div>
                   </div>

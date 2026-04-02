@@ -298,10 +298,11 @@ export const upscale = {
 
   downloadResult() {
     const src = this.elements.previewImg?.src || '';
-    if (!src) return;
+    if (!src || src.includes('placeholder')) return;
+    const extension = src.split('.').pop().split(/[?#]/)[0] || 'png';
     const a = document.createElement('a');
     a.href = src;
-    a.download = `upscale-${Date.now()}.png`;
+    a.download = `upscale-${Date.now()}.${extension}`;
     a.click();
   },
 
