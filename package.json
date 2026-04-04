@@ -27,5 +27,10 @@
     "pg": "^8.20.0",
     "sharp": "^0.34.5",
     "stripe": "^21.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.2",
+    "purgecss": "^8.0.0",
+    "tailwindcss": "^4.2.2"
   }
 }
