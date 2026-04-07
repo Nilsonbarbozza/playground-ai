@@ -68,7 +68,12 @@ class ApiService {
         throw new Error(`Resposta nao-JSON do servidor (Status ${response.status}). Verifique o console.`);
       }
 
-      if (!response.ok) throw new Error(data.error || 'Erro na requisicao.');
+      if (!response.ok) {
+        const errorObj = new Error(data.error || 'Erro na requisicao.');
+        Object.assign(errorObj, data);
+        errorObj.status = response.status;
+        throw errorObj;
+      }
 
       return data;
     } catch (err) {

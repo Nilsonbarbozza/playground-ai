@@ -17,9 +17,18 @@ async function migrate() {
         email VARCHAR(255) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
         credits INT DEFAULT 10,
+        is_verified BOOLEAN DEFAULT false,
+        otp_code VARCHAR(10),
+        otp_expires_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+    
+    // Auto-migrate existing data column if needed in subsequent runs without dropping table
+    await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT false`);
+    await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS otp_code VARCHAR(10)`);
+    await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS otp_expires_at TIMESTAMP`);
+    
     console.log('[OK] Tabela users criada/verificada.');
 
     await db.query(`

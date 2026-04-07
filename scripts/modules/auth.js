@@ -9,6 +9,7 @@ import { telemetry } from '../services/telemetry.js';
  */
 export const auth = {
   user: null,
+  pendingUserId: null,
 
   init() {
     const savedUser = localStorage.getItem('user');
@@ -71,7 +72,14 @@ export const auth = {
           const data = await api.post('/auth/login', { email, password });
           this.handleSuccess(data, false);
         } catch (err) {
-          ui.showToast(err.message, 'error');
+          // If error is 403 and requires_verification, show OTP
+          if (err.requires_verification && err.user) {
+            this.pendingUserId = err.user.id;
+            this.showOtpForm();
+            ui.showToast(err.message || 'Verifique seu e-mail.', 'info');
+          } else {
+            ui.showToast(err.message, 'error');
+          }
         } finally {
           ui.setLoading('btn-login', false);
         }
@@ -98,12 +106,47 @@ export const auth = {
         try {
           ui.setLoading('btn-register', true, 'Criando conta...');
           const data = await api.post('/auth/register', { email, password });
-          this.handleSuccess(data, true);
+          if (data.requires_verification && data.user) {
+            this.pendingUserId = data.user.id;
+            this.showOtpForm();
+            ui.showToast(data.message || 'Verifique seu e-mail.', 'success');
+          } else {
+            this.handleSuccess(data, true);
+          }
         } catch (err) {
           ui.showToast(err.message, 'error');
         } finally {
           ui.setLoading('btn-register', false);
         }
+      };
+    }
+
+    const otpForm = document.getElementById('otp-form');
+    if (otpForm) {
+      otpForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const otpCode = e.target.otpCode.value;
+        if (!this.pendingUserId) return;
+
+        try {
+          ui.setLoading('btn-verify-otp', true, 'Verificando...');
+          const data = await api.post('/auth/verify-otp', { userId: this.pendingUserId, otpCode });
+          this.handleSuccess(data, true);
+        } catch (err) {
+          ui.showToast(err.message, 'error');
+        } finally {
+          ui.setLoading('btn-verify-otp', false);
+        }
+      };
+    }
+
+    const btnBackToLogin = document.getElementById('btn-back-to-login');
+    if (btnBackToLogin) {
+      btnBackToLogin.onclick = () => {
+        document.getElementById('otp-form').classList.add('tw-hidden');
+        document.getElementById('login-form').classList.remove('tw-hidden');
+        document.getElementById('auth-modal-title').textContent='Bem-vindo de volta';
+        document.getElementById('auth-modal-subtitle').textContent='Faça login para continuar criando';
       };
     }
 
@@ -154,5 +197,15 @@ export const auth = {
     } catch (err) {
       console.error('[Auth] Failed to refresh user:', err.message);
     }
+  },
+
+  showOtpForm() {
+    document.getElementById('login-form').classList.add('tw-hidden');
+    document.getElementById('register-form').classList.add('tw-hidden');
+    document.getElementById('otp-form').classList.remove('tw-hidden');
+    
+    document.getElementById('auth-modal-title').textContent = 'Código de Acesso';
+    document.getElementById('auth-modal-subtitle').textContent = 'Digite o código para validar sua conta';
+    document.querySelector('.tw-flex.tw-mb-6.tw-bg-gray-100')?.classList.add('tw-hidden'); // hide tabs
   }
 };

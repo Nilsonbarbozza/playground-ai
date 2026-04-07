@@ -13,10 +13,35 @@ export class UsersRepository {
 
   static async create(email, passwordHash) {
     const result = await db.query(
-      'INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email, credits',
+      'INSERT INTO users (email, password_hash, is_verified) VALUES ($1, $2, false) RETURNING id, email, credits, is_verified',
       [email, passwordHash]
     );
     return result.rows[0];
+  }
+
+  static async saveOtp(userId, otpCode, expiresAt) {
+    await db.query(
+      'UPDATE users SET otp_code = $1, otp_expires_at = $2 WHERE id = $3',
+      [otpCode, expiresAt, userId]
+    );
+  }
+
+  static async verifyOtp(userId, otpCode) {
+    const result = await db.query(
+      'SELECT id, otp_expires_at FROM users WHERE id = $1 AND otp_code = $2',
+      [userId, otpCode]
+    );
+    if (result.rows.length === 0) return false;
+
+    // Comparar no JS para evitar problemas de Timezone do timezone do Servidor vs Postgres
+    const { otp_expires_at } = result.rows[0];
+    if (new Date(otp_expires_at) < new Date()) return false;
+
+    await db.query(
+      'UPDATE users SET is_verified = true, otp_code = NULL, otp_expires_at = NULL WHERE id = $1',
+      [userId]
+    );
+    return true;
   }
 
   static async findProfileById(userId) {

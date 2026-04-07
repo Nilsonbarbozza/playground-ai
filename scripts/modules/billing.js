@@ -95,20 +95,20 @@ export const billing = {
     const wrapper = document.createElement('div');
     wrapper.id = 'billing-modal';
     wrapper.className =
-      'tw-fixed tw-inset-0 tw-bg-black/40 tw-backdrop-blur-sm tw-z-[9998] tw-hidden tw-items-center tw-justify-center tw-p-4';
+      'tw-fixed tw-inset-0 tw-bg-black/40 tw-backdrop-blur-sm tw-z-[9998] tw-hidden tw-items-center tw-justify-center tw-p-3 md:tw-p-4 tw-transition-all';
     wrapper.innerHTML = `
-      <div class="tw-bg-[#F9FAFB] tw-w-full tw-max-w-4xl tw-rounded-[32px] tw-shadow-2xl tw-overflow-hidden tw-border tw-border-white/20">
+      <div class="tw-bg-[#F9FAFB] tw-w-full tw-max-w-md md:tw-max-w-2xl lg:tw-max-w-3xl xl:tw-max-w-4xl tw-rounded-[24px] md:tw-rounded-[32px] tw-shadow-2xl tw-overflow-hidden tw-border tw-border-white/20 tw-transition-all tw-max-h-[95vh] tw-overflow-y-auto">
         <!-- Header -->
-        <div class="tw-flex tw-items-center tw-justify-between tw-px-8 tw-py-6">
-          <h3 id="billing-modal-title" class="tw-text-2xl tw-font-bold tw-text-gray-900">Adicionar Creditos</h3>
+        <div class="tw-flex tw-items-center tw-justify-between tw-px-5 tw-py-4 md:tw-px-8 md:tw-py-6">
+          <h3 id="billing-modal-title" class="tw-text-xl md:tw-text-2xl tw-font-bold tw-text-gray-900">Adicionar Creditos</h3>
           <button id="billing-modal-close" class="tw-text-gray-400 hover:tw-text-gray-600 tw-transition-colors">
             <svg class="tw-w-6 tw-h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
 
-        <div class="tw-px-8 tw-pb-10">
+        <div class="tw-px-5 md:tw-px-8 tw-pb-6 md:tw-pb-10">
           <!-- Billing Toggle (Visual Only) -->
-          <div class="tw-flex tw-justify-center tw-mb-10">
+          <div class="tw-flex tw-justify-center tw-mb-6 md:tw-mb-10">
             <div class="tw-bg-gray-100 tw-p-1 tw-rounded-full tw-flex tw-gap-1">
               <button class="tw-bg-white tw-px-6 tw-py-2 tw-rounded-full tw-text-sm tw-font-semibold tw-shadow-sm">Playground</button>
                 <button data-testid="@ai-playground-v2/sidebar/logo" type="button" class="flex items-center gap-2">
@@ -121,9 +121,9 @@ export const billing = {
           <div id="billing-status" class="tw-hidden tw-mb-6 tw-text-sm tw-rounded-xl tw-p-4 tw-border"></div>
 
           <!-- Plans Grid -->
-          <div id="billing-packages" class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-6">
+          <div id="billing-packages" class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-4 md:tw-gap-6 tw-items-start">
             <!-- Functional Plan: Starter -->
-            <div id="plan-starter-container" class="tw-bg-white tw-rounded-3xl tw-border-2 tw-border-green-500 tw-p-8 tw-relative tw-shadow-lg">
+            <div id="plan-starter-container" class="tw-bg-white tw-rounded-2xl md:tw-rounded-3xl tw-border-2 tw-border-green-500 tw-p-5 md:tw-p-8 tw-relative tw-shadow-lg tw-transition-all">
               <div id="billing-starter-badge" class="tw-absolute -tw-top-4 tw-left-1/2 -tw-translate-x-1/2 tw-bg-[#5666f5] tw-text-white tw-px-4 tw-py-1 tw-rounded-full tw-text-xs tw-font-bold tw-flex tw-items-center tw-gap-1">
                 <svg class="tw-w-3 tw-h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                 Uso Profissional
@@ -169,7 +169,7 @@ export const billing = {
             </div>
 
             <!-- Visual Plan: Premium (Placeholder) -->
-            <div class="tw-hidden lg:tw-block tw-bg-white/50 tw-rounded-3xl tw-border tw-border-gray-200 tw-p-8 tw-opacity-80">
+            <div class="tw-hidden md:tw-block tw-bg-white/50 tw-rounded-2xl md:tw-rounded-3xl tw-border tw-border-gray-200 tw-p-5 md:tw-p-8 tw-opacity-80 tw-transition-all">
               <div class="tw-mb-6">
                 <h4 class="tw-text-2xl tw-font-bold tw-text-gray-900">Premium</h4>
                 <p class="tw-text-gray-500 tw-text-sm tw-mt-1">Acesso completo para máxima criatividade.</p>
@@ -204,12 +204,12 @@ export const billing = {
           </div>
 
           <!-- Bottom Summary -->
-          <div class="tw-mt-10 tw-pt-8 tw-border-t tw-border-gray-100 tw-text-center">
-            <p class="tw-text-xs tw-font-bold tw-text-gray-400 tw-uppercase tw-tracking-widest tw-mb-6">TODOS OS PLANOS INCLUEM:</p>
+          <div class="tw-mt-6 md:tw-mt-10 tw-pt-6 md:tw-pt-8 tw-border-t tw-border-gray-100 tw-text-center">
+            <p class="tw-text-[10px] md:tw-text-xs tw-font-bold tw-text-gray-400 tw-uppercase tw-tracking-widest tw-mb-4 md:tw-mb-6">TODOS OS PLANOS INCLUEM:</p>
             <div class="tw-flex tw-flex-wrap tw-justify-center tw-gap-2">
-              <span class="tw-bg-gray-100 tw-px-4 tw-py-2 tw-rounded-full tw-text-xs tw-font-semibold tw-text-gray-600">Geração Ultra Rápida</span>
-              <span class="tw-bg-gray-100 tw-px-4 tw-py-2 tw-rounded-full tw-text-xs tw-font-semibold tw-text-gray-600">Download em Alta Definição</span>
-              <span class="tw-bg-gray-100 tw-px-4 tw-py-2 tw-rounded-full tw-text-xs tw-font-semibold tw-text-gray-600">Garantia de Reembolso - 7 dias</span>
+              <span class="tw-bg-gray-100 tw-px-3 md:tw-px-4 tw-py-1.5 md:tw-py-2 tw-rounded-full tw-text-[10px] md:tw-text-xs tw-font-semibold tw-text-gray-600">Geração Ultra Rápida</span>
+              <span class="tw-bg-gray-100 tw-px-3 md:tw-px-4 tw-py-1.5 md:tw-py-2 tw-rounded-full tw-text-[10px] md:tw-text-xs tw-font-semibold tw-text-gray-600">Download em Alta Definição</span>
+              <span class="tw-bg-gray-100 tw-px-3 md:tw-px-4 tw-py-1.5 md:tw-py-2 tw-rounded-full tw-text-[10px] md:tw-text-xs tw-font-semibold tw-text-gray-600">Reembolso 7 dias</span>
             </div>
           </div>
         </div>
