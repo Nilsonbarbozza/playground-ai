@@ -46,7 +46,7 @@ class ApiService {
       if (response.status === 404 && allowFallback) {
         const canFallback = ['localhost', '127.0.0.1', ''].includes(window.location.hostname) || window.location.protocol === 'file:';
         if (canFallback) {
-          console.warn(`[API_WARN] 404 em ${url}. Tentando fallback ${this.fallbackBaseUrl}${endpoint}`);
+          // console.warn(`[API_WARN] 404 em ${url}. Tentando fallback 404`);
           return this.requestWithBase(endpoint, options, this.fallbackBaseUrl, false);
         }
       }
@@ -64,7 +64,7 @@ class ApiService {
         data = await response.json();
       } else {
         const text = await response.text();
-        console.warn(`[API_WARN] Expected JSON but received: ${text.substring(0, 100)}...`);
+        // console.warn(`[API_WARN] Expected JSON but received text.`);
         throw new Error(`Resposta nao-JSON do servidor (Status ${response.status}). Verifique o console.`);
       }
 
@@ -77,7 +77,7 @@ class ApiService {
 
       return data;
     } catch (err) {
-      console.error(`[API_ERR] ${endpoint}:`, err.message);
+      // console.error(`[API_ERR] ${endpoint}:`, err.message);
       telemetry.trackError('api.request', `${endpoint}: ${err.message}`);
       throw err;
     }

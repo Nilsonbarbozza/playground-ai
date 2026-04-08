@@ -23,9 +23,40 @@ export const ui = {
   },
 
   showToast(message, type = 'success') {
-    console.log(`[Toast] ${type.toUpperCase()}: ${message}`);
-    // Optional: Implement a floating toast here in the future
-    alert(message);
+    const container = document.getElementById('toast-container');
+    if (!container) {
+      console.log(`[Toast ${type.toUpperCase()}] ${message}`);
+      return;
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `magic-toast magic-toast-${type}`;
+
+    const icons = {
+      success: '✨',
+      error: '⚡',
+      warning: '⚠️',
+      info: '🔵'
+    };
+    const icon = icons[type] || icons.info;
+
+    toast.innerHTML = `
+      <span class="magic-toast-icon">${icon}</span>
+      <div class="tw-flex-1">${message}</div>
+    `;
+
+    container.appendChild(toast);
+
+    const removeToast = () => {
+      toast.classList.add('out');
+      toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+      // Fallback para remover se transitionend falhar
+      setTimeout(() => { if (toast.parentNode) toast.remove(); }, 500);
+    };
+
+    setTimeout(removeToast, 4000);
+
+    toast.addEventListener('click', removeToast);
   },
 
   updateCreditsDisplay(credits) {

@@ -97,7 +97,7 @@ export const billing = {
     wrapper.className =
       'tw-fixed tw-inset-0 tw-bg-black/40 tw-backdrop-blur-sm tw-z-[9998] tw-hidden tw-items-center tw-justify-center tw-p-3 md:tw-p-4 tw-transition-all';
     wrapper.innerHTML = `
-      <div class="tw-bg-[#F9FAFB] tw-w-full tw-max-w-md md:tw-max-w-2xl lg:tw-max-w-3xl xl:tw-max-w-4xl tw-rounded-[24px] md:tw-rounded-[32px] tw-shadow-2xl tw-overflow-hidden tw-border tw-border-white/20 tw-transition-all tw-max-h-[95vh] tw-overflow-y-auto">
+      <div class="tw-bg-[#F9FAFB] tw-w-full tw-max-w-md md:tw-max-w-2xl lg:tw-max-w-3xl xl:tw-max-w-4xl tw-rounded-[24px] md:tw-rounded-[32px] tw-shadow-2xl tw-overflow-hidden tw-border tw-border-white/20 tw-transition-all tw-max-h-[95vh] tw-overflow-y-auto scrollbar-hide">
         <!-- Header -->
         <div class="tw-flex tw-items-center tw-justify-between tw-px-5 tw-py-4 md:tw-px-8 md:tw-py-6">
           <h3 id="billing-modal-title" class="tw-text-xl md:tw-text-2xl tw-font-bold tw-text-gray-900">Adicionar Creditos</h3>
