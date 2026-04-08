@@ -56,6 +56,7 @@ export const upscale = {
       uploader: document.getElementById('upscale-uploader-container'),
       previewContainer: document.getElementById('upscale-preview-container'),
       previewImg: document.getElementById('upscale-preview-img'),
+      magicOverlay: document.getElementById('upscale-magic-overlay'),
       removeBtn: document.getElementById('remove-upscale-img'),
       fileInput: document.getElementById('upscale-file-input'),
       generateBtn: document.getElementById('btn-generate-upscale'),
@@ -196,13 +197,17 @@ export const upscale = {
   setProcessingState(loading) {
     if (loading) {
       this.elements.placeholder?.classList.add('tw-hidden');
-      this.elements.previewContainer?.classList.add('tw-hidden');
       this.elements.loader?.classList.remove('tw-hidden');
       this.elements.loader?.classList.add('tw-flex');
+      if (this.elements.magicOverlay) {
+        this.elements.magicOverlay.classList.remove('tw-hidden');
+        this.elements.previewContainer?.classList.remove('tw-hidden');
+      }
       return;
     }
     this.elements.loader?.classList.add('tw-hidden');
     this.elements.loader?.classList.remove('tw-flex');
+    if (this.elements.magicOverlay) this.elements.magicOverlay.classList.add('tw-hidden');
   },
 
   resolveResultUrl(data) {

@@ -6,6 +6,7 @@ import { UsersRepository } from '../../repositories/users.repository.js';
 import { CreditLedgerRepository } from '../../repositories/credit-ledger.repository.js';
 import { WebhookEventsRepository } from '../../repositories/webhook-events.repository.js';
 import { StripeService } from './stripe.service.js';
+import { MailService } from '../mail/mail.service.js';
 
 function getBaseUrl() {
   return process.env.APP_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
@@ -173,6 +174,17 @@ export class TopupService {
       });
 
       await client.query('COMMIT');
+      
+      // Dispara o e-mail de confirmacao
+      try {
+        const userProfile = await UsersRepository.findProfileById(order.user_id);
+        if (userProfile) {
+          await MailService.sendCreditConfirmationEmail(userProfile.email, order.credits, order.amount_brl_cents);
+        }
+      } catch (mailErr) {
+        console.error('[Mail Credit Error]', mailErr);
+      }
+
       return { processed: true };
     } catch (err) {
       await client.query('ROLLBACK');

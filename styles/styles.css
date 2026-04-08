@@ -2844,3 +2844,48 @@ html {
 .inline_2592cc77 {
   font-size: 16px;
 }
+
+/* Magic Animations */
+@keyframes magic-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes magic-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+@keyframes magic-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.magic-shimmer-bg {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: magic-shimmer 2s infinite linear;
+}
+
+.magic-icon {
+  animation: magic-float 3s infinite ease-in-out;
+}
+
+.magic-text-pulse {
+  animation: magic-pulse 2s infinite ease-in-out;
+}
+
+.magic-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  z-index: 50;
+  border-radius: inherit;
+  transition: opacity 0.3s ease;
+}

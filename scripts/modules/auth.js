@@ -171,7 +171,12 @@ export const auth = {
       props: { user_id: data.user?.id || null }
     });
     telemetry.flush();
-    ui.showToast(isFirstSignup ? `Conta criada! Voce ganhou ${data.user.credits} creditos.` : 'Bem-vindo de volta!');
+    
+    if (isFirstSignup) {
+      this.showWelcomeModal('Boas Vindas!', 'Obrigado pelo cadastro, use nossos motores de AI a vontade.');
+    } else {
+      this.showWelcomeModal('Sucesso!', 'Seja bem-vindo de volta!');
+    }
 
     document.dispatchEvent(
       new CustomEvent('auth:login-success', {
@@ -197,6 +202,27 @@ export const auth = {
     } catch (err) {
       console.error('[Auth] Failed to refresh user:', err.message);
     }
+  },
+
+  showWelcomeModal(title, message) {
+    const modal = document.getElementById('welcome-modal');
+    const content = document.getElementById('welcome-modal-content');
+    if (!modal || !content) return;
+    
+    document.getElementById('welcome-modal-title').textContent = title;
+    document.getElementById('welcome-modal-text').textContent = message;
+    
+    modal.classList.remove('tw-opacity-0', 'tw-pointer-events-none');
+    modal.classList.add('tw-opacity-100', 'tw-pointer-events-auto');
+    content.classList.remove('tw-scale-95');
+    content.classList.add('tw-scale-100');
+
+    setTimeout(() => {
+      modal.classList.remove('tw-opacity-100', 'tw-pointer-events-auto');
+      modal.classList.add('tw-opacity-0', 'tw-pointer-events-none');
+      content.classList.remove('tw-scale-100');
+      content.classList.add('tw-scale-95');
+    }, 3000);
   },
 
   showOtpForm() {

@@ -58,6 +58,7 @@ export const editor = {
       previewFallbackText: document.getElementById('preview-fallback-text'),
       previewFallbackReload: document.getElementById('preview-fallback-reload'),
       maskCanvas: document.getElementById('mask-canvas'),
+      magicOverlay: document.getElementById('editor-magic-overlay'),
       removeBtn: document.getElementById('remove-img'),
       fileInput: document.getElementById('file-input'),
       controls: document.getElementById('editor-controls'),
@@ -97,6 +98,7 @@ export const editor = {
     el.controls.classList.add('tw-hidden');
     el.spinner.classList.add('tw-hidden');
     if (el.btnIcon) el.btnIcon.classList.remove('tw-hidden');
+    if (el.magicOverlay) el.magicOverlay.classList.add('tw-hidden');
     el.errorDisplay.classList.add('tw-hidden');
     el.generateBtn.disabled = false;
     el.btnText.innerText = 'Editar com IA';
@@ -125,6 +127,7 @@ export const editor = {
         el.previewContainer.classList.remove('tw-hidden');
         el.controls.classList.remove('tw-hidden');
         el.spinner.classList.remove('tw-hidden');
+        if (el.magicOverlay) el.magicOverlay.classList.remove('tw-hidden');
         if (el.btnIcon) el.btnIcon.classList.add('tw-hidden');
         el.generateBtn.disabled = true;
         el.btnText.innerText = 'Processando...';
