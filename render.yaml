@@ -1,0 +1,56 @@
+services:
+  - type: web
+    name: agente-gpt
+    env: node
+    plan: starter # Altere para 'free' se desejar o plano gratuito
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: STABILITY_API_KEY
+        sync: false
+      - key: REPLICATE_API_KEY
+        sync: false
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: ALLOWED_ORIGIN
+        sync: false
+      - key: APP_BASE_URL
+        sync: false
+      - key: ADMIN_EMAILS
+        value: "nilson@playground.com"
+      - key: SMTP_HOST
+        value: "smtp.gmail.com"
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: DB_REJECT_UNAUTHORIZED
+        value: "false"
+      - key: TELEMETRY_AGG_BACKFILL_DAYS
+        value: "45"
+      - key: TELEMETRY_RETENTION_DAYS
+        value: "180"
+      - key: COST_TEXT_TO_IMAGE
+        value: "1"
+      - key: COST_IMAGE_EDITOR
+        value: "20"
+      - key: COST_TEXT_TO_VIDEO
+        value: "5"
+      - key: COST_FACESWAP
+        value: "3"
