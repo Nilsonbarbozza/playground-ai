@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import { rateLimit } from 'express-rate-limit';
 
 dotenv.config();
 
@@ -24,7 +25,24 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// Security: Restrict CORS to allowed origin
+const allowedOrigin = process.env.ALLOWED_ORIGIN || '*';
+app.use(cors({ origin: allowedOrigin }));
+
+// Security: Rate Limiting
+const authLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 20, // 20 attempts
+  message: { error: 'Muitas tentativas de login/registro. Tente em uma hora.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const telemetryLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 100,
+  message: { error: 'Limite de eventos excedido.' }
+});
 
 // Stripe requires the raw body for signature validation.
 app.post('/api/billing/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
@@ -33,7 +51,7 @@ app.use(express.json());
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
 
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/video', videoRoutes);
 app.use('/api/faceswap', faceswapRoutes);
@@ -41,7 +59,7 @@ app.use('/api/generate', generateRoutes);
 app.use('/api/edit', editRoutes);
 app.use('/api/upscale', upscaleRoutes);
 app.use('/api/billing', billingRoutes);
-app.use('/api/telemetry', telemetryRoutes);
+app.use('/api/telemetry', telemetryLimiter, telemetryRoutes);
 app.use('/api/admin/experiments', experimentRoutes);
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));

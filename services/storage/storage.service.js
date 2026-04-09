@@ -1,14 +1,11 @@
 import { promises as fsPromises } from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { v2 as cloudinary } from 'cloudinary';
 
 /**
- * Storage Service - Level 3
+ * Storage Service - Level 4 (Stateless Ready)
  * Standardizes how assets are saved and URL-mapped.
- * Easy to swap Local Storage for S3/Supabase in Phase 4.
+ * Seamlessly switches between Local and Cloudinary storage.
  */
 export class StorageService {
   /**
@@ -20,16 +17,44 @@ export class StorageService {
   static async save(buffer, prefix, ext = 'png') {
     const filename = `${prefix}_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
     
-    // In Level 3, we expect 'uploads' to be at the project root
-    // We use path.join to ensure cross-platform compatibility
+    // Cloudinary Storage Driver (Stateless)
+    if (process.env.CLOUDINARY_URL) {
+      try {
+        return new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            {
+              public_id: filename.replace(`.${ext}`, ''),
+              folder: 'playground_assets',
+              resource_type: 'auto'
+            },
+            (error, result) => {
+              if (error) {
+                console.error('[STORAGE_ERR] Cloudinary upload failed:', error);
+                reject(error);
+              } else {
+                resolve(result.secure_url);
+              }
+            }
+          );
+          uploadStream.end(buffer);
+        });
+      } catch (err) {
+        console.error('[STORAGE_ERR] Cloudinary initialization error:', err);
+        // Fallback to local will happen below if we don't throw
+      }
+    }
+
+    // Local Storage Driver (Stateful - Dev Fallback)
     const uploadsDir = path.join(process.cwd(), 'uploads');
     const filepath = path.join(uploadsDir, filename);
 
-    // Ensure directory exists
-    await fsPromises.mkdir(uploadsDir, { recursive: true });
-    await fsPromises.writeFile(filepath, buffer);
-    
-    // Returns the relative URL for frontend consumption
-    return `/uploads/${filename}`;
+    try {
+      await fsPromises.mkdir(uploadsDir, { recursive: true });
+      await fsPromises.writeFile(filepath, buffer);
+      return `/uploads/${filename}`;
+    } catch (err) {
+      console.error('[STORAGE_ERR] Local write failed:', err);
+      throw new Error('Falha ao salvar arquivo no armazenamento.');
+    }
   }
 }

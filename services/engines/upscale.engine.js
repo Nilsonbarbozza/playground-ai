@@ -96,7 +96,7 @@ export class UpscaleEngine {
 
     if (!imageBuffer) throw new Error('Imagem base ausente para upscale.');
 
-    const cost = Number(process.env.COST_UPSCALE_IMAGE) || 1;
+    const cost = Number(process.env.COST_UPSCALE) || 5;
     const intent = normalizeIntent(rawIntent);
     const factor = normalizeFactor(rawFactor);
     const qualityProfile = normalizeQuality(rawQualityProfile);

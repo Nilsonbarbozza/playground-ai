@@ -14,7 +14,7 @@ import { telemetry } from './services/telemetry.js';
  */
 class App {
   static async init() {
-    console.log('🚀 VEED AI Playground Level 3 Starting...');
+    console.log('🚀 AGENTEGPT Playground Level 3 Starting...');
 
     // 1. Initialize Core Services
     auth.init();

@@ -2,7 +2,7 @@ services:
   - type: web
     name: agente-gpt
     env: node
-    plan: starter # Altere para 'free' se desejar o plano gratuito
+    plan: starter
     buildCommand: npm install
     startCommand: node server.js
     envVars:
@@ -42,10 +42,6 @@ services:
         sync: false
       - key: DB_REJECT_UNAUTHORIZED
         value: "false"
-      - key: TELEMETRY_AGG_BACKFILL_DAYS
-        value: "45"
-      - key: TELEMETRY_RETENTION_DAYS
-        value: "180"
       - key: COST_TEXT_TO_IMAGE
         value: "1"
       - key: COST_IMAGE_EDITOR
@@ -54,3 +50,5 @@ services:
         value: "5"
       - key: COST_FACESWAP
         value: "3"
+      - key: COST_UPSCALE
+        value: "5"
