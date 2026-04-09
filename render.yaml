@@ -23,11 +23,11 @@ services:
       - key: CLOUDINARY_URL
         sync: false
       - key: ALLOWED_ORIGIN
-        sync: false
+        value: "https://agentegpt.pro"
       - key: APP_BASE_URL
-        sync: false
+        value: "https://agentegpt.pro"
       - key: ADMIN_EMAILS
-        value: "nilson@playground.com"
+        value: "barbosa.nilsonneto@gmail.com,agentegptplayground@gmail.com"
       - key: SMTP_HOST
         value: "smtp.gmail.com"
       - key: SMTP_PORT
